@@ -261,48 +261,67 @@
             if (radarAtivo) {
                 btn.innerHTML = `<i class="fa-solid fa-pause text-lg w-5 text-center text-sky-400"></i><span class="font-medium text-sky-400 hidden md:block">Pausar Espelhamento</span>`;
                 document.getElementById('screen-overlay').classList.add('hidden');
-                loopRadarBase64();
+                loopRadarBinario();
             } else {
                 btn.innerHTML = `<i class="fa-solid fa-play text-lg w-5 text-center"></i><span class="font-medium hidden md:block">Ligar Espelhamento</span>`;
             }
         }
 
-        async function loopRadarBase64() {
+        async function loopRadarBinario() {
             if (!radarAtivo || transferindo) return;
             
             try {
-                // Solicita a captura da tela JÁ CONVERTIDA para texto Base64 dentro do próprio Android
-                // Isso impede que os dados binários da imagem quebrem ao passar pelo WebUSB
+                // Usamos 'exec:' em vez de 'shell:' para remover o lag do terminal (PTY)
+                // O Android vai nos enviar os bytes puros do PNG diretamente.
                 const myId = localIdCounter++;
-                await sendPacket(0x4E45504F, myId, 0, new TextEncoder().encode("shell:screencap -p | base64\0"));
+                await sendPacket(0x4E45504F, myId, 0, new TextEncoder().encode("exec:screencap -p\0"));
                 
-                let b64Str = "";
+                let chunks = [];
                 let waitClose = true;
 
                 while(waitClose && radarAtivo) {
                     let r = await readPacket();
                     if(!r || r.error) break;
                     
-                    if(r.cmd === 0x45545257 && r.arg1 === myId) { // WRTE
-                        await sendPacket(0x59414B4F, myId, r.arg0); // OKAY
-                        // Converte o pedaço lido para texto e junta
-                        b64Str += new TextDecoder().decode(r.data);
+                    if(r.cmd === 0x45545257 && r.arg1 === myId) { // WRTE (Dados da tela chegando)
+                        await sendPacket(0x59414B4F, myId, r.arg0); // Confirma recebimento
+                        if(r.data.length > 0) chunks.push(r.data);
                     }
-                    if(r.cmd === 0x45534C43 && r.arg1 === myId) { // CLSE
+                    if(r.cmd === 0x45534C43 && r.arg1 === myId) { // CLSE (Fim do frame)
                         await sendPacket(0x45534C43, myId, r.arg0);
                         waitClose = false;
                     }
                 }
 
-                // Limpa quebras de linha vindas do terminal Linux e joga na imagem
-                b64Str = b64Str.replace(/\s+/g, '');
-                if (b64Str.length > 1000) {
-                    document.getElementById('android-screen').src = "data:image/png;base64," + b64Str;
+                // Junta todos os pedaços da imagem em um único bloco de memória (Buffer)
+                const totalLen = chunks.reduce((acc, c) => acc + c.length, 0);
+                if (totalLen > 1000) {
+                    const imgData = new Uint8Array(totalLen);
+                    let offset = 0;
+                    for(let c of chunks) {
+                        imgData.set(c, offset);
+                        offset += c.length;
+                    }
+                    
+                    // Renderiza instantaneamente o binário no navegador sem Base64!
+                    const blob = new Blob([imgData], { type: 'image/png' });
+                    const url = URL.createObjectURL(blob);
+                    const img = document.getElementById('android-screen');
+                    
+                    // Pre-loading para esconder o "piscar" (flicker) da tela trocando
+                    const tempImg = new Image();
+                    tempImg.onload = () => {
+                        img.src = url;
+                        // Libera memória para o navegador não travar com milhares de imagens
+                        if (img.dataset.oldUrl) URL.revokeObjectURL(img.dataset.oldUrl);
+                        img.dataset.oldUrl = url;
+                    };
+                    tempImg.src = url;
                 }
             } catch (e) {}
 
-            // Aguarda e puxa o próximo quadro (Fps baixo proposital para não travar o JS)
-            setTimeout(loopRadarBase64, 800); 
+            // Atualiza rapidamente o próximo frame (Puxa os frames sem delay)
+            setTimeout(loopRadarBinario, 30); 
         }
 
         // Interação de Mouse
@@ -358,6 +377,7 @@
             buffer.set(new Uint8Array(header), 0); buffer.set(data, 24);
             await usbDevice.transferOut(epOut, buffer);
         }
+        
         async function readPacket() {
             if (!usbDevice || !epIn) return null;
             try {
@@ -365,10 +385,20 @@
                 if (!head.data || head.data.byteLength < 24) return null;
                 const view = new DataView(head.data.buffer);
                 const cmd = view.getUint32(0, true), arg0 = view.getUint32(4, true), arg1 = view.getUint32(8, true), len = view.getUint32(12, true);
-                let payload = new Uint8Array(0);
-                if (len > 0) { 
-                    const dat = await usbDevice.transferIn(epIn, len); 
-                    if (dat.data) payload = new Uint8Array(dat.data.buffer); 
+                
+                // NOVO: Garantia de leitura completa do pacote USB.
+                // Se a imagem for muito pesada, a porta USB envia fatiada. 
+                // Esse Loop impede a "Tela Preta" reconstruindo os pedaços.
+                let payload = new Uint8Array(len);
+                let bytesLidos = 0;
+                while (bytesLidos < len) {
+                    const dat = await usbDevice.transferIn(epIn, len - bytesLidos);
+                    if (dat.data && dat.data.byteLength > 0) {
+                        payload.set(new Uint8Array(dat.data.buffer), bytesLidos);
+                        bytesLidos += dat.data.byteLength;
+                    } else {
+                        break;
+                    }
                 }
                 return { cmd, arg0, arg1, data: payload };
             } catch (e) { return { error: true, msg: e.message }; }
