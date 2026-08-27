@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESPELHA AÍ - Controle Remoto Android</title>
+    
+    <!-- Tipografia inspirada na Hydra -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { 
+                        sans: ['"Montserrat"', 'sans-serif']
+                    },
+                    colors: { 
+                        hydra: {
+                            bg: '#302C42',
+                            panel: '#343045',
+                            dark: '#211E2E',
+                            grad1: '#C0B7E8',
+                            grad2: '#8176AF'
+                        }
+                    },
+                    backgroundImage: {
+                        'hydra-gradient': 'linear-gradient(90deg, #C0B7E8 0%, #8176AF 100%)',
+                        'hydra-gradient-dark': 'linear-gradient(90deg, #8176AF 0%, #343045 100%)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { 
+            background-color: theme('colors.hydra.bg'); 
+            color: #ffffff; 
+            overflow: hidden; 
+        }
+        
+        /* Glassmorphism panel */
+        .glass-panel {
+            background: rgba(52, 48, 69, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(192, 183, 232, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border-radius: 40px;
+        }
+
+        /* Botão principal Hydra Style */
+        .btn-hydra {
+            background: linear-gradient(90deg, #C0B7E8 0%, #8176AF 100%);
+            color: #302C42;
+            transition: all 0.3s ease;
+            border-radius: 9999px;
+            font-weight: 700;
+        }
+        .btn-hydra:hover {
+            box-shadow: 0 0 20px rgba(192, 183, 232, 0.6);
+            transform: scale(1.02);
+        }
+        .btn-hydra:active {
+            transform: scale(0.98);
+        }
+
+        .btn-outline {
+            border: 2px solid #C0B7E8;
+            color: #C0B7E8;
+            border-radius: 9999px;
+            transition: all 0.3s ease;
+        }
+        .btn-outline:hover {
+            background: rgba(192, 183, 232, 0.1);
+        }
+
+        /* Moldura do Celular */
+        .device-bezel {
+            border-radius: 2.5rem;
+            box-shadow: 
+                0 0 0 4px #211E2E,
+                0 0 0 8px #343045,
+                0 25px 50px -12px rgba(0, 0, 0, 0.8),
+                inset 0 0 0 2px rgba(192,183,232,0.2);
+            position: relative;
+            overflow: hidden;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #screen-display {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            user-select: none;
+            -webkit-user-drag: none;
+            transition: opacity 0.2s;
+        }
+
+        /* Shapes decorativos ao fundo (Estilo Hydra) */
+        .bg-shape-1 {
+            position: absolute; top: -10%; left: -10%; width: 50vw; height: 50vw;
+            background: radial-gradient(circle, rgba(129,118,175,0.15) 0%, rgba(48,44,66,0) 70%);
+            z-index: -1; pointer-events: none;
+        }
+        .bg-shape-2 {
+            position: absolute; bottom: -10%; right: -10%; width: 40vw; height: 40vw;
+            background: radial-gradient(circle, rgba(192,183,232,0.1) 0%, rgba(48,44,66,0) 70%);
+            z-index: -1; pointer-events: none;
+        }
+
+        /* Scrollbar customizada */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #8176AF; border-radius: 4px; }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col antialiased selection:bg-hydra-grad2/50 font-sans relative">
+
+    <!-- Elementos de Fundo Hydra -->
+    <div class="bg-shape-1"></div>
+    <div class="bg-shape-2"></div>
+
+    <!-- HEADER -->
+    <header class="h-24 shrink-0 px-10 flex justify-between items-center z-50">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-full bg-hydra-gradient flex items-center justify-center shadow-[0_0_20px_rgba(192,183,232,0.4)]">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23302C42'%3E%3Cpath d='M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z'/%3E%3C/svg%3E" alt="Phone" class="w-6 h-6">
+            </div>
+            <div>
+                <h1 class="font-black text-3xl tracking-widest text-white">ESPELHA <span class="text-hydra-grad1 font-light">AÍ</span></h1>
+            </div>
+        </div>
+        
+        <div class="flex items-center gap-6">
+            <div id="status-badge" class="hidden items-center gap-3 px-6 py-2.5 rounded-full border border-hydra-grad1/30 bg-hydra-panel/80 backdrop-blur-md">
+                <div class="w-2.5 h-2.5 rounded-full bg-green-400 animate-pulse shadow-[0_0_10px_rgba(74,222,128,0.8)]"></div>
+                <span class="text-sm font-bold text-hydra-grad1 tracking-widest uppercase">Conectado via ADB</span>
+            </div>
+            <button id="btn-connect" onclick="connectDevice()" class="btn-hydra px-8 py-3.5 text-sm uppercase tracking-widest flex items-center gap-3">
+                <i class="fa-brands fa-usb text-lg"></i> Iniciar Conexão
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 w-full max-w-[1800px] mx-auto px-10 pb-10 flex gap-12 overflow-hidden h-full z-10">
+        
+        <!-- LADO ESQUERDO: Caixa de Texto e Arquivos -->
+        <div class="w-[450px] shrink-0 flex flex-col justify-center gap-8 overflow-y-auto pr-2 pb-4 pt-4">
+            
+            <!-- Painel de Injeção de Texto -->
+            <div class="glass-panel p-8 flex flex-col gap-4 relative">
+                <div class="flex justify-between items-end mb-2">
+                    <h3 class="font-bold text-lg text-white flex items-center gap-2">
+                        <i class="fa-solid fa-keyboard text-hydra-grad1"></i> Injeção de Texto
+                    </h3>
+                    <span class="text-xs text-gray-400">Suporta Quebras de Linha</span>
+                </div>
+                
+                <div class="relative">
+                    <textarea id="message-box" rows="5" class="w-full bg-hydra-dark/80 border border-white/10 rounded-3xl p-5 text-sm text-white focus:outline-none focus:border-hydra-grad1 transition-colors resize-none placeholder-gray-600 shadow-inner" placeholder="Digite sua mensagem aqui..."></textarea>
+                    
+                    <div class="absolute bottom-4 right-5 flex gap-2">
+                        <div class="px-2 py-1 bg-hydra-panel rounded text-[10px] text-hydra-grad1 font-bold border border-hydra-grad1/20">CTRL + ENTER = Enviar</div>
+                    </div>
+                </div>
+
+                <button id="btn-send-msg" onclick="sendTextMessage()" class="btn-hydra w-full py-4 mt-2 text-sm uppercase tracking-widest flex items-center justify-center gap-3">
+                    ENVIAR PARA O CELULAR <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </div>
+
+            <!-- Painel de Envio de Arquivos -->
+            <div class="glass-panel p-8 flex flex-col gap-4 relative">
+                <div class="flex justify-between items-end mb-2">
+                    <h3 class="font-bold text-lg text-white flex items-center gap-2">
+                        <i class="fa-solid fa-file-arrow-up text-hydra-grad1"></i> Envio de Arquivos
+                    </h3>
+                </div>
+                <p class="text-xs text-gray-400 mb-2">Selecione imagens ou PDFs para enviar via WhatsApp.</p>
+                
+                <div class="relative bg-hydra-dark/80 border border-white/10 rounded-3xl p-4 flex items-center justify-center">
+                    <input type="file" id="file-upload" class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-hydra-grad1 file:text-hydra-dark hover:file:bg-hydra-grad2 transition-all cursor-pointer">
+                </div>
+
+                <button id="btn-send-file" onclick="sendFileToWhatsApp()" class="btn-hydra w-full py-4 mt-2 text-sm uppercase tracking-widest flex items-center justify-center gap-3">
+                    COMPARTILHAR NO ZAP <i class="fa-brands fa-whatsapp text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Botões Físicos do Android -->
+            <div class="mt-2">
+                <p class="text-xs text-gray-500 uppercase tracking-widest font-bold mb-4 ml-4">Controles de Hardware</p>
+                <div class="flex gap-4">
+                    <button onclick="sendKey(4)" class="btn-outline flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2" title="Voltar">
+                        <i class="fa-solid fa-angle-left"></i> VOLTAR
+                    </button>
+                    <button onclick="sendKey(3)" class="btn-outline flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2" title="Início">
+                        <i class="fa-solid fa-circle text-[10px]"></i> HOME
+                    </button>
+                    <button onclick="sendKey(187)" class="btn-outline flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2" title="Recentes">
+                        <i class="fa-solid fa-square text-[10px]"></i> RECENTS
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- LADO DIREITO: Espelhamento -->
+        <div class="flex-1 flex justify-center items-center h-full relative py-4">
+            <!-- Anéis de Brilho Hydra -->
+            <div class="absolute w-[600px] h-[900px] bg-hydra-gradient opacity-10 blur-[120px] rounded-full pointer-events-none"></div>
+
+            <!-- Moldura do Celular (Maximizada) -->
+            <div id="device-frame" class="device-bezel h-full aspect-[9/20] bg-hydra-dark group relative z-10 max-h-[95vh]">
+                <!-- Notch -->
+                <div class="absolute top-0 left-1/2 -translate-x-1/2 w-1/3 h-6 bg-hydra-panel rounded-b-2xl z-20 flex justify-center items-center">
+                    <div class="w-12 h-1.5 bg-black/50 rounded-full"></div>
+                </div>
+                
+                <!-- Imagem do Espelhamento -->
+                <img id="screen-display" src="https://placehold.co/1080x2400/211E2E/C0B7E8?text=Aguardando\nConexao+USB" draggable="false" alt="Screen" class="w-full h-full object-contain opacity-50 transition-all duration-500">
+                
+                <!-- Overlay Invisível para capturar o Mouse -->
+                <div id="touch-overlay" class="absolute inset-0 z-30 cursor-pointer hidden"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toasts de Alerta -->
+    <div id="toast-container" class="fixed bottom-10 right-10 z-[200] flex flex-col gap-3 pointer-events-none"></div>
+
+    <script>
+        // --- ESTADOS GLOBAIS WEBUSB E ADB ---
+        let usbDevice = null;
+        let epIn = null;
+        let epOut = null;
+        let isAdbReady = false;
+        let localIdCounter = 1;
+        let isAdbBusy = false; // Novo Lock para evitar colisão de pacotes ADB
+        
+        let isMirroring = false;
+        let deviceWidth = 1080;
+        let deviceHeight = 2400;
+
+        // --- SISTEMA DE LOCK ADB ---
+        async function acquireAdbLock() {
+            while (isAdbBusy) await new Promise(r => setTimeout(r, 20));
+            isAdbBusy = true;
+        }
+        function releaseAdbLock() {
+            isAdbBusy = false;
+        }
+
+        // --- SISTEMA DE TOAST NOTIFICATIONS ---
+        function showToast(msg, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            let bgClass = 'bg-hydra-panel border-hydra-grad1/30 text-white';
+            let iconClass = 'fa-circle-info text-hydra-grad1';
+            
+            if (type === 'error') { bgClass = 'bg-red-900/80 border-red-500 text-white'; iconClass = 'fa-circle-exclamation text-red-400'; }
+            if (type === 'success') { bgClass = 'bg-green-900/80 border-green-500 text-white'; iconClass = 'fa-check-circle text-green-400'; }
+
+            toast.className = `${bgClass} px-6 py-4 rounded-2xl border flex items-center gap-4 transform transition-all duration-300 translate-y-10 opacity-0 pointer-events-auto shadow-2xl backdrop-blur-md`;
+            toast.innerHTML = `<i class="fa-solid ${iconClass} text-xl"></i><span class="text-sm font-bold tracking-wide">${msg}</span>`;
+            
+            container.appendChild(toast);
+            requestAnimationFrame(() => toast.classList.remove('translate-y-10', 'opacity-0'));
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-10', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // --- SISTEMA DE INJEÇÃO DIDÁTICA DE TEXTO ---
+        // Escuta atalhos no textarea (CTRL+ENTER para enviar, ENTER sozinho para quebrar linha)
+        document.getElementById('message-box').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                e.preventDefault(); // Impede quebra de linha extra
+                sendTextMessage();
+            }
+        });
+
+        async function sendTextMessage() {
+            if (!isAdbReady) return showToast("É necessário conectar o celular primeiro.", "error");
+            
+            const box = document.getElementById('message-box');
+            const btn = document.getElementById('btn-send-msg');
+            const rawText = box.value;
+            
+            if (!rawText.trim()) return showToast("A caixa de texto está vazia.", "error");
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-lg"></i> INJETANDO MENSAGEM...';
+            
+            // Divide o texto pelas quebras de linha que o usuário deu
+            const lines = rawText.split('\n');
+            
+            try {
+                for (let i = 0; i < lines.length; i++) {
+                    let line = lines[i];
+                    
+                    // Tratamento rigoroso de caracteres para o ADB Shell
+                    // 1. Escapa aspas, cifrão, crase e contrabarra
+                    let escaped = line
+                        .replace(/\\/g, '\\\\')
+                        .replace(/"/g, '\\"')
+                        .replace(/\$/g, '\\$')
+                        .replace(/`/g, '\\`')
+                        .replace(/ /g, '%s'); // ADB input text aceita %s como espaço de forma segura
+                    
+                    if (escaped.length > 0) {
+                        // Envia a linha envelopada em aspas duplas
+                        await runAdbCommand(`input text "${escaped}"`);
+                    }
+                    
+                    // Se não for a última linha, envia o comando de apertar ENTER virtualmente
+                    if (i < lines.length - 1) {
+                        await runAdbCommand(`input keyevent 66`);
+                    }
+                }
+                
+                showToast("Texto enviado com sucesso!", "success");
+                box.value = ''; // Limpa a caixa após enviar
+            } catch (error) {
+                showToast("Erro ao injetar texto.", "error");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'ENVIAR PARA O CELULAR <i class="fa-solid fa-paper-plane"></i>';
+                box.focus();
+            }
+        }
+
+        // Função genérica para botões de hardware (Home, Back, etc)
+        async function sendKey(keyCode) {
+            if(!isAdbReady) return showToast("Dispositivo não conectado.", "error");
+            await runAdbCommand(`input keyevent ${keyCode}`);
+        }
+
+        // --- SISTEMA DE CAPTURA DO MOUSE (MIRRORING CONTROLS) ---
+        function setupTouchOverlay() {
+            const overlay = document.getElementById('touch-overlay');
+            let isDragging = false;
+            let startX, startY;
+
+            function getMappedCoordinates(e) {
+                const rect = overlay.getBoundingClientRect();
+                const scaleX = deviceWidth / rect.width;
+                const scaleY = deviceHeight / rect.height;
+                const x = Math.floor((e.clientX - rect.left) * scaleX);
+                const y = Math.floor((e.clientY - rect.top) * scaleY);
+                return { x, y };
+            }
+
+            overlay.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                isDragging = true;
+                const pos = getMappedCoordinates(e);
+                startX = pos.x;
+                startY = pos.y;
+            });
+
+            window.addEventListener('mouseup', async (e) => {
+                if (!isDragging || !isAdbReady) return;
+                isDragging = false;
+                
+                if (e.target === overlay) {
+                    const pos = getMappedCoordinates(e);
+                    const dx = Math.abs(pos.x - startX);
+                    const dy = Math.abs(pos.y - startY);
+                    
+                    // Se o movimento for minúsculo, trata como Tap (Clique)
+                    if (dx < 15 && dy < 15) {
+                        await runAdbCommand(`input tap ${pos.x} ${pos.y}`);
+                    } else {
+                        // Se o mouse arrastou longe, trata como Swipe (Rolagem)
+                        await runAdbCommand(`input swipe ${startX} ${startY} ${pos.x} ${pos.y} 300`);
+                    }
+                }
+            });
+        }
+
+
+        // --- NÚCLEO WEBUSB E ADB (ESTÁVEL) ---
+        async function getAdbKeyPair() { 
+            return await crypto.subtle.generateKey(
+                { name: "RSASSA-PKCS1-v1_5", modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" }, 
+                true, ["sign", "verify"]
+            ); 
+        }
+        
+        async function signAdbToken(keyPair, token) { 
+            const signature = await crypto.subtle.sign("RSASSA-PKCS1-v1_5", keyPair.privateKey, token); 
+            return new Uint8Array(signature); 
+        }
+        
+        async function getAdbPublicKeyPayload(keyPair) {
+            const exported = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
+            const binaryStr = atob(exported.n.replace(/-/g, '+').replace(/_/g, '/'));
+            const modBytes = new Uint8Array(binaryStr.length);
+            for (let i = 0; i < binaryStr.length; i++) modBytes[i] = binaryStr.charCodeAt(i);
+            
+            let n = 0n; 
+            for (let i = 0; i < modBytes.length; i++) n = (n << 8n) | BigInt(modBytes[i]);
+            
+            const r32 = 1n << 32n, n0 = n % r32;
+            let inv = 1n; 
+            for (let i = 0; i < 32; i++) inv = (inv * (2n - n0 * inv)) % r32;
+            
+            const buffer = new ArrayBuffer(524), view = new DataView(buffer), bytes = new Uint8Array(buffer);
+            view.setUint32(0, 64, true); 
+            view.setUint32(4, Number((r32 - inv) % r32), true);
+            
+            let tempN = n; 
+            for (let i = 0; i < 256; i++) { bytes[8 + i] = Number(tempN & 0xffn); tempN >>= 8n; }
+            let tempRR = ((1n << 2048n) * (1n << 2048n)) % n; 
+            for (let i = 0; i < 256; i++) { bytes[264 + i] = Number(tempRR & 0xffn); tempRR >>= 8n; }
+            
+            view.setUint32(520, 65537, true);
+            const nameBytes = new TextEncoder().encode("ESPELHA_AI\0");
+            const fullPayload = new Uint8Array(buffer.byteLength + nameBytes.length);
+            fullPayload.set(bytes, 0); 
+            fullPayload.set(nameBytes, buffer.byteLength); 
+            return fullPayload;
+        }
+
+        async function sendPacket(cmd, arg0, arg1, data = new Uint8Array(0)) {
+            if (!usbDevice || !epOut) return;
+            const header = new ArrayBuffer(24), view = new DataView(header);
+            let checksum = 0; 
+            for (let i = 0; i < data.length; i++) checksum = (checksum + data[i]) & 0xffffffff;
+            
+            view.setUint32(0, cmd, true); view.setUint32(4, arg0, true); view.setUint32(8, arg1, true);
+            view.setUint32(12, data.length, true); view.setUint32(16, checksum, true); view.setUint32(20, (cmd ^ 0xffffffff) >>> 0, true);
+            
+            const buffer = new Uint8Array(24 + data.length); 
+            buffer.set(new Uint8Array(header), 0); 
+            buffer.set(data, 24);
+            await usbDevice.transferOut(epOut, buffer);
+        }
+        
+        async function readPacket() {
+            if (!usbDevice || !epIn) return null;
+            try {
+                const headerRes = await usbDevice.transferIn(epIn, 24);
+                if (!headerRes.data || headerRes.data.byteLength < 24) return null;
+                
+                const view = new DataView(headerRes.data.buffer);
+                const cmd = view.getUint32(0, true), arg0 = view.getUint32(4, true), arg1 = view.getUint32(8, true), len = view.getUint32(12, true);
+                
+                let payload = new Uint8Array(0);
+                if (len > 0) { 
+                    const dataRes = await usbDevice.transferIn(epIn, len); 
+                    if (dataRes.data) payload = new Uint8Array(dataRes.data.buffer); 
+                }
+                return { cmd, arg0, arg1, len, data: payload };
+            } catch (e) { return { error: true, msg: e.message }; }
+        }
+
+        async function connectDevice() {
+            try {
+                usbDevice = await navigator.usb.requestDevice({ filters: [{ classCode: 255, subclassCode: 66, protocolCode: 1 }] });
+                await usbDevice.open();
+                
+                if (usbDevice.configuration === null) await usbDevice.selectConfiguration(1);
+                let intfNum = -1;
+                
+                for (const conf of usbDevice.configurations) { 
+                    for (const intf of conf.interfaces) { 
+                        for (const alt of intf.alternates) {
+                            if (alt.interfaceClass === 255 && alt.interfaceSubclass === 66 && alt.interfaceProtocol === 1) {
+                                intfNum = intf.interfaceNumber; 
+                                epIn = alt.endpoints.find(e => e.direction === 'in').endpointNumber; 
+                                epOut = alt.endpoints.find(e => e.direction === 'out').endpointNumber; 
+                                break;
+                            } 
+                        } 
+                    } 
+                }
+                
+                await usbDevice.claimInterface(intfNum);
+                await sendPacket(0x4E584E43, 0x01000000, 4096, new TextEncoder().encode("host::ESPELHA_AI\0"));
+                
+                let keyPair = await getAdbKeyPair();
+                let resp = await readPacket();
+                
+                if (resp && resp.cmd === 0x4E584E43) {
+                    isAdbReady = true; 
+                }
+                else if (resp && resp.cmd === 0x48545541 && resp.arg0 === 1) { 
+                    await sendPacket(0x48545541, 2, 0, await signAdbToken(keyPair, resp.data));
+                    let resp2 = await readPacket();
+                    
+                    if (resp2 && resp2.cmd === 0x4E584E43) {
+                        isAdbReady = true;
+                    } else {
+                        showToast("🚨 Permita a Depuração USB na tela do seu Celular!", "error");
+                        await sendPacket(0x48545541, 3, 0, await getAdbPublicKeyPayload(keyPair));
+                        
+                        while(!isAdbReady) { 
+                            let waitResp = await readPacket(); 
+                            if(waitResp && waitResp.error) throw new Error("Aparelho desconectado."); 
+                            if(waitResp && waitResp.cmd === 0x4E584E43) isAdbReady = true; 
+                        }
+                    }
+                }
+                
+                if (isAdbReady) {
+                    document.getElementById('btn-connect').style.display = 'none';
+                    document.getElementById('status-badge').classList.remove('hidden'); 
+                    document.getElementById('status-badge').classList.add('flex');
+                    showToast("Celular Conectado com Sucesso!", "success");
+                    
+                    await initializeMirroring();
+                }
+            } catch (e) { 
+                showToast("Falha na Conexão USB: " + e.message, "error"); 
+            }
+        }
+
+        async function runAdbCommand(command, expectBinary = false) {
+            if (!isAdbReady) return null;
+            await acquireAdbLock();
+            try {
+                const myId = localIdCounter++;
+                await sendPacket(0x4E45504F, myId, 0, new TextEncoder().encode("exec:" + command + "\0"));
+                
+                let chunks = [];
+                let isClosed = false;
+                const timeout = Date.now() + 5000; 
+                
+                while(!isClosed && Date.now() < timeout) {
+                    let r = await readPacket(); 
+                    if(r && r.error) break;
+                    if(!r) continue;
+
+                    if(r.cmd === 0x59414B4F && r.arg1 === myId) {
+                    }
+                    else if(r.cmd === 0x45545257 && r.arg1 === myId) {
+                        if(r.len > 0) chunks.push(r.data);
+                        await sendPacket(0x59414B4F, myId, r.arg0);
+                    }
+                    else if(r.cmd === 0x45534C43 && r.arg1 === myId) {
+                        await sendPacket(0x45534C43, myId, r.arg0); 
+                        isClosed = true;
+                    }
+                }
+
+                if(chunks.length === 0) return null;
+                
+                let totalLen = chunks.reduce((acc, val) => acc + val.length, 0);
+                let result = new Uint8Array(totalLen);
+                let offset = 0;
+                for(let chunk of chunks) {
+                    result.set(chunk, offset);
+                    offset += chunk.length;
+                }
+
+                if (expectBinary) return result;
+                return new TextDecoder().decode(result);
+
+            } catch(e) { 
+                return null; 
+            } finally { 
+                releaseAdbLock(); 
+            }
+        }
+
+        // --- NOVO: SISTEMA DE ENVIO DE ARQUIVOS (RAW STREAMING) ---
+        async function pushRawFile(filename, rawBytes) {
+            if (!isAdbReady) return false;
+            await acquireAdbLock();
+            
+            try {
+                const myId = localIdCounter++;
+                const safeName = filename.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+                const targetPath = `/sdcard/Download/${safeName}`;
+
+                // Inicia o stream no Android usando o comando 'cat'
+                await sendPacket(0x4E45504F, myId, 0, new TextEncoder().encode(`exec:cat > ${targetPath}\0`));
+                
+                let isOpened = false;
+                let remoteId = 0;
+                
+                // Aguarda confirmação de abertura (OKAY)
+                while(true) {
+                    let r = await readPacket();
+                    if(r && r.error) return null;
+                    if(r && r.cmd === 0x59414B4F && r.arg1 === myId) {
+                        isOpened = true;
+                        remoteId = r.arg0;
+                        break;
+                    }
+                    if(r && r.cmd === 0x45534C43 && r.arg1 === myId) return null;
+                }
+
+                if(isOpened) {
+                    const chunkSize = 4096; // Limite de payload do ADB
+                    // Envia os pacotes binários
+                    for(let offset = 0; offset < rawBytes.length; offset += chunkSize) {
+                        const chunk = rawBytes.slice(offset, offset + chunkSize);
+                        await sendPacket(0x45545257, myId, remoteId, chunk);
+                        
+                        // Aguarda confirmação de recebimento do pacote
+                        while(true) {
+                            let ack = await readPacket();
+                            if(ack && ack.cmd === 0x59414B4F && ack.arg1 === myId) break;
+                            if(ack && ack.cmd === 0x45534C43 && ack.arg1 === myId) break;
+                        }
+                    }
+                    
+                    // Fecha o fluxo
+                    await sendPacket(0x45534C43, myId, remoteId);
+                    return targetPath;
+                }
+                return null;
+            } catch (e) {
+                return null;
+            } finally {
+                releaseAdbLock();
+            }
+        }
+
+        async function sendFileToWhatsApp() {
+            if (!isAdbReady) return showToast("É necessário conectar o celular primeiro.", "error");
+            
+            const fileInput = document.getElementById('file-upload');
+            if (!fileInput.files.length) return showToast("Selecione um arquivo para enviar.", "error");
+            
+            const file = fileInput.files[0];
+            const btn = document.getElementById('btn-send-file');
+            
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-lg"></i> ENVIANDO...';
+            
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const rawBytes = new Uint8Array(arrayBuffer);
+                
+                showToast("Transferindo arquivo para o celular...", "info");
+                const targetPath = await pushRawFile(file.name, rawBytes);
+                
+                if (targetPath) {
+                    showToast("Sucesso! Abrindo no WhatsApp...", "success");
+                    const mimeType = file.type || "*/*";
+                    // Aciona o intent do Android forçando a abertura do arquivo diretamente no WhatsApp (-p com.whatsapp)
+                    await runAdbCommand(`am start -a android.intent.action.SEND -t "${mimeType}" --eu android.intent.extra.STREAM "file://${targetPath}" -f 1 -p com.whatsapp`);
+                } else {
+                    showToast("Falha na transferência via USB.", "error");
+                }
+            } catch (e) {
+                showToast("Erro: " + e.message, "error");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'COMPARTILHAR NO ZAP <i class="fa-brands fa-whatsapp text-lg"></i>';
+                fileInput.value = '';
+            }
+        }
+
+        async function initializeMirroring() {
+            // Pega a resolução exata do aparelho
+            const sizeStr = await runAdbCommand("wm size");
+            if (sizeStr) {
+                const matches = sizeStr.match(/size: (\d+)x(\d+)/g);
+                if (matches && matches.length > 0) {
+                    const finalMatch = matches[matches.length - 1];
+                    const nums = finalMatch.match(/(\d+)x(\d+)/);
+                    deviceWidth = parseInt(nums[1]);
+                    deviceHeight = parseInt(nums[2]);
+                }
+            }
+            
+            document.getElementById('screen-display').classList.remove('opacity-50');
+            document.getElementById('touch-overlay').classList.remove('hidden');
+            setupTouchOverlay();
+            
+            isMirroring = true;
+            
+            // Loop contínuo de captura (Screencap)
+            while (isMirroring && isAdbReady) {
+                try {
+                    const imgData = await runAdbCommand("screencap -p", true);
+                    
+                    if (imgData && imgData.length > 100) {
+                        const blob = new Blob([imgData], { type: 'image/png' });
+                        const url = URL.createObjectURL(blob);
+                        
+                        const imgEl = document.getElementById('screen-display');
+                        if (imgEl.src && imgEl.src.startsWith('blob:')) {
+                            URL.revokeObjectURL(imgEl.src);
+                        }
+                        imgEl.src = url;
+                    }
+                } catch (e) {
+                    await new Promise(r => setTimeout(r, 1000));
+                }
+                
+                // Intervalo para evitar estourar a fila do USB
+                await new Promise(r => setTimeout(r, 80)); 
+            }
+        }
+    </script>
+</body>
+</html>
