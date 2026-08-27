@@ -1,292 +1,482 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="dark">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zap Sync - Chat Híbrido via ADB</title>
+    <title>CRM WhatsApp - Atendimento WebUSB</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
 
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #111B21; color: #E9EDEF; overflow: hidden; }
-        
-        /* WhatsApp Web Colors */
-        .bg-panel-header { background-color: #202C33; }
-        .bg-chat-bg { background-color: #0B141A; background-image: url('https://static.whatsapp.net/rsrc.php/v3/yl/r/r-vwjwJzGz8.png'); opacity: 0.8; }
-        .bg-message-in { background-color: #202C33; }
-        .bg-message-out { background-color: #005C4B; }
-        
-        .input-dark { background-color: #2A3942; color: #D1D7DB; border: none; }
-        .input-dark:focus { outline: none; border: 1px solid #00A884; }
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Roboto', 'sans-serif'] },
+                    colors: {
+                        crm: {
+                            bg: '#F3F4F6',
+                            sidebar: '#FFFFFF',
+                            header: '#FFFFFF',
+                            primary: '#0B3B60', // Azul escuro da imagem
+                            secondary: '#E0E7FF',
+                            bubbleIn: '#FFFFFF',
+                            bubbleOut: '#0B3B60',
+                            textOut: '#FFFFFF',
+                            textIn: '#374151'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 
-        /* Scrollbar like WA Web */
+    <style>
+        body { background-color: theme('colors.crm.bg'); color: #374151; overflow: hidden; }
+        
+        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #374045; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
+        
+        /* Pattern de fundo do chat (simulando a imagem) */
+        .chat-bg {
+            background-color: #F8F9FA;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
 
-        .loader { border: 3px solid rgba(0, 168, 132, 0.2); border-top-color: #00A884; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
+        .contact-active { border-left: 4px solid theme('colors.crm.primary'); background-color: #F3F4F6; }
+        
+        /* Loader */
+        .loader-small { border: 2px solid #E5E7EB; border-top-color: theme('colors.crm.primary'); border-radius: 50%; width: 14px; height: 14px; animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="flex h-screen w-screen selection:bg-[#00A884]/30">
+<body class="flex h-screen w-screen antialiased">
 
-    <!-- BARRA LATERAL: RADAR DE NOTIFICAÇÕES (LEITURA) -->
-    <aside class="w-[400px] flex flex-col border-r border-[#222D34] bg-[#111B21] z-20 shrink-0 h-full">
-        <header class="bg-panel-header h-16 flex items-center justify-between px-4 shrink-0">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-[#00A884] flex items-center justify-center text-white">
-                    <i class="fa-solid fa-radar text-lg"></i>
+    <aside class="w-[320px] bg-crm-sidebar border-r border-gray-200 flex flex-col h-full z-20 shrink-0">
+        
+        <!-- Header Sidebar -->
+        <div class="p-4 border-b border-gray-200">
+            <div class="flex justify-between items-center mb-4">
+                <h1 class="font-bold text-gray-800 text-lg flex items-center gap-2">
+                    <i class="fa-brands fa-whatsapp text-green-500 text-xl"></i>
+                </h1>
+                <button onclick="conectarUSB()" id="btn-conectar" class="text-xs bg-crm-primary text-white px-3 py-1.5 rounded font-medium hover:bg-blue-900 transition">
+                    Conectar USB
+                </button>
+                <div id="status-badge" class="hidden items-center gap-2 text-xs font-bold text-green-600 bg-green-50 px-3 py-1.5 rounded border border-green-200">
+                    <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div> USB Ativo
                 </div>
-                <h1 class="font-semibold text-[15px] text-[#E9EDEF]">Radar de Chegada</h1>
             </div>
-            <button onclick="conectarUSB()" id="btn-conectar" class="text-sm bg-[#00A884] hover:bg-[#029071] text-white px-4 py-1.5 rounded shadow transition-colors font-medium">
-                Conectar USB
-            </button>
-            <div id="status-badge" class="hidden items-center gap-2 px-3 py-1 bg-[#182229] rounded-full border border-[#222D34]">
-                <div class="w-2 h-2 rounded-full bg-[#00A884] animate-pulse"></div>
-                <span class="text-xs text-[#8696A0]">Lendo Sistema...</span>
+            
+            <div class="relative">
+                <input type="text" placeholder="Buscar nas conversas ativas..." class="w-full pl-8 pr-3 py-2 bg-gray-100 border-none rounded text-sm focus:outline-none focus:ring-1 focus:ring-crm-primary">
+                <i class="fa-solid fa-search absolute left-3 top-2.5 text-gray-400 text-xs"></i>
             </div>
-        </header>
-
-        <div class="bg-[#111B21] border-b border-[#222D34] p-3 text-center">
-            <p class="text-[11px] text-[#8696A0] leading-tight">
-                <i class="fa-solid fa-circle-info mr-1"></i> As mensagens só aparecerão aqui se a tela do celular estiver <strong>bloqueada</strong> ou em outro aplicativo (Notificação).
-            </p>
         </div>
 
-        <div id="lista-mensagens" class="flex-1 overflow-y-auto flex flex-col">
-            <!-- As mensagens chegarão aqui -->
-            <div class="flex flex-col items-center justify-center h-full text-[#8696A0] opacity-50 p-6 text-center">
-                <i class="fa-regular fa-comments text-5xl mb-4"></i>
-                <p class="text-sm">Nenhuma nova mensagem interceptada.</p>
-                <p class="text-[10px] mt-2">Aguardando notificações via ADB...</p>
+        <!-- Lista de Contatos -->
+        <div id="contact-list" class="flex-1 overflow-y-auto">
+            <!-- Aviso Vazio Inicial -->
+            <div id="empty-contacts" class="p-6 text-center text-gray-400 mt-10">
+                <i class="fa-solid fa-inbox text-3xl mb-3 opacity-50"></i>
+                <p class="text-sm font-medium">Nenhuma conversa ativa.</p>
+                <p class="text-[10px] mt-1">Aguardando notificações de mensagens via USB...</p>
+                <p class="text-[10px] mt-4 text-amber-600 font-bold"><i class="fa-solid fa-triangle-exclamation"></i> Mantenha a tela do celular apagada para o radar funcionar.</p>
             </div>
+            <!-- Contatos serão injetados aqui -->
         </div>
     </aside>
 
-    <!-- ÁREA PRINCIPAL: DESPACHO E ARQUIVOS (ENVIO) -->
-    <main class="flex-1 h-full flex flex-col bg-chat-bg relative z-10">
+    <main class="flex-1 flex flex-col h-full relative bg-white">
         
-        <header class="bg-panel-header h-16 flex items-center px-6 shrink-0 border-b border-[#222D34]">
-            <h2 class="font-semibold text-[#E9EDEF]">Central de Resposta Rápida (Envio)</h2>
-        </header>
-
-        <div class="flex-1 overflow-y-auto p-8 flex flex-col items-center justify-center">
-            
-            <div class="bg-[#111B21] rounded-lg w-full max-w-2xl shadow-2xl border border-[#222D34] overflow-hidden">
-                <div class="p-6">
-                    <h3 class="text-[#00A884] font-medium text-sm uppercase tracking-wider mb-6 flex items-center gap-2">
-                        <i class="fa-solid fa-paper-plane"></i> Criar Mensagem
-                    </h3>
-
-                    <div class="grid grid-cols-2 gap-4 mb-5">
-                        <div>
-                            <label class="block text-xs text-[#8696A0] mb-2">Número Destino (Com DDD)</label>
-                            <input type="text" id="input-phone" placeholder="Ex: 11999999999" class="input-dark w-full rounded p-3 text-sm font-mono" maxlength="11">
-                        </div>
-                        <div>
-                            <label class="block text-xs text-[#8696A0] mb-2">Versão do WhatsApp</label>
-                            <select id="input-app" class="input-dark w-full rounded p-3 text-sm">
-                                <option value="com.whatsapp">WhatsApp Padrão</option>
-                                <option value="com.whatsapp.w4b">WhatsApp Business</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="mb-5">
-                        <label class="block text-xs text-[#8696A0] mb-2">Texto da Mensagem</label>
-                        <textarea id="input-text" rows="4" placeholder="Digite a resposta aqui..." class="input-dark w-full rounded p-3 text-sm resize-none"></textarea>
-                    </div>
-
-                    <div class="mb-5">
-                        <label class="block text-xs text-[#8696A0] mb-2">Anexar Arquivo (Opcional)</label>
-                        <div class="border border-dashed border-[#8696A0]/50 rounded-lg p-4 text-center cursor-pointer hover:bg-[#2A3942] transition-colors" onclick="document.getElementById('input-file').click()">
-                            <i class="fa-solid fa-file-pdf text-2xl text-[#8696A0] mb-2"></i>
-                            <p class="text-xs text-[#D1D7DB]" id="file-label">Clique para adicionar (PDF, JPG, PNG)</p>
-                            <input type="file" id="input-file" class="hidden" onchange="atualizarNomeArquivo(this)">
-                        </div>
-                    </div>
+        <!-- Header do Chat Ativo -->
+        <header id="chat-header" class="h-[70px] bg-crm-header border-b border-gray-200 flex items-center justify-between px-6 shrink-0 hidden">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded bg-gray-200 flex items-center justify-center text-gray-500 font-bold text-lg" id="active-avatar">
+                    #
                 </div>
-
-                <div class="bg-[#202C33] p-4 flex justify-between items-center border-t border-[#222D34]">
-                    <span id="feedback-txt" class="text-xs text-[#00A884] font-medium hidden flex items-center gap-2"><div class="loader"></div> Enviando...</span>
-                    <button id="btn-enviar" onclick="dispararMensagem()" class="bg-[#00A884] hover:bg-[#029071] text-white px-8 py-2.5 rounded shadow transition-colors text-sm font-semibold ml-auto flex items-center gap-2">
-                        <i class="fa-solid fa-paper-plane"></i> ENVIAR
-                    </button>
+                <div>
+                    <h2 class="font-bold text-gray-800 text-sm uppercase tracking-wide" id="active-name">Nome do Contato</h2>
+                    <div class="flex items-center gap-2 mt-0.5" id="active-phone-container">
+                        <span class="text-xs text-gray-500" id="active-phone">Número não vinculado</span>
+                        <button onclick="abrirModalVinculo()" class="text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded border border-amber-200 hover:bg-amber-200 transition">
+                            Vincular Número
+                        </button>
+                    </div>
                 </div>
             </div>
+            
+            <div class="flex items-center gap-4">
+                <div class="text-right">
+                    <p class="text-[10px] text-gray-400 uppercase font-bold">App Destino</p>
+                    <select id="input-app" class="text-xs bg-gray-50 border border-gray-200 rounded px-2 py-1 focus:outline-none">
+                        <option value="com.whatsapp">WhatsApp Normal</option>
+                        <option value="com.whatsapp.w4b">WA Business</option>
+                    </select>
+                </div>
+            </div>
+        </header>
 
+        <!-- Placeholder Tela Vazia -->
+        <div id="chat-placeholder" class="flex-1 flex flex-col items-center justify-center bg-gray-50">
+            <i class="fa-brands fa-whatsapp text-6xl text-gray-300 mb-4"></i>
+            <h2 class="text-xl font-medium text-gray-500">Central de Mensagens</h2>
+            <p class="text-sm text-gray-400 mt-2">Selecione uma conversa na lateral ou aguarde uma mensagem chegar.</p>
+        </div>
+
+        <!-- Área de Mensagens (Fundo com Pattern) -->
+        <div id="chat-messages" class="flex-1 chat-bg overflow-y-auto p-6 flex flex-col gap-4 hidden">
+            <!-- Balões injetados via JS -->
+        </div>
+
+        <div id="chat-input-area" class="bg-white border-t border-gray-200 p-4 shrink-0 hidden items-end gap-3 relative">
+            
+            <!-- Botão de Anexo -->
+            <button onclick="document.getElementById('input-file').click()" class="w-10 h-10 shrink-0 rounded-full text-gray-400 hover:bg-gray-100 flex items-center justify-center transition" title="Anexar Arquivo">
+                <i class="fa-solid fa-paperclip text-lg"></i>
+            </button>
+            <input type="file" id="input-file" class="hidden" onchange="tratarAnexo(this)">
+
+            <!-- Caixa de Texto -->
+            <div class="flex-1 bg-white border border-gray-300 rounded-lg shadow-sm relative overflow-hidden">
+                <!-- Preview de Arquivo Anexado (Oculto por padrão) -->
+                <div id="attachment-preview" class="hidden bg-gray-50 border-b border-gray-200 p-2 flex justify-between items-center">
+                    <span class="text-xs font-medium text-gray-600 flex items-center gap-2">
+                        <i class="fa-solid fa-file-lines text-crm-primary"></i>
+                        <span id="attachment-name">arquivo.pdf</span>
+                    </span>
+                    <button onclick="removerAnexo()" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                
+                <textarea id="msg-input" rows="1" class="w-full max-h-32 p-3 text-sm text-gray-700 resize-none focus:outline-none" placeholder="Digite uma mensagem (CTRL+ENTER para enviar)..." oninput="this.style.height = '';this.style.height = this.scrollHeight + 'px'"></textarea>
+            </div>
+
+            <!-- Botão Enviar -->
+            <button id="btn-enviar" onclick="enviarMensagem()" class="w-10 h-10 shrink-0 rounded-full bg-crm-primary text-white hover:bg-blue-900 flex items-center justify-center transition shadow-md">
+                <i class="fa-solid fa-paper-plane"></i>
+            </button>
+            <!-- Loader Enviando -->
+            <div id="btn-enviando" class="w-10 h-10 shrink-0 rounded-full bg-gray-200 flex items-center justify-center hidden">
+                <div class="loader-small"></div>
+            </div>
         </div>
     </main>
 
-    <!-- Sistema de Avisos Flutuantes -->
-    <div id="toast-container" class="fixed top-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
+    <!-- Modal Vinculo de Número -->
+    <div id="modal-vinculo" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center backdrop-blur-sm">
+        <div class="bg-white rounded-lg shadow-xl w-[400px] overflow-hidden">
+            <div class="bg-crm-primary p-4 text-white">
+                <h3 class="font-bold">Vincular Número de Telefone</h3>
+            </div>
+            <div class="p-5">
+                <p class="text-sm text-gray-600 mb-4">O Android não informa o número na notificação. Para responder a <strong id="vinculo-nome">---</strong>, digite o número com DDD.</p>
+                <input type="text" id="vinculo-input" placeholder="Ex: 11999999999" class="w-full border border-gray-300 rounded p-2 text-sm focus:outline-none focus:border-crm-primary" maxlength="11">
+                
+                <div class="flex justify-end gap-3 mt-6">
+                    <button onclick="fecharModalVinculo()" class="px-4 py-2 text-sm text-gray-500 hover:bg-gray-100 rounded">Cancelar</button>
+                    <button onclick="salvarVinculo()" class="px-4 py-2 text-sm bg-crm-primary text-white rounded hover:bg-blue-900 shadow">Salvar Número</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
     <script>
-        // === VARIÁVEIS GLOBAIS WEBUSB ===
+        // === BANCO DE DADOS EM MEMÓRIA ===
+        // Estrutura: { "Nome do Contato": { phone: "11999...", unread: 0, msgs: [ {type: 'in', text: 'oi', time: '10:00'}, ... ] } }
+        let chatDB = {};
+        let contatoAtivo = null;
+        let arquivoAnexado = null;
+
+        // === VARIÁVEIS WEBUSB ===
         let usbDevice = null;
         let epIn = null;
         let epOut = null;
         let isAdbReady = false;
         let localIdCounter = 1;
-        let arquivoSelecionado = null;
-        let msgsInterceptadas = new Set(); // Para não duplicar mensagens
+        let radarRodando = false;
 
         // === UTILITÁRIOS ===
         const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+        const getTime = () => new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 
-        function showToast(msg, isError = false) {
+        function showToast(msg, type = 'info') {
             const c = document.getElementById('toast-container');
             const t = document.createElement('div');
-            const color = isError ? 'bg-red-500/10 border-red-500/50 text-red-400' : 'bg-[#202C33] border-[#222D34] text-[#E9EDEF]';
-            t.className = `${color} border px-4 py-3 rounded shadow-xl flex items-center gap-3 transform transition-all duration-300 translate-x-10 opacity-0 pointer-events-auto text-sm`;
-            t.innerHTML = `<i class="fa-solid ${isError ? 'fa-triangle-exclamation' : 'fa-check'} text-[${isError?'#f87171':'#00A884'}]"></i> ${msg}`;
+            const color = type === 'error' ? 'bg-red-50 text-red-600 border-red-200' : 'bg-white text-gray-700 border-gray-200';
+            const icon = type === 'error' ? 'fa-triangle-exclamation text-red-500' : 'fa-check-circle text-green-500';
+            t.className = `${color} border px-4 py-3 rounded shadow-lg flex items-center gap-3 transform transition-all duration-300 translate-x-10 opacity-0 pointer-events-auto text-sm`;
+            t.innerHTML = `<i class="fa-solid ${icon}"></i> ${msg}`;
             c.appendChild(t);
             requestAnimationFrame(() => t.classList.remove('translate-x-10', 'opacity-0'));
-            setTimeout(() => { t.classList.add('translate-x-10', 'opacity-0'); setTimeout(() => t.remove(), 300); }, 3500);
+            setTimeout(() => { t.classList.add('translate-x-10', 'opacity-0'); setTimeout(() => t.remove(), 300); }, 3000);
         }
 
-        function atualizarNomeArquivo(input) {
-            if(input.files.length > 0) {
-                arquivoSelecionado = input.files[0];
-                document.getElementById('file-label').innerHTML = `<span class="text-[#00A884] font-medium">${arquivoSelecionado.name}</span> (${(arquivoSelecionado.size/1024/1024).toFixed(2)} MB)`;
+        // === GERENCIAMENTO DE UI DO CHAT ===
+        function atualizarSidebar() {
+            const list = document.getElementById('contact-list');
+            const empty = document.getElementById('empty-contacts');
+            
+            if (Object.keys(chatDB).length === 0) {
+                empty.style.display = 'block';
+                return;
             }
+            empty.style.display = 'none';
+
+            // Salva os elementos atuais para não recriar do zero se não precisar
+            let html = '';
+            
+            // Ordena (na prática deveria ordenar pelo mais recente, aqui faremos simples)
+            for (let nome in chatDB) {
+                const data = chatDB[nome];
+                const lastMsg = data.msgs.length > 0 ? data.msgs[data.msgs.length - 1].text : 'Arquivo enviado';
+                const unreadBadge = data.unread > 0 ? `<div class="bg-green-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">${data.unread}</div>` : '';
+                const activeClass = contatoAtivo === nome ? 'contact-active' : 'border-l-4 border-transparent hover:bg-gray-50';
+
+                html += `
+                    <div class="flex items-center gap-3 p-3 border-b border-gray-100 cursor-pointer transition ${activeClass}" onclick="abrirConversa('${nome.replace(/'/g, "\\'")}')">
+                        <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-bold shrink-0">
+                            ${nome.charAt(0).toUpperCase()}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex justify-between items-center mb-0.5">
+                                <h4 class="text-sm font-bold text-gray-800 truncate">${nome}</h4>
+                                <span class="text-[10px] text-gray-400 shrink-0">${data.msgs.length > 0 ? data.msgs[data.msgs.length - 1].time : ''}</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <p class="text-xs text-gray-500 truncate pr-2">${lastMsg}</p>
+                                ${unreadBadge}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            list.innerHTML = html;
         }
 
-        // === MOTOR 1: O RADAR DE NOTIFICAÇÕES (LEITURA ADB) ===
-        async function iniciarRadarNotificacoes() {
-            while (isAdbReady) {
+        function abrirConversa(nome) {
+            contatoAtivo = nome;
+            chatDB[nome].unread = 0; // Marca como lido
+            
+            // UI Toggle
+            document.getElementById('chat-placeholder').classList.add('hidden');
+            document.getElementById('chat-header').classList.remove('hidden');
+            document.getElementById('chat-messages').classList.remove('hidden');
+            document.getElementById('chat-input-area').classList.remove('hidden');
+            document.getElementById('chat-input-area').classList.add('flex');
+
+            // Header Info
+            document.getElementById('active-name').innerText = nome;
+            document.getElementById('active-avatar').innerText = nome.charAt(0).toUpperCase();
+            
+            const btnVinculo = document.querySelector('#active-phone-container button');
+            const spanPhone = document.getElementById('active-phone');
+            
+            if (chatDB[nome].phone) {
+                spanPhone.innerText = chatDB[nome].phone;
+                spanPhone.classList.remove('text-amber-500');
+                btnVinculo.classList.add('hidden');
+            } else {
+                spanPhone.innerText = "Número Pendente";
+                spanPhone.classList.add('text-amber-500');
+                btnVinculo.classList.remove('hidden');
+            }
+
+            renderizarMensagens();
+            atualizarSidebar();
+            
+            // Foca no input
+            setTimeout(() => document.getElementById('msg-input').focus(), 100);
+        }
+
+        function renderizarMensagens() {
+            if (!contatoAtivo || !chatDB[contatoAtivo]) return;
+            const container = document.getElementById('chat-messages');
+            container.innerHTML = '';
+
+            const msgs = chatDB[contatoAtivo].msgs;
+            
+            msgs.forEach(m => {
+                const isOut = m.type === 'out';
+                const alignClass = isOut ? 'self-end' : 'self-start';
+                const bubbleClass = isOut ? 'bg-crm-bubbleOut text-crm-textOut rounded-tl-lg rounded-tr-lg rounded-bl-lg' : 'bg-crm-bubbleIn text-crm-textIn rounded-tr-lg rounded-br-lg rounded-bl-lg border border-gray-200';
+                
+                const timeColor = isOut ? 'text-blue-200' : 'text-gray-400';
+                const check = isOut ? `<i class="fa-solid fa-check-double text-[10px] ml-1"></i>` : '';
+
+                // Suporte visual para anexos fakes na UI
+                let contentHTML = `<p class="text-sm leading-relaxed whitespace-pre-wrap">${m.text}</p>`;
+                if (m.isFile) {
+                    contentHTML = `
+                        <div class="flex items-center gap-2 mb-2 p-2 bg-black/10 rounded">
+                            <i class="fa-solid fa-file-pdf text-2xl"></i>
+                            <span class="text-xs font-bold truncate max-w-[150px]">Arquivo Anexado</span>
+                        </div>
+                        ${m.text ? `<p class="text-sm">${m.text}</p>` : ''}
+                    `;
+                }
+
+                const html = `
+                    <div class="max-w-[75%] flex flex-col ${alignClass} mb-2 shadow-sm">
+                        <div class="px-4 py-2 ${bubbleClass}">
+                            ${contentHTML}
+                            <div class="text-[10px] ${timeColor} text-right mt-1 flex items-center justify-end gap-1">
+                                ${m.time} ${check}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += html;
+            });
+
+            // Scroll para baixo
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // === INJEÇÃO NO BANCO E RADAR ===
+        function registrarNovaMensagem(nome, texto) {
+            if (!chatDB[nome]) {
+                chatDB[nome] = { phone: "", unread: 0, msgs: [] };
+            }
+            
+            // Evita duplicatas pela restrição de tempo/texto simples
+            const ultimas = chatDB[nome].msgs;
+            if (ultimas.length > 0) {
+                const ultima = ultimas[ultimas.length - 1];
+                if (ultima.text === texto && ultima.type === 'in') return; // Já registrou
+            }
+
+            chatDB[nome].msgs.push({ type: 'in', text: texto, time: getTime(), isFile: false });
+            
+            if (contatoAtivo !== nome) {
+                chatDB[nome].unread += 1;
+            }
+
+            atualizarSidebar();
+            if (contatoAtivo === nome) renderizarMensagens();
+        }
+
+        async function iniciarRadar() {
+            if (radarRodando) return;
+            radarRodando = true;
+            
+            while (isAdbReady && radarRodando) {
                 try {
-                    // Comando do Android que lista todas as notificações atuais cruas (sem censura)
-                    let dump = await runAdbCommand("dumpsys notification --noredact");
+                    // Dumpsys Notification limpo e filtrado (Menos peso no USB)
+                    let output = await runAdbShell("dumpsys notification --noredact | grep -E 'pkg=com.whatsapp|android.title=|android.text='");
                     
-                    if (dump && dump.includes("pkg=com.whatsapp")) {
-                        // Corta o dump em blocos de notificação
-                        let records = dump.split("NotificationRecord{");
-                        
-                        records.forEach(rec => {
-                            // Filtra apenas as do WhatsApp e que tenham texto
-                            if (rec.includes("pkg=com.whatsapp") && rec.includes("android.text=")) {
-                                
-                                // Extrai Título (Nome da pessoa/grupo)
-                                let titleMatch = rec.match(/android\.title=([^]+?)(?:\n|$)/);
-                                // Extrai Texto (A mensagem)
-                                let textMatch = rec.match(/android\.text=([^]+?)(?:\n|$)/);
+                    if (output && output.includes("android.text=")) {
+                        // O regex aqui precisa ser forte. A estrutura no grep fica bagunçada, mas as tags ficam.
+                        // Solução: Split por linhas e procura pares Title/Text
+                        let linhas = output.split('\n');
+                        let currentTitle = null;
 
-                                if (titleMatch && textMatch) {
-                                    // Limpa formatações estranhas do Android "String (Nome)"
-                                    let nome = titleMatch[1].replace(/String \((.+?)\)/, "$1").trim();
-                                    let msg = textMatch[1].replace(/String \((.+?)\)/, "$1").trim();
-
-                                    // Filtra notificações do sistema ("Buscando mensagens", "WhatsApp Web")
-                                    if (nome && msg && nome !== "WhatsApp" && !msg.includes("novas mensagens")) {
-                                        
-                                        // Cria um Hash único para não repetir na tela
-                                        let hash = nome + msg;
-                                        if (!msgsInterceptadas.has(hash)) {
-                                            msgsInterceptadas.add(hash);
-                                            adicionarMensagemNaTela(nome, msg);
-                                        }
+                        for (let l of linhas) {
+                            if (l.includes("android.title=")) {
+                                let m = l.match(/android\.title=([^]+?)$/);
+                                if(m) {
+                                    currentTitle = m[1].replace(/String \((.+?)\)/, "$1").trim();
+                                }
+                            } else if (l.includes("android.text=") && currentTitle) {
+                                let m = l.match(/android\.text=([^]+?)$/);
+                                if(m) {
+                                    let msgText = m[1].replace(/String \((.+?)\)/, "$1").trim();
+                                    
+                                    // Filtra sistema
+                                    if (currentTitle !== "WhatsApp" && !msgText.includes("novas mensagens")) {
+                                        registrarNovaMensagem(currentTitle, msgText);
                                     }
                                 }
+                                currentTitle = null; // Reseta para o próximo bloco
                             }
-                        });
+                        }
                     }
-                } catch (e) {
-                    console.error("Erro no radar:", e);
-                }
+                } catch (e) { console.log("Erro radar:", e); }
                 
-                // Varredura a cada 3 segundos
-                await sleep(3000); 
+                await sleep(3000); // Polling a cada 3s
             }
         }
 
-        function adicionarMensagemNaTela(nome, msg) {
-            const container = document.getElementById('lista-mensagens');
-            
-            // Remove a mensagem de "vazio" se for a primeira
-            if (container.innerHTML.includes("Nenhuma nova mensagem")) {
-                container.innerHTML = '';
+        // === ENVIO DE MENSAGENS E ARQUIVOS (O DESPACHANTE) ===
+        function tratarAnexo(input) {
+            if(input.files.length > 0) {
+                arquivoAnexado = input.files[0];
+                document.getElementById('attachment-preview').classList.remove('hidden');
+                document.getElementById('attachment-preview').classList.add('flex');
+                document.getElementById('attachment-name').innerText = arquivoAnexado.name;
             }
-
-            const div = document.createElement('div');
-            div.className = "bg-[#111B21] border-b border-[#222D34] p-4 flex gap-3 hover:bg-[#202C33] transition-colors cursor-pointer";
-            
-            // Auto-preenche o nome no campo de texto se clicar (Bônus de usabilidade)
-            div.onclick = () => { 
-                showToast(`Para responder ${nome}, digite o número no painel ao lado.`); 
-            };
-
-            const dataAtual = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-
-            div.innerHTML = `
-                <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-[#00A884] to-emerald-600 flex items-center justify-center text-white font-bold text-lg shrink-0">
-                    ${nome.charAt(0).toUpperCase()}
-                </div>
-                <div class="flex-1 min-w-0">
-                    <div class="flex justify-between items-baseline mb-1">
-                        <h4 class="text-[#E9EDEF] font-medium text-[15px] truncate pr-2">${nome}</h4>
-                        <span class="text-[11px] text-[#8696A0] shrink-0">${dataAtual}</span>
-                    </div>
-                    <p class="text-sm text-[#8696A0] truncate">${msg}</p>
-                </div>
-            `;
-            
-            // Adiciona no topo
-            container.prepend(div);
         }
 
-        // === MOTOR 2: O DESPACHANTE (ENVIO FÍSICO / ARQUIVOS) ===
-        async function dispararMensagem() {
-            if (!isAdbReady) return showToast("Conecte o USB primeiro.", true);
+        function removerAnexo() {
+            arquivoAnexado = null;
+            document.getElementById('input-file').value = '';
+            document.getElementById('attachment-preview').classList.add('hidden');
+            document.getElementById('attachment-preview').classList.remove('flex');
+        }
+
+        document.getElementById('msg-input').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                e.preventDefault();
+                enviarMensagem();
+            }
+        });
+
+        async function enviarMensagem() {
+            if (!contatoAtivo) return;
+            const data = chatDB[contatoAtivo];
             
-            const num = document.getElementById('input-phone').value.replace(/\D/g, '');
-            const texto = document.getElementById('input-text').value;
+            if (!data.phone) {
+                abrirModalVinculo();
+                return;
+            }
+
+            const inputTxt = document.getElementById('msg-input');
+            const texto = inputTxt.value;
             const pkg = document.getElementById('input-app').value;
             
-            if (num.length < 10) return showToast("Número inválido.", true);
-            if (!texto.trim() && !arquivoSelecionado) return showToast("Insira texto ou anexe arquivo.", true);
+            if (!texto.trim() && !arquivoAnexado) return showToast("Digite uma mensagem ou anexe arquivo", "error");
 
-            const btn = document.getElementById('btn-enviar');
-            const feed = document.getElementById('feedback-txt');
-            btn.classList.add('hidden');
-            feed.classList.remove('hidden');
+            // UI Feedback
+            document.getElementById('btn-enviar').classList.add('hidden');
+            document.getElementById('btn-enviando').classList.remove('hidden');
+            document.getElementById('btn-enviando').classList.add('flex');
+            radarRodando = false; // Pausa radar para usar a banda do USB
 
             try {
-                // Acorda e limpa
-                await runAdbCommand("input keyevent 224");
-                await runAdbCommand("input keyevent 3"); 
+                // 1. Acorda Tela
+                await runAdbShell("input keyevent 224");
+                await runAdbShell("input keyevent 3");
                 await sleep(500);
 
-                if (arquivoSelecionado) {
-                    showToast("Transferindo arquivo para o celular...");
+                if (arquivoAnexado) {
+                    showToast("Enviando arquivo para o celular...", "info");
                     
                     const base64 = await new Promise((resolve) => {
                         const reader = new FileReader();
                         reader.onload = () => resolve(reader.result.split(',')[1]);
-                        reader.readAsDataURL(arquivoSelecionado);
+                        reader.readAsDataURL(arquivoAnexado);
                     });
 
-                    const nomeSeguro = arquivoSelecionado.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+                    const nomeSeguro = arquivoAnexado.name.replace(/[^a-zA-Z0-9.-]/g, '_');
                     const pathTmp = `/sdcard/tmp_crm.txt`;
                     const pathFinal = `/sdcard/Download/${nomeSeguro}`;
 
-                    await runAdbCommand(`rm -f ${pathTmp}`);
+                    await runAdbShell(`rm -f ${pathTmp}`);
                     
-                    // Envio Base64 segmentado
                     const chunkSize = 2048;
                     for (let i = 0; i < base64.length; i += chunkSize) {
                         const chunk = base64.substring(i, i + chunkSize);
-                        await runAdbCommand(`echo -n '${chunk}' >> ${pathTmp}`);
+                        await runAdbShell(`echo -n '${chunk}' >> ${pathTmp}`);
                     }
 
-                    await runAdbCommand(`base64 -d ${pathTmp} > ${pathFinal}`);
-                    await runAdbCommand(`rm -f ${pathTmp}`);
+                    await runAdbShell(`base64 -d ${pathTmp} > ${pathFinal}`);
+                    await runAdbShell(`rm -f ${pathTmp}`);
 
-                    // Intent de SEND direcionado ao Contato
-                    let intentCmd = `am start -a android.intent.action.SEND -t "*/*" -f 1 --eu android.intent.extra.STREAM "file://${pathFinal}" -e jid "55${num}@s.whatsapp.net"`;
+                    let intentCmd = `am start -a android.intent.action.SEND -t "*/*" -f 1 --eu android.intent.extra.STREAM "file://${pathFinal}" -e jid "55${data.phone}@s.whatsapp.net"`;
                     
                     if (texto.trim()) {
                         let textoEscapado = texto.replace(/"/g, '\\"').replace(/'/g, "\\'").replace(/ /g, "%s").replace(/&/g, "\\&");
@@ -294,46 +484,78 @@
                     }
                     
                     intentCmd += ` -p ${pkg}`;
-                    await runAdbCommand(intentCmd);
+                    await runAdbShell(intentCmd);
                     
-                    await sleep(3500); // Tempo do zap carregar a foto
-                    
-                    // Envia usando a tecla Enter
-                    await runAdbCommand(`input keyevent 66`);
+                    await sleep(3500); // Aguarda zap abrir o preview da foto
+                    await runAdbShell(`input keyevent 66`); // Enter envia (se configurado)
 
-                } else if (texto.trim()) {
-                    showToast("Injetando mensagem de texto...");
+                } else {
+                    // Só Texto
                     const encodedMsg = encodeURIComponent(texto).replace(/'/g, "%27").replace(/"/g, "%22");
-                    const intentUrl = `whatsapp://send?phone=55${num}&text=${encodedMsg}`;
+                    const intentUrl = `whatsapp://send?phone=55${data.phone}&text=${encodedMsg}`;
                     
-                    await runAdbCommand(`am start -a android.intent.action.VIEW -d '${intentUrl}' -p ${pkg}`);
+                    await runAdbShell(`am start -a android.intent.action.VIEW -d '${intentUrl}' -p ${pkg}`);
                     await sleep(3000); 
-                    
-                    // Envia usando a tecla Enter
-                    await runAdbCommand(`input keyevent 66`);
+                    await runAdbShell(`input keyevent 66`); // Enter para enviar direto
                 }
 
+                // Volta pra home para limpar a tela e o Radar voltar a funcionar
                 await sleep(1000);
-                await runAdbCommand("input keyevent 3"); // Volta a tela inicial para poder ler notificação nova
-                
-                showToast("Mensagem disparada com sucesso!");
-                document.getElementById('input-text').value = '';
-                document.getElementById('input-file').value = '';
-                arquivoSelecionado = null;
-                document.getElementById('file-label').innerHTML = 'Clique para adicionar (PDF, JPG, PNG)';
+                await runAdbShell("input keyevent 3"); 
 
-            } catch (e) {
-                showToast("Erro: " + e.message, true);
-            } finally {
-                btn.classList.remove('hidden');
-                feed.classList.add('hidden');
+                // Registra na UI localmente (Fake sucesso)
+                chatDB[contatoAtivo].msgs.push({ 
+                    type: 'out', 
+                    text: texto, 
+                    time: getTime(),
+                    isFile: arquivoAnexado !== null 
+                });
+                
+                inputTxt.value = '';
+                removerAnexo();
+                renderizarMensagens();
+                atualizarSidebar();
+
+            } catch(e) {
+                showToast("Erro no envio.", "error");
+            }
+
+            // Restaura UI
+            document.getElementById('btn-enviando').classList.add('hidden');
+            document.getElementById('btn-enviando').classList.remove('flex');
+            document.getElementById('btn-enviar').classList.remove('hidden');
+            
+            // Retoma Radar
+            iniciarRadar();
+        }
+
+        // === MODAL VINCULO DE NÚMERO ===
+        function abrirModalVinculo() {
+            if(!contatoAtivo) return;
+            document.getElementById('vinculo-nome').innerText = contatoAtivo;
+            document.getElementById('vinculo-input').value = chatDB[contatoAtivo].phone;
+            document.getElementById('modal-vinculo').classList.remove('hidden');
+            document.getElementById('modal-vinculo').classList.add('flex');
+        }
+
+        function fecharModalVinculo() {
+            document.getElementById('modal-vinculo').classList.add('hidden');
+            document.getElementById('modal-vinculo').classList.remove('flex');
+        }
+
+        function salvarVinculo() {
+            const num = document.getElementById('vinculo-input').value.replace(/\D/g, '');
+            if(num.length < 10) return showToast("Número inválido.", "error");
+            
+            if(contatoAtivo && chatDB[contatoAtivo]) {
+                chatDB[contatoAtivo].phone = num;
+                fecharModalVinculo();
+                abrirConversa(contatoAtivo); // Força refresh do header
+                showToast("Número salvo na memória!", "info");
             }
         }
 
-        // === NÚCLEO WEBUSB E ADB COM CAPTURA DE STRING ===
-        // Diferente das versões anteriores, esta versão de execução ADB aguarda e decodifica
-        // o retorno em texto do terminal Android para que o Radar possa ler.
-        
+        // === NÚCLEO WEBUSB E ADB COM CAPTURA (O MOTOR) ===
         async function getAdbKeyPair() { return await crypto.subtle.generateKey({ name: "RSASSA-PKCS1-v1_5", modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" }, true, ["sign", "verify"]); }
         async function signAdbToken(keyPair, token) { return new Uint8Array(await crypto.subtle.sign("RSASSA-PKCS1-v1_5", keyPair.privateKey, token)); }
         async function getAdbPublicKeyPayload(keyPair) {
@@ -349,7 +571,7 @@
             let tempN = n; for (let i = 0; i < 256; i++) { bytes[8 + i] = Number(tempN & 0xffn); tempN >>= 8n; }
             let tempRR = ((1n << 2048n) * (1n << 2048n)) % n; for (let i = 0; i < 256; i++) { bytes[264 + i] = Number(tempRR & 0xffn); tempRR >>= 8n; }
             view.setUint32(520, 65537, true);
-            const nameBytes = new TextEncoder().encode("ZapSync\0");
+            const nameBytes = new TextEncoder().encode("CRM_Sync\0");
             const fullPayload = new Uint8Array(buffer.byteLength + nameBytes.length);
             fullPayload.set(bytes, 0); fullPayload.set(nameBytes, buffer.byteLength); 
             return fullPayload;
@@ -395,7 +617,7 @@
                 } } }
                 
                 await usbDevice.claimInterface(intfNum);
-                await sendPacket(0x4E584E43, 0x01000000, 4096, new TextEncoder().encode("host::ZapSync\0"));
+                await sendPacket(0x4E584E43, 0x01000000, 4096, new TextEncoder().encode("host::CRMSync\0"));
                 
                 let keyPair = await getAdbKeyPair();
                 let resp = await readPacket();
@@ -407,7 +629,7 @@
                     if (resp2 && resp2.cmd === 0x4E584E43) isAdbReady = true;
                     else {
                         await sendPacket(0x48545541, 3, 0, await getAdbPublicKeyPayload(keyPair));
-                        showToast("Aceite a depuração no seu celular!", true);
+                        showToast("Aceite a depuração no seu celular!", 'error');
                         while(!isAdbReady) { 
                             let waitResp = await readPacket(); 
                             if(waitResp && waitResp.cmd === 0x4E584E43) isAdbReady = true; 
@@ -419,33 +641,30 @@
                     document.getElementById('btn-conectar').classList.add('hidden');
                     document.getElementById('status-badge').classList.remove('hidden');
                     document.getElementById('status-badge').classList.add('flex');
-                    showToast("Sincronização Ativa!");
                     
-                    // Bloqueia a suspensão de energia
-                    await runAdbCommand("settings put global stay_on_while_plugged_in 3");
+                    // Impede tela do PC apagar
                     if ('wakeLock' in navigator) navigator.wakeLock.request('screen');
                     
-                    // Inicia o Scanner de Notificações
-                    iniciarRadarNotificacoes();
+                    // Inicia Radar
+                    iniciarRadar();
                 }
-            } catch (e) { showToast("Erro: " + e.message, true); }
+            } catch (e) { showToast("Erro: " + e.message, 'error'); }
         }
         
-        // Função ADB modificada para retornar o Texto do Terminal (Necessário para o Radar)
-        async function runAdbCommand(command) {
+        async function runAdbShell(command) {
             if (!isAdbReady) return null;
             try {
                 const myId = localIdCounter++;
                 await sendPacket(0x4E45504F, myId, 0, new TextEncoder().encode("shell:" + command + "\0"));
                 
                 let output = "";
-                // Loop generoso para garantir leitura do retorno do comando dumpsys (que é longo)
-                for(let i = 0; i < 50; i++) {
+                // Loop de leitura maior para dar tempo de capturar logs longos
+                for(let i = 0; i < 40; i++) {
                     let r = await readPacket(); 
                     if(!r) break;
                     if(r.cmd === 0x45545257 && r.arg1 === myId) {
                         output += new TextDecoder().decode(r.data);
-                        await sendPacket(0x59414B4F, myId, r.arg0); // Confirma recebimento
+                        await sendPacket(0x59414B4F, myId, r.arg0); 
                     }
                     if(r.cmd === 0x45534C43 && r.arg1 === myId) { 
                         await sendPacket(0x45534C43, myId, r.arg0); 
