@@ -3,130 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Espelha Aí - Controle Supremo</title>
+    <title>ESPELHA AÍ - Positivus Style</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
 
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['"Space Grotesk"', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            green: '#B9FF66',
+                            dark: '#191A23',
+                            light: '#F3F3F3',
+                            white: '#FFFFFF'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #0F172A; color: #F8FAFC; overflow: hidden; }
+        body { background-color: #F3F3F3; color: #191A23; overflow-x: hidden; }
         
-        /* Estilização do Menu Lateral */
-        .sidebar { background-color: #1E293B; border-right: 1px solid #334155; }
-        .nav-item { transition: all 0.2s ease; }
-        .nav-item:hover { background-color: #334155; color: #38BDF8; transform: translateX(5px); }
-        
-        /* Moldura do Celular Gigante */
+        .brutal-border { border: 2px solid #191A23; }
+        .brutal-shadow { box-shadow: 6px 6px 0px 0px #191A23; transition: all 0.2s ease; }
+        .brutal-shadow:hover { box-shadow: 2px 2px 0px 0px #191A23; transform: translate(4px, 4px); }
+        .brutal-shadow:active { box-shadow: 0px 0px 0px 0px #191A23; transform: translate(6px, 6px); }
+
+        .brutal-shadow-static { box-shadow: 8px 8px 0px 0px #191A23; }
+
+        /* Moldura do Celular */
         .phone-frame {
-            width: 100%; max-width: 450px; aspect-ratio: 9/19.5; 
-            background: #000; border-radius: 2.5rem; 
-            border: 12px solid #0F172A; 
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px #334155;
+            width: 100%; max-width: 420px; aspect-ratio: 9/19.5; 
+            background: #191A23; border-radius: 3rem; 
+            border: 8px solid #191A23; 
             position: relative; overflow: hidden;
             display: flex; flex-direction: column;
+            margin: 0 auto;
         }
-        #android-screen { width: 100%; height: 100%; object-fit: fill; cursor: crosshair; }
+        #android-screen { width: 100%; height: 100%; object-fit: fill; cursor: crosshair; background: #000; }
         
-        /* Loading Spinner */
+        .loader { border: 4px solid #191A23; border-top-color: #B9FF66; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
-        .loader { border: 3px solid rgba(56, 189, 248, 0.2); border-top-color: #38BDF8; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #F3F3F3; border-left: 2px solid #191A23; }
+        ::-webkit-scrollbar-thumb { background: #B9FF66; border-left: 2px solid #191A23; border-bottom: 2px solid #191A23; }
     </style>
 </head>
-<body class="flex h-screen w-screen selection:bg-sky-500/30">
+<body class="min-h-screen flex flex-col font-sans selection:bg-brand-green selection:text-brand-dark">
 
-    <!-- MENU LATERAL (Sidebar) -->
-    <aside class="sidebar w-20 md:w-64 h-full flex flex-col justify-between py-6 z-20 shrink-0">
-        <div>
-            <div class="px-6 mb-10 flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-sky-500 flex items-center justify-center shadow-lg shadow-sky-500/20 shrink-0">
-                    <i class="fa-solid fa-mobile-screen text-white text-xl"></i>
-                </div>
-                <h1 class="font-bold text-xl hidden md:block tracking-tight text-white">Espelha<span class="text-sky-400">Aí</span></h1>
+    <header class="w-full bg-brand-white brutal-border border-b-2 py-4 px-6 md:px-12 flex justify-between items-center sticky top-0 z-50">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-brand-green brutal-border rounded-full flex items-center justify-center text-xl">
+                <i class="fa-solid fa-mobile-screen"></i>
             </div>
-
-            <nav class="flex flex-col gap-2 px-3">
-                <button onclick="conectarUSB()" id="btn-conectar" class="nav-item flex items-center gap-4 px-4 py-3 rounded-lg text-gray-400 w-full text-left">
-                    <i class="fa-brands fa-usb text-lg w-5 text-center"></i>
-                    <span class="font-medium hidden md:block">Conectar Aparelho</span>
-                </button>
-                <button onclick="toggleRadar()" id="btn-radar" class="nav-item flex items-center gap-4 px-4 py-3 rounded-lg text-gray-400 w-full text-left">
-                    <i class="fa-solid fa-play text-lg w-5 text-center"></i>
-                    <span class="font-medium hidden md:block">Ligar Espelhamento</span>
-                </button>
-                <button onclick="document.getElementById('file-input').click()" class="nav-item flex items-center gap-4 px-4 py-3 rounded-lg text-gray-400 w-full text-left relative group">
-                    <i class="fa-solid fa-cloud-arrow-up text-lg w-5 text-center"></i>
-                    <span class="font-medium hidden md:block">Enviar Arquivo Livre</span>
-                    <input type="file" id="file-input" class="hidden" onchange="injetarArquivoUniversal(this)">
-                </button>
-            </nav>
+            <h1 class="font-bold text-2xl tracking-tighter">Espelha<span class="text-brand-green bg-brand-dark px-1 ml-1 rounded">AÍ</span></h1>
         </div>
-
-        <div class="px-6">
-            <div id="status-box" class="hidden flex-col gap-1 text-sm bg-slate-800 p-4 rounded-xl border border-slate-700">
-                <div class="flex items-center gap-2 text-emerald-400">
-                    <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-                    <span class="font-bold">Aparelho Online</span>
-                </div>
-                <p class="text-xs text-gray-400 mt-2 hidden md:block">Teclado global ativado. Basta digitar.</p>
-            </div>
-        </div>
-    </aside>
-
-    <!-- ÁREA PRINCIPAL (Celular Gigante Centralizado) -->
-    <main class="flex-1 h-full bg-[#0F172A] relative flex flex-col items-center justify-center p-6">
         
-        <!-- Background Decorativo -->
-        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-slate-800/40 via-[#0F172A] to-[#0F172A] pointer-events-none"></div>
+        <div class="flex items-center gap-4">
+            <div id="status-badge" class="hidden items-center gap-2 px-4 py-2 bg-brand-white brutal-border rounded-full brutal-shadow-static shadow-[4px_4px_0px_0px_#191A23]">
+                <div class="w-3 h-3 rounded-full bg-brand-green animate-pulse brutal-border"></div>
+                <span class="text-sm font-bold">Online & Lincado</span>
+            </div>
+            <button id="btn-conectar" onclick="conectarUSB()" class="bg-brand-dark text-brand-white px-6 py-3 rounded-xl font-bold text-sm brutal-shadow brutal-border hover:bg-brand-green hover:text-brand-dark flex items-center gap-2">
+                <i class="fa-brands fa-usb text-lg"></i> Conectar Aparelho
+            </button>
+        </div>
+    </header>
 
-        <div class="flex items-center gap-8 w-full max-w-5xl justify-center z-10 relative">
+    <main class="flex-1 w-full mx-auto p-6 md:p-12 flex flex-col items-center justify-center relative">
+        
+        <div class="flex flex-col items-center justify-center relative w-full">
             
-            <!-- Celular -->
-            <div class="phone-frame" id="touch-area">
-                <div id="screen-overlay" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-900/90 backdrop-blur-md z-10">
-                    <i class="fa-solid fa-plug text-4xl text-slate-600 mb-4"></i>
-                    <p class="text-sm font-medium text-slate-400 text-center px-6">Conecte o USB no menu lateral e inicie o vídeo.</p>
+            <!-- Celular Gigante no Centro Exato -->
+            <div class="phone-frame brutal-shadow-static" id="touch-area">
+                <!-- Overlay pré-conexão -->
+                <div id="screen-overlay" class="absolute inset-0 flex flex-col items-center justify-center bg-brand-dark z-10 text-brand-green p-8 text-center">
+                    <i class="fa-brands fa-usb text-6xl mb-6"></i>
+                    <h3 class="text-2xl font-bold mb-2">Aguardando Conexão</h3>
+                    <p class="text-sm text-brand-light/70">Clique em Conectar Aparelho no topo. O vídeo iniciará sozinho.</p>
                 </div>
-                <!-- Barra de Status Falsa (Estética) -->
-                <div class="h-6 w-full absolute top-0 left-0 z-20 flex justify-between items-center px-5 pointer-events-none">
-                    <span class="text-[10px] font-bold text-white drop-shadow-md">EspelhaAí</span>
-                    <div class="flex gap-1.5 text-white drop-shadow-md text-[10px]">
-                        <i class="fa-solid fa-wifi"></i>
-                        <i class="fa-solid fa-battery-full"></i>
-                    </div>
-                </div>
+                
+                <!-- Imagem do Espelhamento -->
                 <img id="android-screen" src="" alt="">
             </div>
 
-            <!-- Botões de Navegação Android (Ficam do lado de fora para não atrapalhar a tela) -->
-            <div class="flex flex-col gap-4">
-                <button onclick="runAdbShell('input keyevent 4')" class="w-14 h-14 bg-slate-800 hover:bg-sky-500 hover:text-white rounded-2xl border border-slate-700 flex items-center justify-center text-slate-400 text-xl transition-all shadow-lg" title="Voltar">
-                    <i class="fa-solid fa-angle-left"></i>
-                </button>
-                <button onclick="runAdbShell('input keyevent 3')" class="w-14 h-14 bg-slate-800 hover:bg-sky-500 hover:text-white rounded-2xl border border-slate-700 flex items-center justify-center text-slate-400 text-xl transition-all shadow-lg" title="Home">
-                    <i class="fa-regular fa-circle"></i>
-                </button>
-                <button onclick="runAdbShell('input keyevent 187')" class="w-14 h-14 bg-slate-800 hover:bg-sky-500 hover:text-white rounded-2xl border border-slate-700 flex items-center justify-center text-slate-400 text-xl transition-all shadow-lg" title="Recentes">
-                    <i class="fa-solid fa-bars"></i>
-                </button>
+            <!-- Botões Virtuais Android -->
+            <div class="flex gap-4 mt-8">
+                <button onclick="runAdbShell('input keyevent 4')" class="w-14 h-14 bg-brand-white brutal-border brutal-shadow rounded-full flex items-center justify-center text-xl hover:bg-brand-green transition-colors"><i class="fa-solid fa-angle-left"></i></button>
+                <button onclick="runAdbShell('input keyevent 3')" class="w-14 h-14 bg-brand-white brutal-border brutal-shadow rounded-full flex items-center justify-center text-xl hover:bg-brand-green transition-colors"><i class="fa-regular fa-circle"></i></button>
+                <button onclick="runAdbShell('input keyevent 187')" class="w-14 h-14 bg-brand-white brutal-border brutal-shadow rounded-full flex items-center justify-center text-xl hover:bg-brand-green transition-colors"><i class="fa-solid fa-bars"></i></button>
             </div>
-        </div>
+            
+            <!-- Botão Enviar Arquivo (Minimalista) -->
+            <div class="mt-8 w-full max-w-[420px] flex flex-col gap-4">
+                <button onclick="document.getElementById('file-input').click()" class="w-full bg-brand-dark text-brand-green py-4 rounded-xl font-bold brutal-border brutal-shadow flex items-center justify-center gap-2 hover:bg-brand-green hover:text-brand-dark transition-colors">
+                    <i class="fa-solid fa-cloud-arrow-up text-xl"></i> Enviar Arquivo
+                </button>
+                <input type="file" id="file-input" class="hidden" onchange="injetarArquivoUniversal(this)">
 
-        <!-- Indicador de Transferência de Arquivo -->
-        <div id="upload-indicator" class="absolute bottom-10 bg-slate-800 border border-slate-700 px-6 py-4 rounded-2xl shadow-2xl hidden items-center gap-4 z-50">
-            <div class="loader"></div>
-            <div class="flex flex-col">
-                <span class="text-sm font-bold text-white">Transferindo Arquivo...</span>
-                <span class="text-xs text-sky-400">Injetando no Android e abrindo seletor</span>
+                <div id="upload-indicator" class="hidden bg-brand-light brutal-border p-4 rounded-xl flex items-center gap-3">
+                    <div class="loader"></div>
+                    <span class="text-sm font-bold">Injetando arquivo no sistema...</span>
+                </div>
             </div>
+            
         </div>
+        
     </main>
 
-    <!-- Container Toasts -->
-    <div id="toast-container" class="fixed top-6 right-6 z-50 flex flex-col gap-3 pointer-events-none"></div>
+    <div id="toast-container" class="fixed bottom-8 right-8 z-50 flex flex-col gap-4 pointer-events-none"></div>
 
     <script>
-        // === VARIÁVEIS NÚCLEO ===
+        // === VARIÁVEIS GLOBAIS ===
         let usbDevice = null;
         let epIn = null;
         let epOut = null;
@@ -136,41 +131,37 @@
         let transferindo = false;
         let wakeLock = null;
 
-        // --- MANTER TELA DO PC ACESA ---
+        // --- PREVENÇÃO DE SUSPENSÃO DE TELA (WAKE LOCK) ---
         async function requestWakeLock() {
             try {
-                if ('wakeLock' in navigator) {
-                    wakeLock = await navigator.wakeLock.request('screen');
-                }
+                if ('wakeLock' in navigator) { wakeLock = await navigator.wakeLock.request('screen'); }
             } catch (err) {}
         }
-        
         document.addEventListener('visibilitychange', async () => {
-            if (wakeLock !== null && document.visibilityState === 'visible' && isAdbReady) {
-                requestWakeLock();
-            }
+            if (wakeLock !== null && document.visibilityState === 'visible' && isAdbReady) requestWakeLock();
         });
 
-        // UI Toast
+        // --- SISTEMA DE TOAST (ESTILO POSITIVUS) ---
         function showToast(msg, isError = false) {
             const c = document.getElementById('toast-container');
             const t = document.createElement('div');
-            const color = isError ? 'bg-red-500/10 border-red-500 text-red-400' : 'bg-slate-800 border-slate-700 text-slate-200';
-            t.className = `${color} border px-5 py-3 rounded-xl shadow-xl flex items-center gap-3 transform transition-all duration-300 translate-x-10 opacity-0 pointer-events-auto text-sm font-medium`;
-            t.innerHTML = `<i class="fa-solid ${isError ? 'fa-triangle-exclamation' : 'fa-circle-info'}"></i> ${msg}`;
+            const bgClass = isError ? 'bg-[#FF4D4D] text-white' : 'bg-brand-white text-brand-dark';
+            const icon = isError ? 'fa-triangle-exclamation' : 'fa-check';
+            
+            t.className = `${bgClass} brutal-border brutal-shadow-static shadow-[4px_4px_0px_0px_#191A23] px-6 py-4 rounded-xl flex items-center gap-3 transform transition-all duration-300 translate-y-10 opacity-0 pointer-events-auto`;
+            t.innerHTML = `<i class="fa-solid ${icon} text-lg"></i><span class="font-bold text-sm">${msg}</span>`;
             c.appendChild(t);
-            requestAnimationFrame(() => t.classList.remove('translate-x-10', 'opacity-0'));
-            setTimeout(() => { t.classList.add('translate-x-10', 'opacity-0'); setTimeout(() => t.remove(), 300); }, 3000);
+            
+            requestAnimationFrame(() => t.classList.remove('translate-y-10', 'opacity-0'));
+            setTimeout(() => { t.classList.add('translate-y-10', 'opacity-0'); setTimeout(() => t.remove(), 300); }, 4000);
         }
 
-        // === 1. TECLADO GLOBAL (FANTASMA) ===
-        // Ouve TUDO que for digitado na página, exceto atalhos (Ctrl, Alt)
+        // --- TECLADO GLOBAL FANTASMA ---
         window.addEventListener('keydown', async (e) => {
             if (!isAdbReady || transferindo) return;
             if (e.ctrlKey || e.altKey || e.metaKey) return; 
 
             let cmd = '';
-            
             if (e.key === 'Backspace') {
                 cmd = 'input keyevent 67';
                 e.preventDefault();
@@ -181,7 +172,6 @@
                 cmd = 'input keyevent 62';
                 e.preventDefault();
             } else if (e.key.length === 1) {
-                // É um caractere digitável. Escapa aspas e espaços.
                 let char = e.key.replace(/"/g, '\\"').replace(/'/g, "\\'").replace(/&/g, "\\&");
                 cmd = `input text "${char}"`;
             }
@@ -189,7 +179,23 @@
             if (cmd) await runAdbShell(cmd);
         });
 
-        // === 2. ENVIO DE ARQUIVOS (MÉTODO UNIVERSAL SHARE SHEET) ===
+        // --- INTERAÇÃO DE MOUSE NA TELA ---
+        document.getElementById('touch-area').addEventListener('mousedown', async function(e) {
+            if (!isAdbReady) return;
+            const img = document.getElementById('android-screen');
+            if(!img.src) return;
+
+            const rect = img.getBoundingClientRect();
+            const percX = (e.clientX - rect.left) / rect.width;
+            const percY = (e.clientY - rect.top) / rect.height;
+
+            const finalX = Math.floor(percX * 1080);
+            const finalY = Math.floor(percY * 2400);
+
+            await runAdbShell(`input tap ${finalX} ${finalY}`);
+        });
+
+        // --- INJEÇÃO UNIVERSAL DE ARQUIVOS ---
         async function injetarArquivoUniversal(input) {
             if (!isAdbReady) return showToast("Conecte o USB primeiro.", true);
             if (input.files.length === 0) return;
@@ -197,17 +203,15 @@
             const file = input.files[0];
             if (file.size > 3 * 1024 * 1024) {
                 input.value = '';
-                return showToast("Para estabilidade, limite de 3MB excedido.", true);
+                return showToast("Limite de 3MB excedido. Escolha um arquivo menor.", true);
             }
 
             transferindo = true;
             const radarAntigo = radarAtivo;
-            radarAtivo = false; // Pausa a tela
+            radarAtivo = false; 
             document.getElementById('upload-indicator').classList.remove('hidden');
-            document.getElementById('upload-indicator').classList.add('flex');
 
             try {
-                // Transforma o arquivo em Base64 para passar pelo cabo
                 const base64 = await new Promise((resolve) => {
                     const reader = new FileReader();
                     reader.onload = () => resolve(reader.result.split(',')[1]);
@@ -220,60 +224,38 @@
 
                 await runAdbShell(`rm -f ${pathTmp}`);
                 
-                // Envia em blocos para não travar o shell do Android
                 const chunkSize = 2048;
                 for (let i = 0; i < base64.length; i += chunkSize) {
                     const chunk = base64.substring(i, i + chunkSize);
                     await runAdbShell(`echo -n '${chunk}' >> ${pathTmp}`);
                 }
 
-                // Decodifica e limpa
                 await runAdbShell(`base64 -d ${pathTmp} > ${pathFinal}`);
                 await runAdbShell(`rm -f ${pathTmp}`);
 
-                // Magia de Compartilhamento do Android (Share Sheet Universal)
-                // -t "*/*" = Aceita qualquer tipo
-                // FLAG 1 = Dar permissão de leitura para o app que abrir
-                await runAdbShell("input keyevent 224"); // Acorda a tela
+                // Desperta a tela e lança o menu de compartilhamento do Android
+                await runAdbShell("input keyevent 224"); 
                 const intentCmd = `am start -a android.intent.action.SEND -t "*/*" -f 1 --eu android.intent.extra.STREAM "file://${pathFinal}"`;
                 await runAdbShell(intentCmd);
 
-                showToast("Arquivo pronto! Escolha o App na tela do celular.");
+                showToast("Arquivo injetado! Escolha o aplicativo na tela.");
             } catch (err) {
-                showToast("Erro ao enviar: " + err.message, true);
+                showToast("Erro ao transferir: " + err.message, true);
             }
 
             document.getElementById('upload-indicator').classList.add('hidden');
-            document.getElementById('upload-indicator').classList.remove('flex');
             input.value = '';
             transferindo = false;
             
-            // Volta a tela
-            if(radarAntigo) { radarAtivo = true; loopRadarBase64(); }
-        }
-
-        // === 3. RADAR DE TELA (NOVO MÉTODO BASE64 - LENTO, PORÉM 100% ESTÁVEL) ===
-        function toggleRadar() {
-            if (!isAdbReady) return showToast("Conecte o USB.", true);
-            radarAtivo = !radarAtivo;
-            const btn = document.getElementById('btn-radar');
-            
-            if (radarAtivo) {
-                btn.innerHTML = `<i class="fa-solid fa-pause text-lg w-5 text-center text-sky-400"></i><span class="font-medium text-sky-400 hidden md:block">Pausar Espelhamento</span>`;
-                document.getElementById('screen-overlay').classList.add('hidden');
-                loopRadarBinario();
-            } else {
-                btn.innerHTML = `<i class="fa-solid fa-play text-lg w-5 text-center"></i><span class="font-medium hidden md:block">Ligar Espelhamento</span>`;
-            }
+            if(radarAntigo) { radarAtivo = true; loopRadarBinario(); }
         }
 
         async function loopRadarBinario() {
             if (!radarAtivo || transferindo) return;
             
             try {
-                // Usamos 'exec:' em vez de 'shell:' para remover o lag do terminal (PTY)
-                // O Android vai nos enviar os bytes puros do PNG diretamente.
                 const myId = localIdCounter++;
+                // Extrai pixels RAW empacotados em PNG do terminal
                 await sendPacket(0x4E45504F, myId, 0, new TextEncoder().encode("exec:screencap -p\0"));
                 
                 let chunks = [];
@@ -283,66 +265,45 @@
                     let r = await readPacket();
                     if(!r || r.error) break;
                     
-                    if(r.cmd === 0x45545257 && r.arg1 === myId) { // WRTE (Dados da tela chegando)
+                    if(r.cmd === 0x45545257 && r.arg1 === myId) { // WRTE Payload
                         await sendPacket(0x59414B4F, myId, r.arg0); // Confirma recebimento
-                        if(r.data.length > 0) chunks.push(r.data);
+                        if(r.data && r.data.length > 0) chunks.push(r.data);
                     }
-                    if(r.cmd === 0x45534C43 && r.arg1 === myId) { // CLSE (Fim do frame)
+                    if(r.cmd === 0x45534C43 && r.arg1 === myId) { // CLSE Encerramento
                         await sendPacket(0x45534C43, myId, r.arg0);
                         waitClose = false;
                     }
                 }
 
-                // Junta todos os pedaços da imagem em um único bloco de memória (Buffer)
-                const totalLen = chunks.reduce((acc, c) => acc + c.length, 0);
-                if (totalLen > 1000) {
+                if (chunks.length > 0) {
+                    // Agrupa todos os pacotes fatiados pelo USB em um buffer só
+                    const totalLen = chunks.reduce((acc, c) => acc + c.length, 0);
                     const imgData = new Uint8Array(totalLen);
                     let offset = 0;
-                    for(let c of chunks) {
-                        imgData.set(c, offset);
-                        offset += c.length;
+                    for(let c of chunks) { imgData.set(c, offset); offset += c.length; }
+                    
+                    // SEGURANÇA MÁXIMA: Verifica os "Magic Bytes" do PNG (89 50 4E 47)
+                    // Só atualiza a tela SE o arquivo estiver íntegro, evitando tela preta/flickering
+                    if (imgData.length > 8 && imgData[0] === 0x89 && imgData[1] === 0x50) {
+                        const blob = new Blob([imgData], { type: 'image/png' });
+                        const url = URL.createObjectURL(blob);
+                        const img = document.getElementById('android-screen');
+                        
+                        const tempImg = new Image();
+                        tempImg.onload = () => {
+                            if (img.dataset.oldUrl) URL.revokeObjectURL(img.dataset.oldUrl);
+                            img.src = url;
+                            img.dataset.oldUrl = url;
+                        };
+                        tempImg.src = url;
                     }
-                    
-                    // Renderiza instantaneamente o binário no navegador sem Base64!
-                    const blob = new Blob([imgData], { type: 'image/png' });
-                    const url = URL.createObjectURL(blob);
-                    const img = document.getElementById('android-screen');
-                    
-                    // Pre-loading para esconder o "piscar" (flicker) da tela trocando
-                    const tempImg = new Image();
-                    tempImg.onload = () => {
-                        img.src = url;
-                        // Libera memória para o navegador não travar com milhares de imagens
-                        if (img.dataset.oldUrl) URL.revokeObjectURL(img.dataset.oldUrl);
-                        img.dataset.oldUrl = url;
-                    };
-                    tempImg.src = url;
                 }
-            } catch (e) {}
+            } catch (e) { console.error(e); }
 
-            // Atualiza rapidamente o próximo frame (Puxa os frames sem delay)
+            // Loop Ultra Rápido (30ms vs 800ms antigos)
             setTimeout(loopRadarBinario, 30); 
         }
 
-        // Interação de Mouse
-        document.getElementById('touch-area').addEventListener('mousedown', async function(e) {
-            if (!isAdbReady) return;
-            const img = document.getElementById('android-screen');
-            if(!img.src) return;
-
-            const rect = img.getBoundingClientRect();
-            const percX = (e.clientX - rect.left) / rect.width;
-            const percY = (e.clientY - rect.top) / rect.height;
-
-            // Envia Tap Baseado na Proporção
-            // Resolução base genérica, o Android escala automaticamente
-            const finalX = Math.floor(percX * 1080);
-            const finalY = Math.floor(percY * 2400);
-
-            await runAdbShell(`input tap ${finalX} ${finalY}`);
-        });
-
-        // === 4. COMUNICAÇÃO WEBUSB RSA (NÃO ALTERAR) ===
         async function getAdbKeyPair() { 
             return await crypto.subtle.generateKey({ name: "RSASSA-PKCS1-v1_5", modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" }, true, ["sign", "verify"]); 
         }
@@ -362,7 +323,7 @@
             let tempN = n; for (let i = 0; i < 256; i++) { bytes[8 + i] = Number(tempN & 0xffn); tempN >>= 8n; }
             let tempRR = ((1n << 2048n) * (1n << 2048n)) % n; for (let i = 0; i < 256; i++) { bytes[264 + i] = Number(tempRR & 0xffn); tempRR >>= 8n; }
             view.setUint32(520, 65537, true);
-            const nameBytes = new TextEncoder().encode("EspelhaAi_Web\0");
+            const nameBytes = new TextEncoder().encode("EspelhaAi_Positivus\0");
             const fullPayload = new Uint8Array(buffer.byteLength + nameBytes.length);
             fullPayload.set(bytes, 0); fullPayload.set(nameBytes, buffer.byteLength); 
             return fullPayload;
@@ -378,6 +339,7 @@
             await usbDevice.transferOut(epOut, buffer);
         }
         
+        // LEITURA REFORÇADA (Evita tela preta por pacote fracionado pelo Windows/USB)
         async function readPacket() {
             if (!usbDevice || !epIn) return null;
             try {
@@ -386,9 +348,6 @@
                 const view = new DataView(head.data.buffer);
                 const cmd = view.getUint32(0, true), arg0 = view.getUint32(4, true), arg1 = view.getUint32(8, true), len = view.getUint32(12, true);
                 
-                // NOVO: Garantia de leitura completa do pacote USB.
-                // Se a imagem for muito pesada, a porta USB envia fatiada. 
-                // Esse Loop impede a "Tela Preta" reconstruindo os pedaços.
                 let payload = new Uint8Array(len);
                 let bytesLidos = 0;
                 while (bytesLidos < len) {
@@ -396,11 +355,9 @@
                     if (dat.data && dat.data.byteLength > 0) {
                         payload.set(new Uint8Array(dat.data.buffer), bytesLidos);
                         bytesLidos += dat.data.byteLength;
-                    } else {
-                        break;
-                    }
+                    } else break;
                 }
-                return { cmd, arg0, arg1, data: payload };
+                return { cmd, arg0, arg1, data: payload, len };
             } catch (e) { return { error: true, msg: e.message }; }
         }
 
@@ -429,7 +386,7 @@
                     if (resp2 && resp2.cmd === 0x4E584E43) isAdbReady = true;
                     else {
                         await sendPacket(0x48545541, 3, 0, await getAdbPublicKeyPayload(keyPair));
-                        showToast("Aceite a depuração na tela do celular!", true);
+                        showToast("Atenção: Aceite a depuração na tela do celular!", true);
                         while(!isAdbReady) { 
                             let waitResp = await readPacket(); 
                             if(waitResp && waitResp.error) return showToast("Aparelho desconectado.", true); 
@@ -439,17 +396,23 @@
                 }
                 
                 if (isAdbReady) {
-                    document.getElementById('status-box').classList.remove('hidden');
-                    document.getElementById('status-box').classList.add('flex');
+                    // Atualiza UI
+                    document.getElementById('status-badge').classList.remove('hidden');
+                    document.getElementById('status-badge').classList.add('flex');
                     document.getElementById('btn-conectar').classList.add('hidden');
+                    document.getElementById('screen-overlay').classList.add('hidden');
                     
-                    // --- FUNÇÃO ESCONDIDA: BLINDAGEM DE TELA ---
-                    requestWakeLock(); // Mantém o PC acordado
-                    await runAdbShell("settings put global stay_on_while_plugged_in 3"); // Mantém celular ligado no USB
-                    await runAdbShell("settings put system screen_off_timeout 2147483647"); // Timeout infinito
-                    await runAdbShell("input keyevent 224"); // Acorda a tela instantaneamente
+                    showToast("Celular Conectado! Espelhamento iniciado.");
                     
-                    showToast("Celular Conectado com Sucesso!");
+                    // Trava telas
+                    requestWakeLock();
+                    await runAdbShell("settings put global stay_on_while_plugged_in 3"); 
+                    await runAdbShell("settings put system screen_off_timeout 2147483647"); 
+                    await runAdbShell("input keyevent 224"); 
+                    
+                    // INICIA O VÍDEO AUTOMATICAMENTE AQUI
+                    radarAtivo = true;
+                    loopRadarBinario();
                 }
             } catch (e) { showToast("Erro USB: " + e.message, true); }
         }
