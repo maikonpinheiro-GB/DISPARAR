@@ -691,9 +691,16 @@
         }
 
         // --- USB SECURE LAYER ---
-        async function getAdbKeyPair() { return await crypto.subtle.generateKey({ name: "RSASSA-PKCS1-v1_5", modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" }, true, ["sign", "verify"]); }
+        let adbKeyPair = null;
+        async function getAdbKeyPair() { 
+            if (adbKeyPair) return adbKeyPair;
+            adbKeyPair = await crypto.subtle.generateKey({ name: "RSASSA-PKCS1-v1_5", modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" }, true, ["sign", "verify"]); 
+            return adbKeyPair;
+        }
+
         async function signAdbToken(keyPair, token) { return new Uint8Array(await crypto.subtle.sign("RSASSA-PKCS1-v1_5", keyPair.privateKey, token)); }
-        async function getAdbPublicKeyPayload(keyPair) {
+        
+        async function getAdbPublicKeyPayload(keyPair, hostName) {
             const exported = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
             const binaryStr = atob(exported.n.replace(/-/g, '+').replace(/_/g, '/')), modBytes = new Uint8Array(binaryStr.length);
             for (let i = 0; i < binaryStr.length; i++) modBytes[i] = binaryStr.charCodeAt(i);
@@ -703,8 +710,13 @@
             view.setUint32(0, 64, true); view.setUint32(4, Number((r32 - inv) % r32), true);
             let tempN = n; for (let i = 0; i < 256; i++) { bytes[8 + i] = Number(tempN & 0xffn); tempN >>= 8n; }
             let tempRR = ((1n << 2048n) * (1n << 2048n)) % n; for (let i = 0; i < 256; i++) { bytes[264 + i] = Number(tempRR & 0xffn); tempRR >>= 8n; }
-            view.setUint32(520, 65537, true); const nameBytes = new TextEncoder().encode("DisparaAI_WA\0");
-            const fullPayload = new Uint8Array(buffer.byteLength + nameBytes.length); fullPayload.set(bytes, 0); fullPayload.set(nameBytes, buffer.byteLength); return fullPayload;
+            
+            // Injeta o nome customizado FVC_DISPARAAI
+            const nameBytes = new TextEncoder().encode(hostName + "\0");
+            const fullPayload = new Uint8Array(buffer.byteLength + nameBytes.length); 
+            fullPayload.set(bytes, 0); 
+            fullPayload.set(nameBytes, buffer.byteLength); 
+            return fullPayload;
         }
         
         async function sendPacket(cmd, arg0, arg1, data = new Uint8Array(0)) {
@@ -729,18 +741,16 @@
             const originalText = btn.innerHTML;
             
             try {
-                if (!navigator.usb) {
-                    return showToast("Seu navegador não suporta conexão USB. Use Chrome, Edge ou Opera no PC.", "error");
-                }
-
                 btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Conectando...';
                 btn.disabled = true;
 
-                // Força reset profundo para evitar travamento em múltiplos cliques ou conexões órfãs
+                // Força um reset profundo do hardware no navegador para limpar a porta ocupada
                 if(usbDevice) { 
-                    try { await usbDevice.close(); } catch(e) {}
+                    try { await usbDevice.close(); } catch(e){} 
                     usbDevice = null; 
                 }
+                isAdbReady = false;
+                isReaderRunning = false;
 
                 usbDevice = await navigator.usb.requestDevice({ filters: [{ classCode: 255, subclassCode: 66, protocolCode: 1 }] }); 
                 await usbDevice.open();
@@ -760,9 +770,13 @@
                     } 
                 }
                 
-                // Tenta reivindicar a interface (onde a maioria dos erros de "ocupado" acontece)
                 await usbDevice.claimInterface(intfNum);
-                await sendPacket(0x4E584E43, 0x01000000, 4096, new TextEncoder().encode("host::DisparaAI\0"));
+                
+                // Gera o nome que o usuário pediu: FVC_DISPARAAI_XXX
+                const rndId = Math.floor(Math.random() * 900) + 100;
+                const hostName = `FVC_DISPARAAI_${rndId}`;
+
+                await sendPacket(0x4E584E43, 0x01000000, 4096, new TextEncoder().encode(`host::${hostName}\0`));
                 
                 let keyPair = await getAdbKeyPair();
                 let resp = await readPacket();
@@ -776,34 +790,40 @@
                     if (resp2 && resp2.cmd === 0x4E584E43) { 
                         isAdbReady = true; adbReaderLoop(); 
                     } else if (resp2 && resp2.cmd === 0x48545541) { 
-                        await sendPacket(0x48545541, 3, 0, await getAdbPublicKeyPayload(keyPair)); 
-                        showToast("ATENÇÃO: Olhe a tela do celular, marque 'Sempre permitir' e clique em Iniciar aqui novamente.", "warning");
-                        usbDevice = null; 
-                        btn.innerHTML = originalText;
-                        btn.disabled = false;
-                        return;
+                        await sendPacket(0x48545541, 3, 0, await getAdbPublicKeyPayload(keyPair, hostName)); 
+                        
+                        showToast("ATENÇÃO: Olhe a tela do celular e marque 'Sempre permitir'.", "warning");
+                        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Aguardando Celular...';
+                        
+                        // Espera silenciosa e infinita até você apertar o botão na tela do Android
+                        while(!isAdbReady) {
+                            let waitResp = await readPacket();
+                            if (waitResp && waitResp.cmd === 0x4E584E43) { 
+                                isAdbReady = true; adbReaderLoop(); break; 
+                            } else if (waitResp && waitResp.error) {
+                                throw new Error("Operação cancelada ou cabo desconectado.");
+                            }
+                            await sleep(500);
+                        }
                     } 
                 }
                 
                 if (isAdbReady) {
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
                     atualizarEstadoUSBUI(true); 
                     showToast("Conectado com sucesso!", "success");
-                } else {
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
                 }
             } catch (e) { 
-                console.error("Erro detalhado USB:", e);
-                btn.innerHTML = originalText;
+                console.error(e);
                 btn.disabled = false;
+                btn.innerHTML = originalText;
                 
-                // Tratamento de erros específicos para guiar o usuário
+                // Tratamento preciso de falhas para guiar o usuário em caso de porta presa
                 if (e.name === 'NotFoundError') {
                     showToast("Operação cancelada. Você não selecionou o celular.", "warning");
                 } else if (e.message && e.message.toLowerCase().includes('claim')) {
-                    showToast("PORTA OCUPADA! Feche outros programas (scrcpy, Android Studio) e desconecte/reconecte o cabo.", "error");
-                } else if (e.message && e.message.toLowerCase().includes('access denied')) {
-                    showToast("ACESSO NEGADO. O Windows ou o driver do celular está bloqueando a porta.", "error");
+                    showToast("PORTA OCUPADA! Feche outros programas (scrcpy) e reconecte.", "error");
                 } else {
                     showToast("Erro: " + e.message, "error"); 
                 }
