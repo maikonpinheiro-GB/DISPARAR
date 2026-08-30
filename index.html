@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Instalador | DisparaAI Web Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     <style>
         body {
             margin: 0; padding: 0; font-family: 'Inter', sans-serif;
@@ -13,48 +14,46 @@
             min-height: 100vh; text-align: center;
         }
         .container {
-            max-width: 650px; background: #1e1f20; padding: 50px;
+            max-width: 600px; background: #1e1f20; padding: 40px;
             border-radius: 24px; border: 1px solid #444746;
             box-shadow: 0 20px 40px rgba(0,0,0,0.5);
         }
-        h1 { font-size: 36px; background: linear-gradient(90deg, #8ab4f8, #c58af9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 15px; margin-top: 0; letter-spacing: -1px; }
-        p { font-size: 16px; color: #c4c7c5; line-height: 1.6; margin-bottom: 40px; }
-        .step { background: #131314; border: 1px solid #444746; border-radius: 12px; padding: 25px; text-align: left; margin-bottom: 30px; }
-        .step span { display: inline-block; background: #8ab4f8; color: #131314; width: 28px; height: 28px; text-align: center; border-radius: 50%; font-weight: bold; line-height: 28px; margin-right: 12px; }
+        h1 { font-size: 32px; background: linear-gradient(90deg, #8ab4f8, #c58af9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; margin-top: 0; }
+        p { font-size: 16px; color: #c4c7c5; line-height: 1.6; margin-bottom: 30px; }
+        .step { background: #131314; border: 1px solid #444746; border-radius: 12px; padding: 20px; text-align: left; margin-bottom: 30px; }
+        .step span { display: inline-block; background: #8ab4f8; color: #131314; width: 24px; height: 24px; text-align: center; border-radius: 50%; font-weight: bold; line-height: 24px; margin-right: 10px; }
         .bookmark-btn {
             display: inline-block; background: #8ab4f8; color: #131314;
-            text-decoration: none; padding: 18px 50px; font-size: 20px;
+            text-decoration: none; padding: 15px 40px; font-size: 18px;
             font-weight: 800; border-radius: 99px; transition: all 0.2s;
             cursor: grab; box-shadow: 0 4px 15px rgba(138, 180, 248, 0.3);
         }
-        .bookmark-btn:hover { background: #aecbfa; transform: translateY(-3px); box-shadow: 0 8px 25px rgba(138, 180, 248, 0.5); }
+        .bookmark-btn:hover { background: #aecbfa; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(138, 180, 248, 0.4); }
     </style>
 </head>
 <body>
-
     <div class="container">
         <h1>DisparaAI Web Pro</h1>
-        <p>A arquitetura antifalhas baseada em SPA. O motor injeta contatos e mídias <b>sem nunca recarregar o WhatsApp</b>.</p>
+        <p>Motor de injeção direta no DOM do WhatsApp Web. Versão aprimorada com suporte inteligente a mídias, vídeos, fotos e PDF.</p>
 
         <div class="step">
-            <div style="font-weight: 700; margin-bottom: 12px; color: #fff; font-size: 18px;"><span>1</span> Instalação (1 Clique)</div>
-            <div style="font-size: 15px; color: #c4c7c5; line-height: 1.5;">
-                Aperte as teclas <b>CTRL + SHIFT + B</b> para exibir sua barra de favoritos no navegador. Em seguida, <b>clique e arraste</b> o botão azul abaixo para dentro da barra de favoritos.
+            <div style="font-weight: 600; margin-bottom: 10px; color: #fff;"><span>1</span> Como instalar:</div>
+            <div style="font-size: 14px; color: #c4c7c5;">
+                Aperte <b>CTRL + SHIFT + B</b> para exibir sua barra de favoritos no Chrome. Depois, <b>CLIQUE E ARRASTE</b> o botão azul abaixo para dentro da sua barra de favoritos.
             </div>
         </div>
 
-        <a id="btn-magico" class="bookmark-btn" href="#">⚡ Iniciar DisparaAI</a>
+        <a id="btn-magico" class="bookmark-btn" href="#">⚡ DisparaAI Pro</a>
 
-        <div class="step" style="margin-top: 40px; margin-bottom: 0;">
-            <div style="font-weight: 700; margin-bottom: 12px; color: #fff; font-size: 18px;"><span>2</span> Operação</div>
-            <div style="font-size: 15px; color: #c4c7c5; line-height: 1.5;">
-                Abra o site <b>web.whatsapp.com</b> normalmente. Assim que suas conversas carregarem, clique no botão "⚡ Iniciar DisparaAI" que você acabou de salvar na barra de favoritos. O painel se abrirá instantaneamente.
+        <div class="step" style="margin-top: 30px; margin-bottom: 0;">
+            <div style="font-weight: 600; margin-bottom: 10px; color: #fff;"><span>2</span> Como usar:</div>
+            <div style="font-size: 14px; color: #c4c7c5;">
+                Abra o site <b>web.whatsapp.com</b> e espere carregar. Clique no botão "⚡ DisparaAI Pro" que você salvou nos favoritos. O painel abrirá instantaneamente sem recarregar a página.
             </div>
         </div>
     </div>
 
     <script>
-        // NÚCLEO DO ROBÔ (Baseado no seu código original Premium)
         const codigoDoRobo = function() {
             const PANEL_ID = 'sistema-disparai-pro'; 
             if (document.getElementById(PANEL_ID)) document.getElementById(PANEL_ID).remove();
@@ -116,6 +115,7 @@
                 .speed-card[data-speed="rapido"] .card-title { color: var(--c-warning); }
                 .speed-card[data-speed="normal"] .card-title { color: var(--c-success); }
                 .speed-card[data-speed="seguro"] .card-title { color: var(--c-extreme); }
+                .fs-footer { position: absolute; bottom: 24px; font-size: 14px; max-width: 80%; text-align: center; line-height: 1.5; background: linear-gradient(90deg, #8ab4f8, #c58af9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 500; }
                 .tab-content { padding: 24px; display: none; flex-direction: column; flex: 1; gap: 20px; overflow-y: auto; }
                 .tab-content.active { display: flex; animation: fadeIn 0.3s forwards; }
                 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -138,33 +138,24 @@
                 .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; flex-shrink: 0; }
                 .stat-card { background: var(--c-bg-base); padding: 16px; border-radius: var(--radius-md); display: flex; flex-direction: column; gap: 4px; border: 1px solid var(--c-border); }
                 .stat-val { font-size: 24px; font-weight: 600; color: var(--c-text-main); }
-                .stat-lab { font-size: 10px; color: var(--c-text-muted); font-weight: 600; text-transform: uppercase; }
+                .stat-lab { font-size: 10px; color: var(--c-text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;}
                 #st-sent { color: var(--c-success); } #st-err { color: var(--c-danger); }
                 .timer-box { background: var(--c-bg-base); border: 1px solid var(--c-border); padding: 16px; border-radius: var(--radius-md); display: flex; flex-direction: column; align-items: center; gap: 4px; flex-shrink: 0; }
-                .timer-label { font-size: 11px; color: var(--c-text-muted); text-transform: uppercase; font-weight: 600; }
+                .timer-label { font-size: 11px; color: var(--c-text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
                 .timer-clock { font-size: 28px; font-weight: 600; color: var(--c-text-main); font-variant-numeric: tabular-nums; }
-                .anti-idle-active-badge { display: none; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: var(--c-success); margin-top: 8px; background: var(--c-success-bg); padding: 4px 10px; border-radius: 20px; text-transform: uppercase; }
                 @keyframes pulse-anti-idle { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+                .anti-idle-active-badge { display: none; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: var(--c-success); margin-top: 8px; background: var(--c-success-bg); padding: 4px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px;}
                 .anti-idle-active-badge svg { animation: pulse-anti-idle 2s infinite ease-in-out; }
-                .btn-run { background: var(--c-primary); border: none; padding: 16px; border-radius: var(--radius-md); color: var(--c-bg-base); font-weight: 600; cursor: pointer; text-transform: uppercase; font-size: 14px; transition: all 0.2s ease; width: 100%; display: flex; justify-content: center; align-items: center; gap: 10px; flex-shrink: 0;}
+                .btn-run { background: var(--c-primary); border: none; padding: 16px; border-radius: var(--radius-md); color: var(--c-bg-base); font-weight: 600; cursor: pointer; text-transform: uppercase; font-size: 14px; letter-spacing: 1px; transition: all 0.2s ease; width: 100%; display: flex; justify-content: center; align-items: center; gap: 10px; flex-shrink: 0;}
                 .btn-run:hover { background: var(--c-primary-hover); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(138, 180, 248, 0.2); }
                 .btn-outline { background: transparent; border: 1px solid var(--c-border); color: var(--c-text-main); }
-                .btn-outline:hover { border-color: var(--c-text-main); background: var(--c-bg-hover); transform: translateY(-2px); }
+                .btn-outline:hover { border-color: var(--c-text-main); background: var(--c-bg-hover); transform: translateY(-2px); box-shadow: none; }
                 .btn-danger-outline { background: transparent; border: 1px solid var(--c-danger); color: var(--c-danger); }
                 .btn-danger-outline:hover { background: var(--c-danger-bg); transform: translateY(-2px); }
                 .logs-container { display: flex; flex-direction: column; gap: 8px; flex: 1; min-height: 120px; }
                 .logs { flex: 1; background: #000; border: 1px solid var(--c-border); border-radius: var(--radius-md); padding: 16px; font-family: "Consolas", monospace; font-size: 12px; color: #A0AAB2; overflow-y: auto; }
                 .log-entry { margin-bottom: 8px; line-height: 1.5; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px; }
                 ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: rgba(255,255,255, 0.1); border-radius: 10px; }
-                .custom-dialog { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(19, 19, 20, 0.85); z-index: 2147483648; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
-                .dialog-box { background: var(--c-bg-panel); border: 1px solid var(--c-border); border-radius: var(--radius-lg); padding: 32px; width: 340px; max-width: 90vw; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.4); animation: scaleIn 0.2s ease-out; }
-                @keyframes scaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-                .dialog-title { font-weight: 600; font-size: 18px; margin-bottom: 12px; color: var(--c-text-main); }
-                .dialog-text { font-size: 14px; color: var(--c-text-muted); margin-bottom: 24px; line-height: 1.5; }
-                .dialog-buttons { display: flex; gap: 12px; }
-                .dialog-btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; font-size: 14px; transition: all 0.2s; }
-                .btn-confirm { background: var(--c-primary); color: var(--c-bg-base); } .btn-confirm:hover { background: var(--c-primary-hover); }
-                .btn-cancel { background: var(--c-bg-base); border: 1px solid var(--c-border); color: var(--c-text-main); } .btn-cancel:hover { background: var(--c-bg-hover); }
             `;
             shadow.appendChild(style);
 
@@ -196,6 +187,7 @@
                             <div class="card-title">Seguro</div><div class="card-desc">Comportamento extremo. Pausas longas imitando digitação.</div>
                         </div>
                     </div>
+                    <div class="fs-footer">Disparador via Bookmarklet - Otimizado e Humanizado</div>
                 </div>
 
                 <div class="app-layout">
@@ -214,7 +206,7 @@
                     <div class="content-area">
                         <div class="header">
                             <div class="brand">
-                                <button id="back-to-speed" class="btn-action-header"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg></button>
+                                <button id="back-to-speed" class="btn-action-header" title="Trocar Velocidade"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg></button>
                                 <div><h2>DisparAI Pro</h2><span id="speed-indicator-pill" class="speed-pill-header normal">NORMAL</span></div>
                             </div>
                             <div class="header-actions">
@@ -226,7 +218,12 @@
                         <div id="tab-disparo" class="tab-content active">
                             <div class="input-group">
                                 <label class="input-label">Textos para Envio (Sorteio)</label>
-                                <div id="msg-list" style="display:flex; flex-direction:column; gap:12px;"></div>
+                                <div id="msg-list" style="display:flex; flex-direction:column; gap:12px;">
+                                    <div class="msg-variant">
+                                        <textarea class="dr-msg-input" placeholder="Digite sua mensagem aqui... Use :re: para puxar o NOME."></textarea>
+                                        <button class="btn-remove-msg"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+                                    </div>
+                                </div>
                                 <button id="btn-add-msg" class="btn-add-msg">+ Adicionar Variação</button>
                             </div>
                             <div class="media-area" id="dr-media-container">
@@ -237,20 +234,12 @@
                                 <label class="btn-file">
                                     Adicionar Mídia <input type="file" id="dr-img-input" accept="image/*,video/*,application/pdf" style="display:none;" multiple>
                                 </label>
-                                <div id="media-warning" style="display:none; color:var(--c-danger); font-size:11px;">Modo "Turbo" bloqueia mídias.</div>
                             </div>
                             <div class="stats-grid">
-                                <div class="stat-card"><span class="stat-lab">Fila</span><span class="stat-val" id="st-pend">0</span></div>
+                                <div class="stat-card"><span class="stat-lab">Fila Restante</span><span class="stat-val" id="st-pend">0</span></div>
                                 <div class="stat-card"><span class="stat-lab">Enviados</span><span class="stat-val" id="st-sent">0</span></div>
                                 <div class="stat-card"><span class="stat-lab">Falhas</span><span class="stat-val" id="st-err">0</span></div>
-                                <div class="stat-card"><span class="stat-lab">Total</span><span class="stat-val" id="st-total">0</span></div>
-                            </div>
-                            <div class="timer-box">
-                                <div class="timer-label">Estimativa de Conclusão</div>
-                                <div id="dr-timer" class="timer-clock">00:00:00</div>
-                                <div id="dr-anti-idle-badge" class="anti-idle-active-badge">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> ANTI-IDLE ATIVO
-                                </div>
+                                <div class="stat-card"><span class="stat-lab">Total Lidos</span><span class="stat-val" id="st-total">0</span></div>
                             </div>
                             <button id="dr-start" class="btn-run">INICIAR DISPAROS</button>
                         </div>
@@ -267,7 +256,7 @@
                             <div class="input-group" style="flex:1;">
                                 <label class="input-label">Terminal de Registros</label>
                                 <div class="logs-container">
-                                    <div class="logs" id="dr-logs"></div>
+                                    <div class="logs" id="dr-logs"><div class="log-entry"><span style="color:var(--c-primary);">> DisparAI Inicializado.</span></div></div>
                                 </div>
                             </div>
                             <div style="display:flex; flex-direction:column; gap:12px;">
@@ -280,17 +269,14 @@
             `;
             shadow.appendChild(ui);
 
-            // LOGICA DA APLICACAO
             const wrapper = shadow.getElementById('main-wrapper');
             const tabs = shadow.querySelectorAll('.tab');
             const speedCards = shadow.querySelectorAll('.speed-card');
-            const mediaContainer = shadow.getElementById('dr-media-container');
-            const mediaWarning = shadow.getElementById('media-warning');
             const speedPill = shadow.getElementById('speed-indicator-pill');
             const msgList = shadow.getElementById('msg-list');
             const btnAddMsg = shadow.getElementById('btn-add-msg');
 
-            let app = { active: false, contacts: [], selectedMedias: [], currentSpeedMode: 'normal', runSendsCount: 0, wakeLock: null, startTime: null };
+            let app = { active: false, contacts: [], selectedMedias: [], currentSpeedMode: 'normal', runSendsCount: 0 };
 
             function bindRemoveMsg(btn) {
                 btn.onclick = () => {
@@ -302,12 +288,12 @@
             function addMsgVariant(value = '') {
                 const div = document.createElement('div');
                 div.className = 'msg-variant';
-                div.innerHTML = `<textarea class="dr-msg-input" placeholder="Digite sua mensagem aqui...\nUse :re: para puxar o NOME.">${value}</textarea><button class="btn-remove-msg">X</button>`;
+                div.innerHTML = `<textarea class="dr-msg-input" placeholder="Digite sua mensagem aqui... Use :re: para puxar o NOME.">${value}</textarea><button class="btn-remove-msg"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>`;
                 bindRemoveMsg(div.querySelector('.btn-remove-msg'));
                 msgList.appendChild(div);
             }
             btnAddMsg.onclick = () => addMsgVariant();
-            addMsgVariant();
+            shadow.querySelectorAll('.btn-remove-msg').forEach(bindRemoveMsg);
 
             tabs.forEach(btn => {
                 btn.onclick = () => {
@@ -333,43 +319,22 @@
                     app.currentSpeedMode = card.dataset.speed;
                     speedPill.className = 'speed-pill-header ' + app.currentSpeedMode;
                     speedPill.innerText = app.currentSpeedMode.toUpperCase();
-                    if(app.currentSpeedMode === 'turbo') { mediaContainer.classList.add('disabled'); mediaWarning.style.display = 'block'; } 
-                    else { mediaContainer.classList.remove('disabled'); mediaWarning.style.display = 'none'; }
-                    writeLog(`Arquitetura: ${app.currentSpeedMode.toUpperCase()}`, "info");
-                    syncStats();
+                    writeLog("Arquitetura selecionada.", "info");
                     wrapper.className = 'ui-container state-sidebar';
                 };
             });
 
             shadow.getElementById('back-to-speed').onclick = () => { wrapper.className = 'ui-container state-fullscreen'; };
-            shadow.getElementById('close-dr').onclick = () => { app.active = false; host.remove(); fab.remove(); };
+            shadow.getElementById('close-dr').onclick = () => { host.remove(); fab.remove(); };
 
             const wait = (ms) => new Promise(r => setTimeout(r, ms));
             const randomWait = (min, max) => wait(Math.floor(Math.random() * (max - min + 1) + min));
 
-            async function requestWakeLock() {
-                if ('wakeLock' in navigator) {
-                    try {
-                        if(!app.wakeLock) app.wakeLock = await navigator.wakeLock.request('screen');
-                        shadow.getElementById('dr-anti-idle-badge').style.display = 'inline-flex';
-                    } catch (err) { writeLog("Navegador não permitiu WakeLock.", "warning"); }
-                }
-            }
-
-            function releaseWakeLock() {
-                if (app.wakeLock) {
-                    app.wakeLock.release().then(() => {
-                        app.wakeLock = null;
-                        shadow.getElementById('dr-anti-idle-badge').style.display = 'none';
-                    });
-                }
-            }
-
             const DELAY_CONFIG = {
-                turbo: { after_search_enter: 1500, preview_open_cycle: 100, preview_close_cycle: 100, multi_media_interval: 0, reset_wait: 400, type_min: 2, type_max: 10 },
-                rapido: { after_search_enter: 2500, preview_open_cycle: 150, preview_close_cycle: 150, multi_media_interval: 1200, reset_wait: 1000, type_min: 10, type_max: 25 },
-                normal: { after_search_enter: 3500, preview_open_cycle: 200, preview_close_cycle: 250, multi_media_interval: 2000, reset_wait: 2000, type_min: 20, type_max: 60 },
-                seguro: { after_search_enter: 5000, preview_open_cycle: 600, preview_close_cycle: 800, multi_media_interval: 6000, reset_wait: 4000, type_min: 80, type_max: 200 }
+                turbo: { search_wait: 300, paste_wait: 300, type_min: 2, type_max: 10, loop_wait: 1000 },
+                rapido: { search_wait: 600, paste_wait: 800, type_min: 10, type_max: 25, loop_wait: 3000 },
+                normal: { search_wait: 1500, paste_wait: 2000, type_min: 20, type_max: 60, loop_wait: 6000 },
+                seguro: { search_wait: 3000, paste_wait: 4000, type_min: 80, type_max: 200, loop_wait: 15000 }
             };
             const getDelay = (k) => DELAY_CONFIG[app.currentSpeedMode][k];
 
@@ -378,91 +343,89 @@
                 const el = document.createElement('div');
                 el.className = 'log-entry';
                 el.style.color = type === 'error' ? 'var(--c-danger)' : type === 'success' ? 'var(--c-success)' : 'var(--c-text-muted)';
-                el.innerHTML = `<span>> ${msg}</span>`;
+                el.innerHTML = "<span>> " + msg + "</span>";
                 box.prepend(el);
             }
 
-            function updateMediaUI() {
-                const count = app.selectedMedias.length;
-                shadow.getElementById('file-name').innerText = count === 0 ? "Nenhum" : (count === 1 ? app.selectedMedias[0].name : `${count} arquivos`);
-                shadow.getElementById('btn-clear-img').style.display = count > 0 ? 'inline' : 'none';
-            }
-
             function syncStats() {
-                const pending = app.contacts.filter(c => c.status === 'PENDENTE').length;
                 shadow.getElementById('st-sent').innerText = app.contacts.filter(c => c.status === 'ENVIADO').length;
                 shadow.getElementById('st-err').innerText = app.contacts.filter(c => c.status === 'ERRO').length;
-                shadow.getElementById('st-pend').innerText = pending;
+                shadow.getElementById('st-pend').innerText = app.contacts.filter(c => c.status === 'PENDENTE').length;
                 shadow.getElementById('st-total').innerText = app.contacts.length;
-                
-                let avg = app.currentSpeedMode === 'turbo' ? 1500 : (app.currentSpeedMode === 'rapido' ? 3000 : (app.currentSpeedMode === 'seguro' ? 30000 : 10000));
-                if (app.selectedMedias.length > 0) avg += 5000;
-                let ms = pending * avg;
-                
-                let seconds = Math.floor((ms / 1000) % 60), minutes = Math.floor((ms / 60000) % 60), hours = Math.floor((ms / 3600000) % 24);
-                shadow.getElementById('dr-timer').innerText = [hours, minutes, seconds].map(v => v.toString().padStart(2, '0')).join(':');
             }
 
             function dispatchKey(element, key) {
                 const keyCode = key === 'Enter' ? 13 : (key === 'Escape' ? 27 : key.charCodeAt(0));
-                const evt = { key, keyCode, bubbles: true, composed: true };
+                const evt = { key, keyCode, bubbles: true };
                 (element || document).dispatchEvent(new KeyboardEvent('keydown', evt));
                 (element || document).dispatchEvent(new KeyboardEvent('keyup', evt));
             }
 
             async function typeLikeHuman(targetElement, text, mode) {
+                if (!targetElement) return;
                 targetElement.focus();
-                try { document.execCommand('selectAll', false, null); document.execCommand('delete', false, null); } catch(e){}
+                try { document.execCommand('selectAll', false, null); document.execCommand('delete', false, null); } catch (e) { targetElement.textContent = ''; }
                 await wait(300);
-                const speeds = DELAY_CONFIG[mode];
-                const chars = Array.from(text.replace(/\r\n/g, '\n').replace(/\r/g, '\n'));
+
+                const cnf = DELAY_CONFIG[mode];
+                const chars = Array.from(text.replace(/\\r\\n/g, '\\n').replace(/\\r/g, '\\n'));
                 
                 for (const char of chars) {
                     if (!app.active) break;
-                    if (char === '\n') {
-                        document.execCommand('insertLineBreak');
+                    if (char === '\\n') {
+                        const dt = new DataTransfer(); dt.setData('text/plain', '\\n');
+                        const pasteEvt = new ClipboardEvent('paste', { bubbles: true });
+                        Object.defineProperty(pasteEvt, 'clipboardData', { value: dt });
+                        targetElement.dispatchEvent(pasteEvt);
                         await wait(400);
                     } else {
                         document.execCommand('insertText', false, char);
                     }
-                    targetElement.dispatchEvent(new Event('input', { bubbles: true, composed: true }));
-                    if (char !== '\n') await randomWait(speeds.type_min, speeds.type_max);
-                    if (mode !== 'turbo' && Math.random() < 0.03) await randomWait(speeds.type_max * 2, speeds.type_max * 4);
+                    targetElement.dispatchEvent(new Event('input', { bubbles: true }));
+                    if (char !== '\\n') await randomWait(cnf.type_min, cnf.type_max);
+                    if (mode !== 'turbo' && Math.random() < 0.03) await randomWait(cnf.type_max * 2, cnf.type_max * 4);
                 }
+                
                 document.execCommand('insertText', false, ' ');
-                targetElement.dispatchEvent(new Event('input', { bubbles: true, composed: true }));
+                targetElement.dispatchEvent(new Event('input', { bubbles: true }));
             }
 
             async function simulateMediaPaste(targetElement, file) {
+                if (!targetElement) return;
                 targetElement.focus();
                 await wait(500);
-                const dataTransfer = new DataTransfer();
-                dataTransfer.items.add(file);
-                const pasteEvent = new ClipboardEvent('paste', { bubbles: true, composed: true });
-                Object.defineProperty(pasteEvent, 'clipboardData', { value: dataTransfer });
-                targetElement.dispatchEvent(pasteEvent);
+                const dt = new DataTransfer(); dt.items.add(file);
+                const pe = new ClipboardEvent('paste', { bubbles: true });
+                Object.defineProperty(pe, 'clipboardData', { value: dt });
+                targetElement.dispatchEvent(pe);
                 await wait(1000);
             }
 
-            function isMediaPreviewOpen() { return !!document.querySelector('div[role="dialog"]') || !!document.querySelector('div[data-testid="drawer-left"]'); }
-            function findCaptionField() {
-                const byAria = document.querySelector('div[aria-placeholder*="legenda" i], div[aria-placeholder*="caption" i]');
-                if (byAria) return byAria;
-                const modal = document.querySelector('div[role="dialog"]') || document.querySelector('div[data-testid="drawer-left"]');
-                if (modal) { const editables = modal.querySelectorAll('div[contenteditable="true"]'); for(let i=0; i<editables.length; i++) if(editables[i].offsetWidth > 0) return editables[i]; }
-                return null;
-            }
+            // SELETORES RESILIENTES ATUALIZADOS
+            function findSearchInput() { return document.querySelector('div[contenteditable="true"][data-tab="3"]') || document.querySelector('div[title*="pesquisa" i]') || document.querySelector('#side div[contenteditable="true"]'); }
+            function findChatInput() { return document.querySelector('footer div[contenteditable="true"]') || document.querySelector('div[contenteditable="true"][data-tab="10"]') || document.querySelector('#main footer div[contenteditable="true"]'); }
             function findSendButton() { return document.querySelector('span[data-icon="send"]') || document.querySelector('button[aria-label="Enviar"]') || document.querySelector('button[aria-label="Send"]') || document.querySelector('[data-testid="send"]'); }
+            
+            function isMediaPreviewOpen() {
+                return !!document.querySelector('div[role="dialog"]') || !!document.querySelector('div[data-testid="drawer-left"]') || !!document.querySelector('div[data-testid="media-preview"]');
+            }
 
-            async function executeSafePauseCountdown(seconds) {
-                const timerClock = shadow.getElementById('dr-timer');
-                let color = app.currentSpeedMode === 'seguro' ? 'var(--c-extreme)' : 'var(--c-warning)';
-                for (let i = seconds; i > 0; i--) {
-                    if (!app.active) break;
-                    timerClock.innerText = `Pausa: ${i}s`; timerClock.style.color = color;
-                    await wait(1000);
+            // FUNÇÃO ATUALIZADA: CAÇADOR DE LEGENDAS BLINDADO
+            function findCaptionField() {
+                // Tenta achar pelos atributos de acessibilidade (ARIA)
+                let el = document.querySelector('div[aria-placeholder*="legenda" i], div[aria-placeholder*="caption" i], div[aria-label*="legenda" i], div[aria-label*="caption" i]');
+                if (el) return el;
+                
+                // Se falhar, procura agressivamente dentro de modais abertos
+                let modals = document.querySelectorAll('div[role="dialog"], div[data-testid="drawer-left"], div[data-testid="media-preview"]');
+                for (let modal of modals) {
+                    let editables = modal.querySelectorAll('div[contenteditable="true"]');
+                    for (let editable of editables) {
+                        // Confirma se o campo de texto está visível e ativo na tela
+                        if (editable.offsetWidth > 0 && editable.offsetHeight > 0) return editable;
+                    }
                 }
-                timerClock.style.color = "var(--c-text-main)"; syncStats();
+                return null;
             }
 
             async function engine() {
@@ -470,170 +433,159 @@
                 const next = app.contacts.find(c => c.status === 'PENDENTE');
                 
                 if (!next) {
-                    writeLog("OPERAÇÃO FINALIZADA!", "success");
-                    app.active = false; releaseWakeLock();
+                    writeLog("PROCESSO CONCLUÍDO!", "success");
+                    app.active = false;
                     shadow.getElementById('dr-start').innerText = "INICIAR DISPAROS";
-                    shadow.getElementById('dr-start').style.background = "var(--c-primary)";
                     return;
                 }
 
                 try {
-                    writeLog(`Navegando: ${next.phone}`);
+                    writeLog("Contatando: " + next.phone);
                     
-                    // SPA TRICK: Navega para a conversa SEM recarregar o WhatsApp
+                    // SPA: Navegação por clique fantasma para evitar refresh
                     let a = document.getElementById('wa-magic-link');
                     if(!a) { a = document.createElement('a'); a.id = 'wa-magic-link'; document.body.appendChild(a); }
-                    
-                    const textareas = Array.from(shadow.querySelectorAll('.dr-msg-input'));
-                    const validMsgs = textareas.map(t => t.value).filter(v => v.trim() !== '');
-                    let msgFinal = validMsgs.length > 0 ? validMsgs[Math.floor(Math.random() * validMsgs.length)] : '';
-                    msgFinal = msgFinal.replace(/:re:/gi, next.name);
-
-                    const shouldSendMedia = app.selectedMedias.length > 0 && app.currentSpeedMode !== 'turbo';
-                    
-                    let cleanPhone = next.phone.replace(/\D/g, '');
-                    if (!cleanPhone.startsWith('55') && cleanPhone.length <= 11) cleanPhone = '55' + cleanPhone;
-
-                    // Ação de clique para o WhatsApp interceptar
-                    a.href = `https://web.whatsapp.com/send?phone=${cleanPhone}`;
+                    a.href = "https://web.whatsapp.com/send?phone=55" + next.phone;
                     a.click();
                     
-                    await wait(getDelay('after_search_enter'));
+                    await wait(getDelay('search_wait') + 1500);
 
-                    // Verifica se o número é inválido no popup do WhatsApp
+                    // Verifica número inválido
                     let errorModal = document.querySelector('[data-animate-modal-popup="true"]');
                     if(errorModal && errorModal.innerText.toLowerCase().includes('inválid')) {
                         let okBtn = errorModal.querySelector('button');
                         if(okBtn) okBtn.click();
-                        throw new Error("Inválido");
+                        throw new Error("Número Inválido");
                     }
 
-                    let chatInput = document.querySelector('footer div[contenteditable="true"]') || document.querySelector('div[contenteditable="true"][data-tab="10"]');
-                    if (!chatInput) throw new Error("Chat falhou ao abrir.");
+                    const chatInput = findChatInput();
+                    if (!chatInput) throw new Error("Chat não acessível.");
 
-                    if (shouldSendMedia) {
-                        let captionSuccessfullyTyped = false;
+                    const textareas = Array.from(shadow.querySelectorAll('.dr-msg-input')).map(t => t.value).filter(v => v.trim() !== '');
+                    let msgFinal = textareas.length > 0 ? textareas[Math.floor(Math.random() * textareas.length)] : '';
+                    
+                    // Regex ATUALIZADA para aceitar tanto :re: quanto :re
+                    msgFinal = msgFinal.replace(/:re:?/gi, next.name);
 
+                    let captionPasted = false;
+
+                    if (app.selectedMedias.length > 0 && app.currentSpeedMode !== 'turbo') {
                         for (let i = 0; i < app.selectedMedias.length; i++) {
-                            if (!app.active) break;
-                            const file = app.selectedMedias[i];
-                            const isLast = (i === app.selectedMedias.length - 1);
+                            let file = app.selectedMedias[i];
+                            let isLast = (i === app.selectedMedias.length - 1);
                             
-                            let pasteTarget = isMediaPreviewOpen() ? (findCaptionField() || chatInput) : chatInput;
-                            await simulateMediaPaste(pasteTarget, file);
+                            await simulateMediaPaste(chatInput, file);
                             
-                            let previewOpened = false;
+                            // Aguarda modal abrir
                             for (let cycle = 0; cycle < 50; cycle++) {
                                 if (!app.active) break;
-                                if (isMediaPreviewOpen()) { previewOpened = true; break; }
-                                await wait(getDelay('preview_open_cycle'));
+                                if (isMediaPreviewOpen() || findCaptionField()) break;
+                                await wait(200);
                             }
-                            
+
+                            // Só escreve legenda na última mídia
                             if (isLast && msgFinal.trim().length > 0) {
                                 let caption = null;
-                                for(let c=0; c<20; c++){ caption = findCaptionField(); if(caption) break; await wait(300); }
+                                for(let c=0; c<15; c++){ 
+                                    caption = findCaptionField(); 
+                                    if(caption) break; 
+                                    await wait(300); 
+                                }
                                 if(caption) {
+                                    writeLog("Inserindo legenda da mídia...");
+                                    // Força foco clicando no campo antes de digitar
+                                    caption.click();
+                                    await wait(200);
                                     await typeLikeHuman(caption, msgFinal, app.currentSpeedMode);
-                                    captionSuccessfullyTyped = true;
+                                    captionPasted = true;
+                                    await wait(500);
                                 }
                             }
-                            
+
                             let sendBtn = findSendButton();
-                            if(sendBtn) { sendBtn.click(); } else { dispatchKey(document.activeElement, 'Enter'); }
+                            if(sendBtn) sendBtn.click();
+                            else dispatchKey(document.activeElement, 'Enter');
                             
-                            for (let cycle = 0; cycle < 40; cycle++) {
-                                if (!app.active) break;
-                                if (!isMediaPreviewOpen()) break;
-                                await wait(getDelay('preview_close_cycle'));
-                            }
-                            await wait(getDelay('multi_media_interval'));
+                            await wait(2000);
                         }
-
-                        // Fallback: Se a mídia for um arquivo que não aceita legenda (ex: PDF ou Documento)
-                        // ou a legenda falhou, envia o texto em seguida como uma mensagem normal separada.
-                        if (!captionSuccessfullyTyped && msgFinal.trim().length > 0) {
-                            await wait(1000); // Aguarda o popup de arquivo fechar
-                            let chatInputAfterMedia = document.querySelector('footer div[contenteditable="true"]') || document.querySelector('div[contenteditable="true"][data-tab="10"]');
-                            if (chatInputAfterMedia) {
-                                await typeLikeHuman(chatInputAfterMedia, msgFinal, app.currentSpeedMode);
-                                let sBtn = findSendButton();
-                                if(sBtn) sBtn.click(); else dispatchKey(chatInputAfterMedia, 'Enter');
-                            }
-                        }
-
-                    } else if (msgFinal.trim().length > 0) {
-                        await typeLikeHuman(chatInput, msgFinal, app.currentSpeedMode);
-                        let sBtn = findSendButton();
-                        if(sBtn) sBtn.click(); else dispatchKey(chatInput, 'Enter');
                     }
 
-                    next.status = 'ENVIADO'; app.runSendsCount++; syncStats(); writeLog(`Sucesso: ${next.phone}`, "success");
+                    // FALLBACK BLINDADO: Se falhou a legenda (ex: PDF), atira a mensagem avulsa embaixo
+                    if (msgFinal.trim().length > 0 && !captionPasted) {
+                        writeLog("Injetando texto (Chat)...");
+                        await wait(1500); // Aguarda animações do WA
+                        let freshChatInput = findChatInput();
+                        if (freshChatInput) {
+                            freshChatInput.focus();
+                            await typeLikeHuman(freshChatInput, msgFinal, app.currentSpeedMode);
+                            await wait(500);
+                            let sBtn = findSendButton();
+                            if(sBtn) sBtn.click();
+                            else dispatchKey(freshChatInput, 'Enter');
+                        }
+                    }
+
+                    next.status = 'ENVIADO'; syncStats(); writeLog("Sucesso: " + next.phone, "success");
                     
                     if (app.active) {
-                        if (app.currentSpeedMode === 'seguro') {
-                            const randomBasePause = Math.floor(Math.random() * (40 - 20 + 1) + 20); 
-                            await executeSafePauseCountdown(randomBasePause);
-                            if (app.runSendsCount % 4 === 0) {
-                                const bigPause = Math.floor(Math.random() * (120 - 60 + 1) + 60);
-                                writeLog("Pausa orgânica profunda...");
-                                await executeSafePauseCountdown(bigPause);
-                            }
-                        } else {
-                            await wait(getDelay('reset_wait'));
+                        let wt = getDelay('loop_wait');
+                        if (app.currentSpeedMode === 'normal' || app.currentSpeedMode === 'seguro') {
+                            wt += Math.floor(Math.random() * 5000); 
                         }
+                        await wait(wt);
                         setTimeout(engine, 100);
                     }
 
                 } catch (e) {
-                    writeLog(`Erro em ${next.phone}: ${e.message}`, "error");
+                    writeLog("Erro " + next.phone + ": " + e.message, "error");
                     next.status = 'ERRO'; syncStats();
-                    dispatchKey(document, 'Escape'); await wait(500);
-                    await wait(Math.floor(Math.random() * 3000) + 2000);
-                    if (app.active) setTimeout(engine, 500);
+                    dispatchKey(document, 'Escape'); await wait(200); dispatchKey(document, 'Escape');
+                    await wait(3000);
+                    if (app.active) setTimeout(engine, 100);
                 }
             }
 
             shadow.getElementById('dr-save').onclick = () => {
                 const text = shadow.getElementById('dr-import').value;
-                app.contacts = text.split('\n').filter(l => l.trim()).map(line => {
-                    const parts = line.split(/[\s\t]+/);
-                    let phone = parts.find(p => /^\d{10,14}$/.test(p.replace(/\D/g, ''))) || '';
-                    let name = parts.filter(p => p !== phone).join(' ') || 'Cliente';
-                    return { phone: phone.replace(/\D/g, ''), name, status: 'PENDENTE' };
+                app.contacts = text.split('\\n').filter(l => l.trim()).map(line => {
+                    const parts = line.split(/[\\s\\t]+/);
+                    let phone = ''; let nameParts = [];
+                    parts.forEach(p => { const cl = p.replace(/\\D/g, ''); if(cl.length>=10 && !phone) phone=cl; else nameParts.push(p); });
+                    return { phone, name: nameParts.join(' ') || 'Cliente', status: 'PENDENTE' };
                 }).filter(c => c.phone);
-                writeLog(`${app.contacts.length} contatos lidos.`); syncStats();
+                writeLog(app.contacts.length + " contatos carregados."); syncStats();
                 shadow.querySelector('[data-tab="disparo"]').click();
             };
 
             shadow.getElementById('dr-img-input').onchange = (e) => {
                 app.selectedMedias = Array.from(e.target.files);
-                updateMediaUI(); writeLog(`${app.selectedMedias.length} mídias anexadas.`);
+                shadow.getElementById('file-name').innerText = app.selectedMedias.length > 0 ? app.selectedMedias.length + " arquivo(s)" : "Nenhum";
             };
-            shadow.getElementById('btn-clear-img').onclick = () => { app.selectedMedias = []; shadow.getElementById('dr-img-input').value = ""; updateMediaUI(); };
 
             shadow.getElementById('dr-start').onclick = () => {
-                if (app.contacts.length === 0) return alert("Forneça a lista de contatos na aba 'Lista'!");
+                if (app.contacts.length === 0) return alert("Adicione contatos na aba 'Lista'!");
                 app.active = !app.active;
                 const btn = shadow.getElementById('dr-start');
                 if (app.active) {
                     btn.innerText = "PAUSAR MOTOR"; btn.style.background = "var(--c-danger)";
-                    requestWakeLock(); engine();
+                    engine();
                 } else {
                     btn.innerText = "INICIAR DISPAROS"; btn.style.background = "var(--c-primary)";
-                    releaseWakeLock();
                 }
             };
             
             shadow.getElementById('dr-reset').onclick = () => {
-                app.contacts = []; app.selectedMedias = []; app.runSendsCount = 0; shadow.getElementById('dr-import').value = ""; shadow.getElementById('dr-img-input').value = "";
-                const msgList = shadow.getElementById('msg-list'); msgList.innerHTML = ''; addMsgVariant();
-                updateMediaUI(); syncStats(); releaseWakeLock(); writeLog("Memória limpa.");
+                app.contacts = []; app.selectedMedias = [];
+                shadow.getElementById('dr-import').value = ""; shadow.getElementById('dr-img-input').value = "";
+                shadow.getElementById('file-name').innerText = "Nenhum";
+                syncStats(); writeLog("Memória Limpa.");
             };
         };
 
-        // Envelopa o robô perfeitamente no botão de Instalação
+        const scriptString = codigoDoRobo.toString();
+        // Não precisamos escapar quebras de linha aqui pois o código já está envelopado bonitinho em função
         const linkMagico = document.getElementById('btn-magico');
-        linkMagico.href = 'javascript:(' + encodeURIComponent(codigoDoRobo.toString()) + ')();';
+        linkMagico.href = 'javascript:(' + encodeURIComponent(scriptString) + ')();';
     </script>
 </body>
 </html>
