@@ -7,7 +7,7 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Helvetica+Neue:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
@@ -17,12 +17,12 @@
             theme: {
                 extend: {
                     fontFamily: { 
-                        'sans': ['"Inter"', 'sans-serif']
+                        'sans': ['"Inter"', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif']
                     },
                     colors: { 
                         'wa-green': '#25D366',
                         'wa-dark-green': '#128C7E',
-                        'wa-bg': '#F0F2F5',
+                        'wa-bg': '#FCFDFE',
                         'wa-panel': '#FFFFFF',
                         'wa-text': '#111B21',
                         'wa-muted': '#54656F',
@@ -38,23 +38,23 @@
         
         .wa-card {
             background: #FFFFFF;
-            border-radius: 20px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 0 1px rgba(0,0,0,0.06);
-            border: 1px solid #E9EDEF;
+            border-radius: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03), 0 0 2px rgba(0,0,0,0.05);
+            border: 1px solid rgba(0,0,0,0.02);
             overflow: hidden;
         }
 
         .wa-btn {
             background-color: #25D366;
-            color: #FFFFFF;
-            border-radius: 999px;
+            color: #111B21;
+            border-radius: 9999px;
             transition: all 0.2s ease;
-            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.2);
+            box-shadow: 0 4px 14px rgba(37, 211, 102, 0.2);
         }
         
         .wa-btn:hover:not(:disabled) {
             transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(37, 211, 102, 0.3);
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.3);
             background-color: #22c55e;
         }
         
@@ -65,13 +65,13 @@
         .wa-input { 
             background: #F0F2F5; 
             border: 1px solid transparent; 
-            border-radius: 12px; 
+            border-radius: 16px; 
             transition: all 0.2s; 
         }
         .wa-input:focus { 
             background: #FFFFFF;
             border-color: #25D366; 
-            box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.15); 
+            box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.1); 
             outline: none; 
         }
 
@@ -83,10 +83,10 @@
 </head>
 <body class="min-h-screen flex flex-col font-sans antialiased selection:bg-green-100 selection:text-wa-dark-green">
 
-    <!-- HEADER -->
-    <header class="bg-white px-6 py-4 flex justify-between items-center z-50 sticky top-0 shadow-sm border-b border-wa-border">
+    <!-- HEADER WHATSAPP STYLE -->
+    <header class="bg-white px-8 py-5 flex justify-between items-center z-50 sticky top-0 shadow-sm border-b border-wa-border">
         <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-wa-green flex items-center justify-center text-white text-xl shadow-inner">
+            <div class="w-10 h-10 rounded-full bg-wa-green flex items-center justify-center text-white text-xl">
                 <i class="fa-brands fa-whatsapp"></i>
             </div>
             <div>
@@ -99,87 +99,87 @@
                 <div id="usb-status-dot" class="w-2.5 h-2.5 rounded-full bg-wa-green animate-pulse"></div>
                 <span id="usb-status-text" class="text-xs font-semibold text-wa-dark-green">Dispositivo Conectado</span>
             </div>
-            <button id="btn-conectar" onclick="conectarUSB()" class="wa-btn font-semibold px-6 py-2.5 text-sm flex items-center gap-2 text-white">
+            <button id="btn-conectar" onclick="conectarUSB()" class="wa-btn font-semibold px-8 py-2.5 text-sm flex items-center gap-2 text-white bg-wa-dark-green shadow-none hover:shadow-md">
                 Iniciar
             </button>
         </div>
     </header>
 
-    <main class="flex-1 w-full max-w-[1400px] mx-auto p-6 grid grid-cols-1 xl:grid-cols-12 gap-6">
+    <main class="flex-1 w-full max-w-[1400px] mx-auto p-6 md:p-8 grid grid-cols-1 xl:grid-cols-12 gap-8">
         
         <!-- COLUNA ESQUERDA -->
         <div class="xl:col-span-5 flex flex-col gap-6">
             
-            <!-- BLOCO 1: COLE OS DADOS -->
-            <div class="wa-card p-6">
-                <div class="flex items-center gap-2 mb-4">
+            <!-- BLOCO 1: ENTRADA DE DADOS -->
+            <div class="wa-card p-6 md:p-8">
+                <div class="flex items-center gap-3 mb-4">
                     <h2 class="text-wa-text font-bold text-lg tracking-tight">Cole os Dados</h2>
                 </div>
                 <textarea id="paste-area" rows="4" class="w-full wa-input p-4 text-sm text-wa-text placeholder-wa-muted resize-none font-medium leading-relaxed" placeholder="DENTRO DA VDI COPIE CÓDIGO, NOME E TELEFONE DO REVENDEDOR E COLE AQUI DENTRO"></textarea>
-                <button onclick="processarEntradas()" class="w-full mt-4 wa-btn py-3.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 bg-wa-dark-green hover:bg-wa-green">
+                <button onclick="processarEntradas()" class="w-full mt-4 wa-btn text-white py-3.5 rounded-full text-sm font-semibold flex items-center justify-center gap-2 hover:bg-wa-dark-green bg-wa-dark-green shadow-none hover:shadow-md">
                     Processar
                 </button>
             </div>
 
             <!-- BLOCO 2: CONTEÚDO -->
-            <div class="wa-card p-6 flex flex-col flex-1">
+            <div class="wa-card p-6 md:p-8 flex flex-col min-h-[400px]">
                 <div class="flex justify-between items-center mb-2">
                     <h2 class="text-wa-text font-bold text-lg tracking-tight">Conteúdo</h2>
                 </div>
                 
-                <p class="text-xs text-wa-muted mb-5 leading-relaxed">
+                <p class="text-xs text-wa-muted mb-6 leading-relaxed">
                     Para adicionar variações adicione texto ou áudio, o sistema vai mandar de forma aleatória para cada RE.
                 </p>
 
-                <div id="pipeline-container" class="flex flex-col gap-4 mb-4 overflow-y-auto pr-2 min-h-[150px]">
+                <div id="pipeline-container" class="flex flex-col gap-4 mb-4 overflow-y-auto flex-1 pr-2">
                     <!-- Cards (Inicia Vazio) -->
                 </div>
                 
                 <div class="grid grid-cols-2 gap-3 mt-auto pt-4 border-t border-wa-border">
-                    <button onclick="addPipelineAction('TEXT')" class="bg-gray-50 border border-gray-200 text-wa-text py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 hover:bg-gray-100 transition-colors">
+                    <button onclick="addPipelineAction('TEXT')" class="bg-gray-50 border border-gray-200 text-wa-text py-3 rounded-full text-sm font-semibold flex items-center justify-center gap-2 hover:bg-gray-100 transition-colors">
                         <i class="fa-solid fa-comment-dots text-wa-green"></i> Adicionar Texto
                     </button>
-                    <button onclick="addPipelineAction('AUDIO')" class="bg-gray-50 border border-gray-200 text-wa-text py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 hover:bg-gray-100 transition-colors">
+                    <button onclick="addPipelineAction('AUDIO')" class="bg-gray-50 border border-gray-200 text-wa-text py-3 rounded-full text-sm font-semibold flex items-center justify-center gap-2 hover:bg-gray-100 transition-colors">
                         <i class="fa-solid fa-microphone text-blue-500"></i> Adicionar Áudio
                     </button>
                 </div>
             </div>
             
             <!-- BLOCO 3: CONFIGURAÇÃO -->
-            <div class="wa-card p-6">
+            <div class="wa-card p-6 md:p-8">
                 <div class="flex items-center gap-2 mb-4">
                     <h2 class="text-wa-text font-bold text-lg tracking-tight">Configuração</h2>
                 </div>
 
-                <div class="bg-amber-50 p-4 rounded-xl border border-amber-100 mb-5">
+                <div class="bg-amber-50/50 p-4 rounded-2xl border border-amber-100 mb-6">
                     <p class="text-xs text-amber-800 font-medium leading-relaxed">
                         <i class="fa-solid fa-circle-info mr-1"></i> No WhatsApp do celular vá em <b>Configurações > Conversas</b> e <b>ATIVE "Enviar com Enter"</b>.
                     </p>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4 mb-4">
+                <div class="grid grid-cols-2 gap-5 mb-5">
                     <div>
-                        <label class="block text-[11px] font-semibold text-wa-muted mb-1.5 uppercase tracking-wider">App Alvo</label>
-                        <select id="cfg-app" class="w-full wa-input text-wa-text font-medium text-sm p-3 border-gray-200">
+                        <label class="block text-xs font-semibold text-wa-muted mb-2">App Alvo</label>
+                        <select id="cfg-app" class="w-full wa-input text-wa-text font-medium text-sm p-3">
                             <option value="com.whatsapp.w4b">WA Business</option>
                             <option value="com.whatsapp">WA Normal</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-[11px] font-semibold text-wa-muted mb-1.5 uppercase tracking-wider">Motor</label>
+                        <label class="block text-xs font-semibold text-wa-muted mb-2">Motor</label>
                         <div class="w-full bg-gray-50 border border-gray-100 text-gray-500 font-semibold text-sm rounded-xl p-3 flex items-center gap-2">
                             Inteligente
                         </div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="bg-gray-50 p-3 rounded-xl border border-gray-100 text-center">
-                        <label class="block text-[11px] font-semibold text-wa-muted mb-1 uppercase tracking-wider">Pausa Mín. (s)</label>
+                <div class="grid grid-cols-2 gap-5">
+                    <div class="bg-gray-50 p-3 rounded-2xl border border-gray-100 text-center">
+                        <label class="block text-xs font-semibold text-wa-muted mb-1">Pausa Mín. (s)</label>
                         <input type="number" id="cfg-delay-min" value="10" onchange="atualizarMetricas()" class="w-full bg-transparent text-xl text-wa-text font-bold text-center outline-none">
                     </div>
-                    <div class="bg-gray-50 p-3 rounded-xl border border-gray-100 text-center">
-                        <label class="block text-[11px] font-semibold text-wa-muted mb-1 uppercase tracking-wider">Pausa Máx. (s)</label>
+                    <div class="bg-gray-50 p-3 rounded-2xl border border-gray-100 text-center">
+                        <label class="block text-xs font-semibold text-wa-muted mb-1">Pausa Máx. (s)</label>
                         <input type="number" id="cfg-delay-max" value="25" onchange="atualizarMetricas()" class="w-full bg-transparent text-xl text-wa-text font-bold text-center outline-none">
                     </div>
                 </div>
@@ -189,41 +189,40 @@
         <!-- COLUNA DIREITA -->
         <div class="xl:col-span-7 flex flex-col gap-6">
             
-            <div class="wa-card p-8 flex flex-col items-center justify-center relative min-h-[500px] flex-1">
-                <!-- BG Pattern Soft -->
-                <div class="absolute inset-0 opacity-[0.02] bg-[url('https://i.pinimg.com/originals/97/c0/07/97c00759d90d786d9b6096d274ad3e07.png')] bg-repeat pointer-events-none"></div>
+            <div class="wa-card p-10 flex flex-col items-center justify-center relative min-h-[500px] flex-1">
+                <div class="absolute inset-0 opacity-[0.03] bg-[url('https://i.pinimg.com/originals/97/c0/07/97c00759d90d786d9b6096d274ad3e07.png')] bg-repeat pointer-events-none"></div>
                 
                 <div class="text-center relative z-10 w-full max-w-md flex flex-col items-center">
                     
                     <div class="flex justify-center mb-8">
-                        <span id="stage-status" class="px-5 py-2 bg-gray-100 text-wa-muted text-xs font-semibold rounded-full border border-gray-200">
+                        <span id="stage-status" class="px-5 py-2 bg-gray-100 text-wa-muted text-xs font-bold rounded-full">
                             Aguardando Início
                         </span>
                     </div>
 
-                    <h2 id="stage-name" class="text-3xl font-bold text-wa-text mb-2 tracking-tight break-words line-clamp-2">---</h2>
-                    <p id="stage-phone" class="text-sm font-medium text-wa-muted mb-10 tracking-wide">---</p>
+                    <h2 id="stage-name" class="text-3xl font-bold text-wa-text mb-3 tracking-tight break-words line-clamp-2">...</h2>
+                    <p id="stage-phone" class="text-base font-medium text-wa-muted mb-10">...</p>
                     
                     <div id="action-feedback" class="hidden flex-col items-center justify-center mb-10">
-                        <div id="action-icon-box" class="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mb-3 transition-all border border-green-100">
+                        <div id="action-icon-box" class="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mb-4 transition-all">
                             <i id="action-icon" class="fa-solid fa-robot text-3xl text-wa-green"></i>
                         </div>
-                        <p id="action-text" class="text-sm font-semibold text-wa-text">Aguardando...</p>
+                        <p id="action-text" class="text-sm font-semibold text-wa-text">Aguardando Ação...</p>
                     </div>
 
                     <div class="flex flex-col gap-3 w-full">
-                        <button id="btn-start" onclick="iniciarCampanha()" class="wa-btn w-full text-white font-bold text-lg py-4 rounded-xl flex items-center justify-center gap-3 disabled:opacity-50 hover:bg-wa-green bg-wa-dark-green shadow-sm hover:shadow-md">
+                        <button id="btn-start" onclick="iniciarCampanha()" class="wa-btn w-full text-white font-bold text-lg py-4 flex items-center justify-center gap-3 disabled:opacity-50 hover:bg-wa-dark-green bg-wa-dark-green shadow-none hover:shadow-lg">
                             <i class="fa-solid fa-paper-plane"></i> Iniciar Disparos
                         </button>
-                        <button id="btn-resume" onclick="retomarCampanha()" class="hidden w-full bg-blue-500 text-white rounded-xl font-bold text-lg py-4 flex items-center justify-center gap-3 hover:bg-blue-600 transition-colors shadow-sm">
+                        <button id="btn-resume" onclick="retomarCampanha()" class="hidden w-full bg-blue-500 text-white rounded-full font-bold text-lg py-4 flex items-center justify-center gap-3 hover:bg-blue-600 transition-colors shadow-md">
                             <i class="fa-solid fa-bolt"></i> Retomar
                         </button>
                         
                         <div id="btn-controls" class="hidden gap-3 w-full">
-                            <button onclick="pularCliente()" class="flex-1 bg-gray-100 text-gray-700 font-semibold text-sm py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-gray-200 transition-colors border border-gray-200" title="Pular este contato">
+                            <button onclick="pularCliente()" class="flex-1 bg-gray-100 text-gray-700 font-semibold text-sm py-4 rounded-full flex items-center justify-center gap-2 hover:bg-gray-200 transition-colors" title="Pular este contato">
                                 <i class="fa-solid fa-forward-step"></i> Pular
                             </button>
-                            <button onclick="pararCampanha(false)" class="flex-1 bg-red-50 text-red-600 font-semibold text-sm py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-red-100 transition-colors border border-red-100" title="Pausar Operação">
+                            <button onclick="pararCampanha(false)" class="flex-1 bg-red-50 text-red-600 font-semibold text-sm py-4 rounded-full flex items-center justify-center gap-2 hover:bg-red-100 transition-colors" title="Pausar Operação">
                                 <i class="fa-solid fa-hand"></i> Interromper
                             </button>
                         </div>
@@ -231,42 +230,42 @@
                 </div>
             </div>
 
-            <!-- DASHBOARD -->
-            <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mt-auto">
-                <div class="wa-card p-4 text-center flex flex-col justify-center">
+            <!-- DASHBOARD WHATSAPP METRICS -->
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mt-auto">
+                <div class="wa-card p-5 text-center flex flex-col justify-center">
                     <p class="text-[10px] text-wa-muted uppercase font-bold tracking-wider mb-1">Na Fila</p>
-                    <p id="stat-pendentes" class="text-xl font-bold text-wa-text">0</p>
+                    <p id="stat-pendentes" class="text-2xl font-bold text-wa-text">0</p>
                 </div>
-                <div class="wa-card p-4 text-center flex flex-col justify-center bg-green-50 border-green-100">
+                <div class="wa-card p-5 text-center flex flex-col justify-center bg-green-50 border-none">
                     <p class="text-[10px] text-wa-dark-green uppercase font-bold tracking-wider mb-1">Enviados</p>
-                    <p id="stat-feitos" class="text-xl font-bold text-wa-dark-green">0</p>
+                    <p id="stat-feitos" class="text-2xl font-bold text-wa-dark-green">0</p>
                 </div>
-                <div class="wa-card p-4 text-center flex flex-col justify-center bg-red-50 border-red-100">
+                <div class="wa-card p-5 text-center flex flex-col justify-center bg-red-50 border-none">
                     <p class="text-[10px] text-red-600 uppercase font-bold tracking-wider mb-1">Inválidos</p>
-                    <p id="stat-invalidos" class="text-xl font-bold text-red-600">0</p>
+                    <p id="stat-invalidos" class="text-2xl font-bold text-red-600">0</p>
                 </div>
-                <div class="wa-card p-4 text-center flex flex-col justify-center">
+                <div class="wa-card p-5 text-center flex flex-col justify-center">
                     <p class="text-[10px] text-wa-muted uppercase font-bold tracking-wider mb-1">Término Em</p>
-                    <p id="stat-eta" class="text-lg font-bold text-wa-text mt-1">00h 00m</p>
+                    <p id="stat-eta" class="text-xl font-bold text-wa-text mt-1">00h 00m</p>
                 </div>
-                <button onclick="exportarRelatorio()" class="wa-card p-4 text-center flex flex-col justify-center items-center hover:bg-gray-50 transition-colors cursor-pointer group">
-                    <i class="fa-solid fa-download text-lg mb-1 text-wa-muted group-hover:text-wa-green transition-colors"></i>
-                    <p class="text-[9px] font-bold text-wa-muted uppercase tracking-wider group-hover:text-wa-green transition-colors">Relatório</p>
+                <button onclick="exportarRelatorio()" class="wa-card p-5 text-center flex flex-col justify-center items-center hover:bg-gray-50 transition-colors">
+                    <i class="fa-solid fa-download text-xl mb-1.5 text-wa-muted"></i>
+                    <p class="text-[9px] font-bold text-wa-muted uppercase tracking-wider">Relatório</p>
                 </button>
             </div>
         </div>
     </main>
 
     <!-- MODAL DE INSPEÇÃO -->
-    <div id="modal-preview" class="fixed inset-0 bg-wa-text/50 backdrop-blur-sm z-[100] hidden items-center justify-center p-4 transition-opacity">
+    <div id="modal-preview" class="fixed inset-0 bg-wa-text/40 backdrop-blur-sm z-[100] hidden items-center justify-center p-4 transition-opacity">
         <div class="wa-card w-full max-w-3xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl">
-            <div class="p-5 border-b border-wa-border flex justify-between items-center bg-white">
-                <h2 class="text-base font-bold text-wa-text tracking-tight">Auditoria de Dados</h2>
+            <div class="p-6 border-b border-wa-border flex justify-between items-center bg-white">
+                <h2 class="text-lg font-bold text-wa-text tracking-tight">Auditoria de Dados</h2>
                 <button onclick="fecharModal()" class="text-wa-muted hover:text-wa-text transition-colors w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             
-            <div class="p-3 bg-gray-50 flex justify-between items-center px-6 border-b border-wa-border">
-                <span class="text-xs font-semibold text-wa-dark-green bg-green-100/60 px-3 py-1 rounded-full"><i class="fa-solid fa-shield-check mr-1"></i> Desduplicação Ativa</span>
+            <div class="p-4 bg-gray-50 flex justify-between items-center px-6 border-b border-wa-border">
+                <span class="text-xs font-semibold text-wa-dark-green bg-green-100/50 px-3 py-1 rounded-full"><i class="fa-solid fa-shield-check mr-1"></i> Desduplicação Ativa</span>
                 <span class="text-xs font-semibold text-wa-text" id="preview-count">0 Registros</span>
             </div>
 
@@ -274,26 +273,26 @@
                 <table class="w-full text-left text-sm">
                     <thead class="text-xs font-semibold text-wa-muted bg-white sticky top-0 border-b border-wa-border shadow-sm">
                         <tr>
-                            <th class="py-3 px-6">Nome Extraído</th>
-                            <th class="py-3 px-6 text-center">Código</th>
-                            <th class="py-3 px-6 text-right">Telefone</th>
+                            <th class="py-4 px-6">Nome Extraído</th>
+                            <th class="py-4 px-6 text-center">Código</th>
+                            <th class="py-4 px-6 text-right">Telefone</th>
                         </tr>
                     </thead>
-                    <tbody id="preview-table-body" class="divide-y divide-gray-100 text-wa-text font-medium text-xs"></tbody>
+                    <tbody id="preview-table-body" class="divide-y divide-gray-50 text-wa-text font-medium"></tbody>
                 </table>
             </div>
-            <div class="p-4 bg-white flex justify-end gap-3 border-t border-wa-border">
-                <button onclick="fecharModal()" class="px-5 py-2 rounded-xl text-sm font-semibold text-wa-muted hover:bg-gray-100 transition-colors">Descartar</button>
-                <button onclick="confirmarImportacao()" class="wa-btn px-6 py-2 rounded-xl text-sm font-semibold text-white bg-wa-dark-green hover:bg-wa-green shadow-sm">Aprovar Base</button>
+            <div class="p-5 bg-white flex justify-end gap-3 border-t border-wa-border">
+                <button onclick="fecharModal()" class="px-6 py-2.5 rounded-full text-sm font-semibold text-wa-muted hover:bg-gray-100 transition-colors">Descartar</button>
+                <button onclick="confirmarImportacao()" class="wa-btn px-8 py-2.5 rounded-full text-sm font-semibold text-white bg-wa-dark-green hover:bg-wa-dark-green hover:shadow-md">Aprovar Base</button>
             </div>
         </div>
     </div>
 
-    <!-- TOASTS -->
-    <div id="toast-container" class="fixed bottom-6 right-6 z-[200] flex flex-col gap-3 pointer-events-none"></div>
+    <!-- TOASTS MINIMALISTAS -->
+    <div id="toast-container" class="fixed bottom-8 right-8 z-[200] flex flex-col gap-3 pointer-events-none"></div>
 
     <script>
-        // --- 1. ESTADO GLOBAL ---
+        // --- ESTADO GLOBAL ---
         let contatosBase = [];
         let contatosTemp = [];
         let currentIndex = 0;
@@ -333,8 +332,8 @@
             else if (type === 'success') { iconClass = 'fa-circle-check text-wa-green'; }
             else if (type === 'warning') { iconClass = 'fa-triangle-exclamation text-amber-500'; }
             
-            toast.className = `bg-white border border-gray-200 px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 transform transition-all duration-300 translate-y-10 opacity-0 pointer-events-auto z-[250]`;
-            toast.innerHTML = `<i class="fa-solid ${iconClass} text-lg"></i><span class="text-xs font-semibold text-wa-text">${msg}</span>`;
+            toast.className = `bg-white border border-gray-100 px-5 py-3.5 rounded-2xl shadow-lg flex items-center gap-3 transform transition-all duration-300 translate-y-10 opacity-0 pointer-events-auto z-[250]`;
+            toast.innerHTML = `<i class="fa-solid ${iconClass} text-lg"></i><span class="text-sm font-medium text-wa-text">${msg}</span>`;
             container.appendChild(toast);
             requestAnimationFrame(() => toast.classList.remove('translate-y-10', 'opacity-0'));
             setTimeout(() => { toast.classList.add('translate-y-10', 'opacity-0'); setTimeout(() => toast.remove(), 300); }, 5000);
@@ -346,26 +345,26 @@
             container.innerHTML = '';
             pipelineActions.forEach((action, index) => {
                 const div = document.createElement('div');
-                div.className = `bg-white border border-gray-200 rounded-xl p-3 shrink-0`;
+                div.className = `bg-white border border-gray-200 rounded-2xl p-4 shrink-0`;
                 
                 let innerHtml = `
-                    <div class="flex justify-between items-center mb-2">
+                    <div class="flex justify-between items-center mb-3">
                         <span class="text-[10px] font-bold uppercase tracking-wider text-wa-muted">
                             Bloco ${index + 1}: ${action.type === 'TEXT' ? 'Mensagem' : 'Áudio'}
                         </span>
-                        <button onclick="removerPipelineAction(${index})" class="text-gray-400 hover:text-red-500 transition-colors w-6 h-6 flex items-center justify-center rounded-full hover:bg-red-50"><i class="fa-solid fa-trash text-[10px]"></i></button>
+                        <button onclick="removerPipelineAction(${index})" class="text-gray-400 hover:text-red-500 transition-colors w-6 h-6 flex items-center justify-center rounded-full hover:bg-red-50"><i class="fa-solid fa-trash text-xs"></i></button>
                     </div>
                 `;
 
                 if (action.type === 'TEXT') {
-                    innerHtml += `<textarea rows="2" class="w-full wa-input p-2.5 text-xs text-wa-text font-medium placeholder-gray-400 resize-none" placeholder="use :re para puxar o nome..." onchange="updatePipelineAction(${index}, 'TEXT', this.value)">${action.content}</textarea>`;
+                    innerHtml += `<textarea rows="3" class="w-full wa-input p-3 text-sm text-wa-text font-medium placeholder-gray-400 resize-none" placeholder="use :re para puxar o nome e personalizar a mensagem" onchange="updatePipelineAction(${index}, 'TEXT', this.value)">${action.content}</textarea>`;
                 } else if (action.type === 'AUDIO') {
                     innerHtml += `
-                        <div class="flex items-center gap-3 bg-gray-50 p-2.5 rounded-lg border border-gray-100">
-                            <i class="fa-solid fa-microphone-lines text-xl text-blue-500 w-6 text-center"></i>
+                        <div class="flex items-center gap-4 bg-gray-50 p-3 rounded-xl border border-gray-100">
+                            <i class="fa-solid fa-microphone-lines text-2xl text-blue-500 w-8 text-center"></i>
                             <div class="flex-1">
-                                <label class="block text-[9px] font-semibold text-wa-muted uppercase tracking-wider mb-0.5">Anexar Áudio</label>
-                                <input type="file" accept="audio/*" id="audio-file-${action.id}" class="w-full text-[10px] font-medium text-wa-text file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-[10px] file:font-semibold file:bg-white file:text-wa-text file:border file:border-gray-200 hover:file:bg-gray-50 cursor-pointer transition-colors">
+                                <label class="block text-[10px] font-semibold text-wa-muted uppercase tracking-wider mb-1">Anexar Áudio</label>
+                                <input type="file" accept="audio/*" id="audio-file-${action.id}" class="w-full text-xs font-medium text-wa-text file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-white file:text-wa-text file:border file:border-gray-200 hover:file:bg-gray-50 cursor-pointer transition-colors">
                             </div>
                         </div>
                     `;
@@ -377,7 +376,6 @@
         function removerPipelineAction(index) { pipelineActions.splice(index, 1); renderPipelineUI(); }
         function updatePipelineAction(index, type, val) { if(type === 'TEXT') pipelineActions[index].content = val; }
 
-        // --- IMPORTAÇÃO ---
         function processarEntradas() {
             const rawText = document.getElementById('paste-area').value;
             if(!rawText.trim()) return showToast("Cole os dados primeiro.", "warning");
@@ -406,7 +404,7 @@
             const tbody = document.getElementById('preview-table-body'); tbody.innerHTML = ''; document.getElementById('preview-count').innerText = `${total} Registros`;
             contatosTemp.forEach(c => {
                 let tr = document.createElement('tr');
-                tr.innerHTML = `<td class="py-2.5 px-6">${c.name}</td><td class="py-2.5 px-6 font-mono text-center text-wa-muted">${c.code}</td><td class="py-2.5 px-6 font-mono text-right ${c.phone !== 'N/A' ? 'text-wa-text' : 'text-amber-500'}">${c.phone !== 'N/A' ? c.phone : 'Busca por Cód.'}</td>`;
+                tr.innerHTML = `<td class="py-3 px-6 text-xs">${c.name}</td><td class="py-3 px-6 font-mono text-xs text-center text-wa-muted">${c.code}</td><td class="py-3 px-6 font-mono text-xs text-right ${c.phone !== 'N/A' ? 'text-wa-text' : 'text-amber-500'}">${c.phone !== 'N/A' ? c.phone : 'Busca por Cód.'}</td>`;
                 tbody.appendChild(tr);
             });
             document.getElementById('modal-preview').classList.remove('hidden'); document.getElementById('modal-preview').classList.add('flex');
@@ -444,8 +442,8 @@
 
         function setActionUI(icon, text, isPulsing = false, iconColor = 'text-wa-green', bgColor = 'bg-green-50') {
             document.getElementById('action-feedback').classList.remove('hidden'); document.getElementById('action-feedback').classList.add('flex');
-            document.getElementById('action-icon-box').className = `w-16 h-16 rounded-full ${bgColor} flex items-center justify-center mb-3 transition-all ${isPulsing ? 'animate-pulse' : ''}`;
-            document.getElementById('action-icon').className = `fa-solid ${icon} text-2xl ${iconColor}`;
+            document.getElementById('action-icon-box').className = `w-20 h-20 rounded-full ${bgColor} flex items-center justify-center mb-4 transition-all ${isPulsing ? 'animate-pulse' : ''}`;
+            document.getElementById('action-icon').className = `fa-solid ${icon} text-3xl ${iconColor}`;
             document.getElementById('action-text').innerText = text;
         }
 
@@ -466,7 +464,7 @@
             }
         }
 
-        // --- CONTROLES DE EMERGÊNCIA ---
+        // --- EMERGÊNCIA ---
         function pararCampanha(emergencia = false) {
             isCampaignActive = false; skipCurrent = true;
             document.getElementById('btn-controls').style.display = 'none'; document.getElementById('btn-start').style.display = 'none';
@@ -483,23 +481,22 @@
         }
 
         function pularCliente() { if(!isCampaignActive) return; skipCurrent = true; showToast("Pulando...", "warning"); }
-        
         function retomarCampanha() {
-            if (!isAdbReady) return showToast("Verifique se o USB está conectado no celular, lembrando que tem que ter ativado a depuração.", "error");
+            if (!isAdbReady) return showToast("Verifique se o USB está conectado no seu celular, lembrando que tem que ter ativado a depuração do usb.", "error");
             document.getElementById('btn-resume').style.display = 'none'; document.getElementById('btn-start').style.display = 'none'; document.getElementById('btn-controls').style.display = 'flex';
             document.getElementById('stage-status').className = "px-4 py-1.5 rounded-full bg-gray-100 text-[10px] font-bold text-wa-muted uppercase";
             isCampaignActive = true; skipCurrent = false; processarProximo();
         }
 
         async function iniciarCampanha() {
-            if (!isAdbReady) return showToast("Verifique se o USB está conectado no celular, lembrando que tem que ter ativado a depuração.", "error"); 
+            if (!isAdbReady) return showToast("Verifique se o USB está conectado no seu celular, lembrando que tem que ter ativado a depuração do usb.", "error"); 
             if (pipelineActions.length === 0) return showToast("Adicione conteúdo primeiro.", "error");
             isCampaignActive = true; skipCurrent = false;
             document.getElementById('btn-start').style.display = 'none'; document.getElementById('btn-controls').style.display = 'flex';
             processarProximo();
         }
 
-        // --- NÚCLEO ADB ---
+        // --- NÚCLEO ADB (SEM TRAVAMENTO DE TELA) ---
         async function adbReaderLoop() {
             if (isReaderRunning) return; isReaderRunning = true;
             while (isAdbReady && usbDevice && epIn) {
@@ -526,9 +523,8 @@
             return new Promise(async (resolve) => {
                 const myId = localIdCounter++;
                 adbStreams[myId] = { data: "", closed: false, resolve: resolve };
-                
-                // Enviando comando direto para o shell do Android sem envelopamento que quebra o binário "am"
                 await sendPacket(0x4E45504F, myId, 0, new TextEncoder().encode("shell:" + command + "\0"));
+                // Timeout de segurança absoluta: Se o comando demorar demais, encerra e continua a vida
                 setTimeout(() => { if (!adbStreams[myId].closed) { adbStreams[myId].closed = true; resolve(adbStreams[myId].data); } }, timeoutMs);
             });
         }
@@ -563,8 +559,8 @@
                 await safeSleep(500);
 
                 if (contato.phone !== "N/A") {
-                    setActionUI('fa-magnifying-glass', 'Buscando...', true, 'text-blue-500', 'bg-blue-50');
-                    // Usando aspas simples apenas no URI do WhatsApp para proteger o ADB Shell
+                    setActionUI('fa-magnifying-glass', 'Abrindo Conversa...', true, 'text-blue-500', 'bg-blue-50');
+                    // Abertura nativa 100% segura sem quebrar no adb shell
                     await runAdb(`am start -a android.intent.action.VIEW -d 'whatsapp://send?phone=55${contato.phone}' -p ${appPackage}`);
                     await safeSleep(3500); if (skipCurrent || !isCampaignActive) { abortarTurno(contato); return; }
 
@@ -582,9 +578,7 @@
                     await runAdb(`am start -n ${appPackage}/com.whatsapp.Main`);
                     await safeSleep(2000); if(skipCurrent) { abortarTurno(contato); return; }
                     await runAdb("input keyevent 84"); await safeSleep(1000);
-                    
-                    // Tratamento seguro para input text (remove espaços e caracteres que quebram o comando da Lupa)
-                    const cleanCode = contato.code.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s/g, "");
+                    const cleanCode = contato.code.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
                     await runAdb(`input text ${cleanCode}`);
                     await safeSleep(2000); if(skipCurrent) { abortarTurno(contato); return; }
                     await runAdb("input keyevent 66"); await safeSleep(1500);
@@ -601,16 +595,14 @@
                         const msg = parseMensagem(acao.content, contato.name);
                         
                         if(contato.phone === "N/A") {
-                            // Envio por Lupa (Input Text Nativo): Troca espaços por %s para o adb shell e remove quebras nativas que dariam erro na shell
+                            // Se abriu via Lupa, usa input text com escapes protetores
                             let cleanMsg = msg.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\n/g, '%s').replace(/\s/g, '%s').replace(/[&<>"']/g, ''); 
                             await runAdb(`input text ${cleanMsg}`); await safeSleep(500);
                             await runAdb("input keyevent 66"); await safeSleep(300); await runAdb("input keyevent 66");
                         } else {
-                            // Envio Seguro por Intent (Aceita Multi-Line %0A e Caracteres Especiais)
+                            // Se tem telefone, aproveita e envia via Intent (MUITO mais rápido e limpo)
                             const encodedMsg = encodeURIComponent(msg).replace(/'/g, "%27").replace(/"/g, "%22");
-                            const sendUrl = `whatsapp://send?phone=55${contato.phone}&text=${encodedMsg}`;
-                            // Usando aspas simples no link para o Shell interpretar todos os parâmetros (&text) corretamente
-                            await runAdb(`am start -a android.intent.action.VIEW -d '${sendUrl}' -p ${appPackage}`);
+                            await runAdb(`am start -a android.intent.action.VIEW -d 'whatsapp://send?phone=55${contato.phone}&text=${encodedMsg}' -p ${appPackage}`);
                             await safeSleep(1500); if(skipCurrent) break;
                             await runAdb("input keyevent 66"); await safeSleep(200); await runAdb("input keyevent 66");
                         }
@@ -623,7 +615,7 @@
                                 audio.onloadedmetadata = async () => {
                                     if(skipCurrent) { resolve(); return; }
                                     const durMs = Math.ceil(audio.duration * 1000);
-                                    // Adicionado Timeout Expandido para suportar áudios longos sem derrubar o ADB Stream
+                                    // Swipe estendido para suportar o áudio todo sem desconectar
                                     runAdb(`input swipe 950 1450 950 1450 ${durMs + 1000}`, durMs + 5000); 
                                     await safeSleep(300); audio.play(); await safeSleep(durMs + 1200);
                                     URL.revokeObjectURL(audioUrl); resolve();
@@ -634,7 +626,7 @@
                 }
 
                 if (skipCurrent || !isCampaignActive) { abortarTurno(contato); return; }
-                await runAdb("input keyevent 3"); // Retorna pra home garantindo tela limpa
+                await runAdb("input keyevent 3"); // Botão home
                 contato.statusEnvio = 'Enviado'; statsData.sucesso++; currentIndex++; atualizarMetricas();
 
                 const delaySegundos = rnd(parseInt(document.getElementById('cfg-delay-min').value) || 10, parseInt(document.getElementById('cfg-delay-max').value) || 25);
@@ -663,7 +655,7 @@
             const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "Relatorio.csv"; link.click();
         }
 
-        // --- USB SECURE LAYER ---
+        // --- USB CORE ---
         async function getAdbKeyPair() { return await crypto.subtle.generateKey({ name: "RSASSA-PKCS1-v1_5", modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" }, true, ["sign", "verify"]); }
         async function signAdbToken(keyPair, token) { return new Uint8Array(await crypto.subtle.sign("RSASSA-PKCS1-v1_5", keyPair.privateKey, token)); }
         async function getAdbPublicKeyPayload(keyPair) {
@@ -699,9 +691,7 @@
 
         async function conectarUSB() {
             try {
-                // Força reset para evitar travamento em múltiplos cliques
                 if(usbDevice) { usbDevice = null; }
-
                 usbDevice = await navigator.usb.requestDevice({ filters: [{ classCode: 255, subclassCode: 66, protocolCode: 1 }] }); 
                 await usbDevice.open();
                 if (usbDevice.configuration === null) await usbDevice.selectConfiguration(1);
@@ -723,7 +713,8 @@
                         isAdbReady = true; adbReaderLoop(); 
                     } else if (resp2 && resp2.cmd === 0x48545541) { 
                         await sendPacket(0x48545541, 3, 0, await getAdbPublicKeyPayload(keyPair)); 
-                        showToast("Autorize a conexão na tela do seu celular e clique em Iniciar novamente.", "warning");
+                        // Regra simplificada e efetiva sem travamento: Solicita permissão e corta o script se a pessoa não apertou.
+                        showToast("⚠️ Autorize na tela do seu celular e CLIQUE EM INICIAR NOVAMENTE.", "warning");
                         usbDevice = null; return;
                     } 
                 }
@@ -732,9 +723,10 @@
                     atualizarEstadoUSBUI(true); showToast("Conectado com sucesso!", "success");
                 }
             } catch (e) { 
-                showToast("Verifique se o USB está conectado no seu celular, lembrando que tem que ter ativado a depuração.", "error"); 
+                showToast("Verifique se o USB está conectado no seu celular, lembrando que tem que ter ativado a depuração do usb.", "error"); 
             }
         }
     </script>
 </body>
 </html>
+```eof
