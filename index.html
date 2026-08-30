@@ -187,7 +187,7 @@
                             <div class="card-title">Seguro</div><div class="card-desc">Comportamento extremo. Pausas longas imitando digitação.</div>
                         </div>
                     </div>
-                    <div class="fs-footer">Disparador via Bookmarklet - Otimizado e Humanizado</div>
+                    <div class="fs-footer">Desenvolvido por Maikon Nattan</div>
                 </div>
 
                 <div class="app-layout">
@@ -368,12 +368,12 @@
                 await wait(300);
 
                 const cnf = DELAY_CONFIG[mode];
-                const chars = Array.from(text.replace(/\\r\\n/g, '\\n').replace(/\\r/g, '\\n'));
+                const chars = Array.from(text.replace(/\r\n/g, '\n').replace(/\r/g, '\n'));
                 
                 for (const char of chars) {
                     if (!app.active) break;
-                    if (char === '\\n') {
-                        const dt = new DataTransfer(); dt.setData('text/plain', '\\n');
+                    if (char === '\n') {
+                        const dt = new DataTransfer(); dt.setData('text/plain', '\n');
                         const pasteEvt = new ClipboardEvent('paste', { bubbles: true });
                         Object.defineProperty(pasteEvt, 'clipboardData', { value: dt });
                         targetElement.dispatchEvent(pasteEvt);
@@ -382,7 +382,7 @@
                         document.execCommand('insertText', false, char);
                     }
                     targetElement.dispatchEvent(new Event('input', { bubbles: true }));
-                    if (char !== '\\n') await randomWait(cnf.type_min, cnf.type_max);
+                    if (char !== '\n') await randomWait(cnf.type_min, cnf.type_max);
                     if (mode !== 'turbo' && Math.random() < 0.03) await randomWait(cnf.type_max * 2, cnf.type_max * 4);
                 }
                 
@@ -410,18 +410,15 @@
                 return !!document.querySelector('div[role="dialog"]') || !!document.querySelector('div[data-testid="drawer-left"]') || !!document.querySelector('div[data-testid="media-preview"]');
             }
 
-            // FUNÇÃO ATUALIZADA: CAÇADOR DE LEGENDAS BLINDADO
+            // CAÇADOR DE LEGENDAS BLINDADO E UNIVERSAL
             function findCaptionField() {
-                // Tenta achar pelos atributos de acessibilidade (ARIA)
                 let el = document.querySelector('div[aria-placeholder*="legenda" i], div[aria-placeholder*="caption" i], div[aria-label*="legenda" i], div[aria-label*="caption" i]');
                 if (el) return el;
                 
-                // Se falhar, procura agressivamente dentro de modais abertos
                 let modals = document.querySelectorAll('div[role="dialog"], div[data-testid="drawer-left"], div[data-testid="media-preview"]');
                 for (let modal of modals) {
                     let editables = modal.querySelectorAll('div[contenteditable="true"]');
                     for (let editable of editables) {
-                        // Confirma se o campo de texto está visível e ativo na tela
                         if (editable.offsetWidth > 0 && editable.offsetHeight > 0) return editable;
                     }
                 }
@@ -510,7 +507,7 @@
                         }
                     }
 
-                    // FALLBACK BLINDADO: Se falhou a legenda (ex: PDF), atira a mensagem avulsa embaixo
+                    // FALLBACK BLINDADO: Se falhou a legenda (ex: PDF ou Vídeo bloqueado), atira a mensagem avulsa embaixo
                     if (msgFinal.trim().length > 0 && !captionPasted) {
                         writeLog("Injetando texto (Chat)...");
                         await wait(1500); // Aguarda animações do WA
@@ -547,10 +544,15 @@
 
             shadow.getElementById('dr-save').onclick = () => {
                 const text = shadow.getElementById('dr-import').value;
-                app.contacts = text.split('\\n').filter(l => l.trim()).map(line => {
-                    const parts = line.split(/[\\s\\t]+/);
+                app.contacts = text.split('\n').filter(l => l.trim()).map(line => {
+                    // REGRA DE SEPARAÇÃO CORRIGIDA (Quebra no Espaço sem bugar aspas)
+                    const parts = line.split(/\s+/);
                     let phone = ''; let nameParts = [];
-                    parts.forEach(p => { const cl = p.replace(/\\D/g, ''); if(cl.length>=10 && !phone) phone=cl; else nameParts.push(p); });
+                    parts.forEach(p => { 
+                        const cl = p.replace(/\D/g, ''); 
+                        if(cl.length >= 10 && !phone) phone = cl; 
+                        else nameParts.push(p); 
+                    });
                     return { phone, name: nameParts.join(' ') || 'Cliente', status: 'PENDENTE' };
                 }).filter(c => c.phone);
                 writeLog(app.contacts.length + " contatos carregados."); syncStats();
@@ -583,7 +585,6 @@
         };
 
         const scriptString = codigoDoRobo.toString();
-        // Não precisamos escapar quebras de linha aqui pois o código já está envelopado bonitinho em função
         const linkMagico = document.getElementById('btn-magico');
         linkMagico.href = 'javascript:(' + encodeURIComponent(scriptString) + ')();';
     </script>
