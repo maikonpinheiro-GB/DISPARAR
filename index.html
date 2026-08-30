@@ -3,784 +3,243 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dispara AI Mobile</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Helvetica+Neue:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Instalador | DisparaAI Web Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { 
-                        'sans': ['"Inter"', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif']
-                    },
-                    colors: { 
-                        'wa-green': '#25D366',
-                        'wa-dark-green': '#128C7E',
-                        'wa-bg': '#FCFDFE',
-                        'wa-panel': '#FFFFFF',
-                        'wa-text': '#111B21',
-                        'wa-muted': '#54656F',
-                        'wa-border': '#E9EDEF'
-                    }
-                }
-            }
-        }
-    </script>
-
     <style>
-        body { background-color: #F0F2F5; color: #111B21; }
-        
-        .wa-card {
-            background: #FFFFFF;
-            border-radius: 24px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03), 0 0 2px rgba(0,0,0,0.05);
-            border: 1px solid rgba(0,0,0,0.02);
-            overflow: hidden;
+        body {
+            margin: 0; padding: 0; font-family: 'Inter', sans-serif;
+            background-color: #131314; color: #e3e3e3;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            min-height: 100vh; text-align: center;
         }
-
-        .wa-btn {
-            background-color: #25D366;
-            color: #111B21;
-            border-radius: 9999px;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 14px rgba(37, 211, 102, 0.2);
+        .container {
+            max-width: 600px; background: #1e1f20; padding: 40px;
+            border-radius: 24px; border: 1px solid #444746;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
         }
-        
-        .wa-btn:hover:not(:disabled) {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.3);
-            background-color: #22c55e;
+        h1 { font-size: 32px; background: linear-gradient(90deg, #8ab4f8, #c58af9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; margin-top: 0; }
+        p { font-size: 16px; color: #c4c7c5; line-height: 1.6; margin-bottom: 30px; }
+        .step { background: #131314; border: 1px solid #444746; border-radius: 12px; padding: 20px; text-align: left; margin-bottom: 30px; }
+        .step span { display: inline-block; background: #8ab4f8; color: #131314; width: 24px; height: 24px; text-align: center; border-radius: 50%; font-weight: bold; line-height: 24px; margin-right: 10px; }
+        .bookmark-btn {
+            display: inline-block; background: #8ab4f8; color: #131314;
+            text-decoration: none; padding: 15px 40px; font-size: 18px;
+            font-weight: 800; border-radius: 99px; transition: all 0.2s;
+            cursor: grab; box-shadow: 0 4px 15px rgba(138, 180, 248, 0.3);
         }
-        
-        .wa-btn:active:not(:disabled) {
-            transform: translateY(1px);
-        }
-
-        .wa-input { 
-            background: #F0F2F5; 
-            border: 1px solid transparent; 
-            border-radius: 16px; 
-            transition: all 0.2s; 
-        }
-        .wa-input:focus { 
-            background: #FFFFFF;
-            border-color: #25D366; 
-            box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.1); 
-            outline: none; 
-        }
-
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #D1D7DB; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #8696A0; }
+        .bookmark-btn:hover { background: #aecbfa; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(138, 180, 248, 0.4); }
+        .alert { background: rgba(242, 139, 130, 0.12); color: #f28b82; padding: 12px; border-radius: 8px; font-size: 13px; font-weight: 600; margin-top: 20px; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col font-sans antialiased selection:bg-green-100 selection:text-wa-dark-green">
+<body>
 
-    <!-- HEADER WHATSAPP STYLE -->
-    <header class="bg-white px-8 py-5 flex justify-between items-center z-50 sticky top-0 shadow-sm border-b border-wa-border">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-wa-green flex items-center justify-center text-white text-xl">
-                <i class="fa-brands fa-whatsapp"></i>
-            </div>
-            <div>
-                <h1 class="font-bold text-xl tracking-tight text-wa-text leading-none">Dispara AI Mobile</h1>
-            </div>
-        </div>
-        
-        <div class="flex items-center gap-4">
-            <div id="usb-status" class="hidden items-center gap-2 px-4 py-2 rounded-full bg-green-50 border border-green-100 transition-colors">
-                <div id="usb-status-dot" class="w-2.5 h-2.5 rounded-full bg-wa-green animate-pulse"></div>
-                <span id="usb-status-text" class="text-xs font-semibold text-wa-dark-green">Dispositivo Conectado</span>
-            </div>
-            <button id="btn-conectar" onclick="conectarUSB()" class="wa-btn font-semibold px-8 py-2.5 text-sm flex items-center gap-2 text-white bg-wa-dark-green shadow-none hover:shadow-md">
-                <i class="fa-solid fa-plug"></i> <span id="txt-btn-conectar">Iniciar</span>
-            </button>
-        </div>
-    </header>
+    <div class="container">
+        <h1>DisparaAI Web Pro</h1>
+        <p>A arquitetura antifalhas. O motor foi redesenhado para <b>nunca mais recarregar a página do WhatsApp</b> e perder o envio.</p>
 
-    <main class="flex-1 w-full max-w-[1400px] mx-auto p-6 md:p-8 grid grid-cols-1 xl:grid-cols-12 gap-8">
-        
-        <!-- COLUNA ESQUERDA -->
-        <div class="xl:col-span-5 flex flex-col gap-6">
-            
-            <!-- BLOCO 1: ENTRADA DE DADOS -->
-            <div class="wa-card p-6 md:p-8">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-wa-text font-bold text-lg tracking-tight">Cole os Dados</h2>
-                    <button onclick="limparFila()" class="text-wa-muted hover:text-red-500 transition-colors text-sm font-semibold flex items-center gap-1 bg-gray-50 px-3 py-1.5 rounded-full hover:bg-red-50"><i class="fa-solid fa-trash-can"></i> Limpar</button>
-                </div>
-                <textarea id="paste-area" rows="4" class="w-full wa-input p-4 text-sm text-wa-text placeholder-wa-muted resize-none font-medium leading-relaxed" placeholder="DENTRO DA VDI COPIE CÓDIGO, NOME E TELEFONE DO REVENDEDOR E COLE AQUI DENTRO"></textarea>
-                <button onclick="processarEntradas()" class="w-full mt-4 wa-btn text-white py-3.5 rounded-full text-sm font-semibold flex items-center justify-center gap-2 hover:bg-wa-dark-green bg-wa-dark-green shadow-none hover:shadow-md">
-                    Processar
-                </button>
-            </div>
-
-            <!-- BLOCO 2: CONTEÚDO -->
-            <div class="wa-card p-6 md:p-8 flex flex-col min-h-[400px]">
-                <div class="flex justify-between items-center mb-2">
-                    <h2 class="text-wa-text font-bold text-lg tracking-tight">Conteúdo</h2>
-                </div>
-                
-                <p class="text-xs text-wa-muted mb-6 leading-relaxed">
-                    Para adicionar variações adicione texto ou áudio, o sistema vai mandar de forma aleatória para cada RE.
-                </p>
-
-                <div id="pipeline-container" class="flex flex-col gap-4 mb-4 overflow-y-auto flex-1 pr-2">
-                    <!-- Cards de Ações Vêm Aqui -->
-                </div>
-                
-                <div class="grid grid-cols-2 gap-3 mt-auto pt-4 border-t border-wa-border">
-                    <button onclick="addPipelineAction('TEXT')" class="bg-gray-50 border border-gray-200 text-wa-text py-3 rounded-full text-sm font-semibold flex items-center justify-center gap-2 hover:bg-gray-100 transition-colors">
-                        <i class="fa-solid fa-comment-dots text-wa-green"></i> Adicionar Texto
-                    </button>
-                    <button onclick="addPipelineAction('AUDIO')" class="bg-gray-50 border border-gray-200 text-wa-text py-3 rounded-full text-sm font-semibold flex items-center justify-center gap-2 hover:bg-gray-100 transition-colors">
-                        <i class="fa-solid fa-microphone text-blue-500"></i> Adicionar Áudio
-                    </button>
-                </div>
-            </div>
-            
-            <!-- BLOCO 3: CONFIGURAÇÃO -->
-            <div class="wa-card p-6 md:p-8">
-                <div class="flex items-center gap-2 mb-4">
-                    <h2 class="text-wa-text font-bold text-lg tracking-tight">Configuração</h2>
-                </div>
-
-                <div class="bg-amber-50/50 p-4 rounded-2xl border border-amber-100 mb-6">
-                    <p class="text-xs text-amber-800 font-medium leading-relaxed">
-                        <i class="fa-solid fa-circle-info mr-1"></i> No WhatsApp do celular vá em <b>Configurações > Conversas</b> e <b>ATIVE "Enviar com Enter"</b>.
-                    </p>
-                </div>
-
-                <div class="grid grid-cols-2 gap-5 mb-5">
-                    <div>
-                        <label class="block text-xs font-semibold text-wa-muted mb-2">App Alvo</label>
-                        <select id="cfg-app" class="w-full wa-input text-wa-text font-medium text-sm p-3">
-                            <option value="com.whatsapp.w4b">WA Business</option>
-                            <option value="com.whatsapp">WA Normal</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-wa-muted mb-2">Motor</label>
-                        <div class="w-full bg-gray-50 border border-gray-100 text-wa-dark-green font-semibold text-sm rounded-xl p-3 flex items-center gap-2">
-                            <i class="fa-solid fa-shield-halved"></i> Assíncrono
-                        </div>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-5">
-                    <div class="bg-gray-50 p-3 rounded-2xl border border-gray-100 text-center">
-                        <label class="block text-xs font-semibold text-wa-muted mb-1">Pausa Mín. (s)</label>
-                        <input type="number" id="cfg-delay-min" value="10" onchange="atualizarMetricas()" class="w-full bg-transparent text-xl text-wa-text font-bold text-center outline-none">
-                    </div>
-                    <div class="bg-gray-50 p-3 rounded-2xl border border-gray-100 text-center">
-                        <label class="block text-xs font-semibold text-wa-muted mb-1">Pausa Máx. (s)</label>
-                        <input type="number" id="cfg-delay-max" value="25" onchange="atualizarMetricas()" class="w-full bg-transparent text-xl text-wa-text font-bold text-center outline-none">
-                    </div>
-                </div>
+        <div class="step">
+            <div style="font-weight: 600; margin-bottom: 10px; color: #fff;"><span>1</span> Como instalar (Leva 3 segundos):</div>
+            <div style="font-size: 14px; color: #c4c7c5;">
+                Aperte as teclas <b>CTRL + SHIFT + B</b> para exibir sua barra de favoritos no Chrome. Depois, <b>CLIQUE E ARRASTE</b> o botão azul abaixo para dentro da sua barra de favoritos.
             </div>
         </div>
 
-        <!-- COLUNA DIREITA -->
-        <div class="xl:col-span-7 flex flex-col gap-6">
-            
-            <div class="wa-card p-10 flex flex-col items-center justify-center relative min-h-[500px] flex-1">
-                <div class="absolute inset-0 opacity-[0.03] bg-[url('https://i.pinimg.com/originals/97/c0/07/97c00759d90d786d9b6096d274ad3e07.png')] bg-repeat pointer-events-none"></div>
-                
-                <div class="text-center relative z-10 w-full max-w-md flex flex-col items-center">
-                    
-                    <div class="flex justify-center mb-8">
-                        <span id="stage-status" class="px-5 py-2 bg-gray-100 text-wa-muted text-xs font-bold rounded-full">
-                            Aguardando Início
-                        </span>
-                    </div>
+        <a id="btn-magico" class="bookmark-btn" href="#">⚡ Iniciar DisparaAI</a>
 
-                    <h2 id="stage-name" class="text-3xl font-bold text-wa-text mb-3 tracking-tight break-words line-clamp-2">...</h2>
-                    <p id="stage-phone" class="text-base font-medium text-wa-muted mb-10">...</p>
-                    
-                    <div id="action-feedback" class="hidden flex-col items-center justify-center mb-10">
-                        <div id="action-icon-box" class="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mb-4 transition-all">
-                            <i id="action-icon" class="fa-solid fa-robot text-3xl text-wa-green"></i>
-                        </div>
-                        <p id="action-text" class="text-sm font-semibold text-wa-text">Aguardando Ação...</p>
-                    </div>
-
-                    <div class="flex flex-col gap-3 w-full">
-                        <button id="btn-start" onclick="iniciarCampanha()" class="wa-btn w-full text-white font-bold text-lg py-4 flex items-center justify-center gap-3 disabled:opacity-50 hover:bg-wa-dark-green bg-wa-dark-green shadow-none hover:shadow-lg">
-                            <i class="fa-solid fa-paper-plane"></i> Iniciar Disparos
-                        </button>
-                        <button id="btn-resume" onclick="retomarCampanha()" class="hidden w-full bg-blue-500 text-white rounded-full font-bold text-lg py-4 flex items-center justify-center gap-3 hover:bg-blue-600 transition-colors shadow-md">
-                            <i class="fa-solid fa-bolt"></i> Retomar
-                        </button>
-                        
-                        <div id="btn-controls" class="hidden gap-3 w-full">
-                            <button onclick="pularCliente()" class="flex-1 bg-gray-100 text-gray-700 font-semibold text-sm py-4 rounded-full flex items-center justify-center gap-2 hover:bg-gray-200 transition-colors" title="Pular este contato">
-                                <i class="fa-solid fa-forward-step"></i> Pular
-                            </button>
-                            <button onclick="pararCampanha(false)" class="flex-1 bg-red-50 text-red-600 font-semibold text-sm py-4 rounded-full flex items-center justify-center gap-2 hover:bg-red-100 transition-colors" title="Pausar Operação">
-                                <i class="fa-solid fa-hand"></i> Interromper
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- DASHBOARD WHATSAPP METRICS -->
-            <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mt-auto">
-                <div class="wa-card p-5 text-center flex flex-col justify-center">
-                    <p class="text-[10px] text-wa-muted uppercase font-bold tracking-wider mb-1">Na Fila</p>
-                    <p id="stat-pendentes" class="text-2xl font-bold text-wa-text">0</p>
-                </div>
-                <div class="wa-card p-5 text-center flex flex-col justify-center bg-green-50 border-none">
-                    <p class="text-[10px] text-wa-dark-green uppercase font-bold tracking-wider mb-1">Enviados</p>
-                    <p id="stat-feitos" class="text-2xl font-bold text-wa-dark-green">0</p>
-                </div>
-                <div class="wa-card p-5 text-center flex flex-col justify-center bg-red-50 border-none">
-                    <p class="text-[10px] text-red-600 uppercase font-bold tracking-wider mb-1">Inválidos</p>
-                    <p id="stat-invalidos" class="text-2xl font-bold text-red-600">0</p>
-                </div>
-                <div class="wa-card p-5 text-center flex flex-col justify-center">
-                    <p class="text-[10px] text-wa-muted uppercase font-bold tracking-wider mb-1">Término Em</p>
-                    <p id="stat-eta" class="text-xl font-bold text-wa-text mt-1">00h 00m</p>
-                </div>
-                <button onclick="exportarRelatorio()" class="wa-card p-5 text-center flex flex-col justify-center items-center hover:bg-gray-50 transition-colors">
-                    <i class="fa-solid fa-download text-xl mb-1.5 text-wa-muted"></i>
-                    <p class="text-[9px] font-bold text-wa-muted uppercase tracking-wider">Relatório</p>
-                </button>
-            </div>
-        </div>
-    </main>
-
-    <!-- MODAL DE INSPEÇÃO -->
-    <div id="modal-preview" class="fixed inset-0 bg-wa-text/40 backdrop-blur-sm z-[100] hidden items-center justify-center p-4 transition-opacity">
-        <div class="wa-card w-full max-w-3xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl">
-            <div class="p-6 border-b border-wa-border flex justify-between items-center bg-white">
-                <h2 class="text-lg font-bold text-wa-text tracking-tight">Auditoria de Dados</h2>
-                <button onclick="fecharModal()" class="text-wa-muted hover:text-wa-text transition-colors w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-            
-            <div class="p-4 bg-gray-50 flex justify-between items-center px-6 border-b border-wa-border">
-                <span class="text-xs font-semibold text-wa-dark-green bg-green-100/50 px-3 py-1 rounded-full"><i class="fa-solid fa-shield-check mr-1"></i> Desduplicação Ativa</span>
-                <span class="text-xs font-semibold text-wa-text" id="preview-count">0 Registros</span>
-            </div>
-
-            <div class="flex-1 overflow-y-auto bg-white">
-                <table class="w-full text-left text-sm">
-                    <thead class="text-xs font-semibold text-wa-muted bg-white sticky top-0 border-b border-wa-border shadow-sm">
-                        <tr>
-                            <th class="py-4 px-6">Nome Extraído</th>
-                            <th class="py-4 px-6 text-center">Código</th>
-                            <th class="py-4 px-6 text-right">Telefone</th>
-                        </tr>
-                    </thead>
-                    <tbody id="preview-table-body" class="divide-y divide-gray-50 text-wa-text font-medium"></tbody>
-                </table>
-            </div>
-            <div class="p-5 bg-white flex justify-end gap-3 border-t border-wa-border">
-                <button onclick="fecharModal()" class="px-6 py-2.5 rounded-full text-sm font-semibold text-wa-muted hover:bg-gray-100 transition-colors">Descartar</button>
-                <button onclick="confirmarImportacao()" class="wa-btn px-8 py-2.5 rounded-full text-sm font-semibold text-white bg-wa-dark-green hover:bg-wa-dark-green hover:shadow-md">Aprovar Base</button>
+        <div class="step" style="margin-top: 30px; margin-bottom: 0;">
+            <div style="font-weight: 600; margin-bottom: 10px; color: #fff;"><span>2</span> Como usar:</div>
+            <div style="font-size: 14px; color: #c4c7c5;">
+                Abra o site oficial <b>web.whatsapp.com</b> e espere suas conversas carregarem. Em seguida, clique no botão "⚡ Iniciar DisparaAI" que você arrastou para a sua barra de favoritos! O painel se abrirá instantaneamente.
             </div>
         </div>
     </div>
 
-    <!-- TOASTS MINIMALISTAS -->
-    <div id="toast-container" class="fixed bottom-8 right-8 z-[200] flex flex-col gap-3 pointer-events-none"></div>
-
+    <!-- NÚCLEO DO ROBÔ (MINIFICADO DINAMICAMENTE) -->
     <script>
-        // --- 1. ESTADO GLOBAL ---
-        let contatosBase = [];
-        let contatosTemp = [];
-        let currentIndex = 0;
-        let isCampaignActive = false;
-        let isProcessingCore = false;
-        let skipCurrent = false;
-        let statsData = { sucesso: 0, invalidos: 0 };
-        let pipelineActions = [];
-
-        // ESTADO WEBUSB (REESCRITO E BLINDADO)
-        let usbDevice = null;
-        let epIn = null, epOut = null;
-        let isAdbReady = false;
-        let localIdCounter = 1;
-        let adbStreams = {}; 
-        let isReaderRunning = false; 
-
-        const sleep = ms => new Promise(r => setTimeout(r, ms));
-        const rnd = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-
-        window.onload = function() { renderPipelineUI(); atualizarMetricas(); };
-        window.addEventListener('beforeunload', function (e) { if (isCampaignActive || contatosBase.length > 0) { e.preventDefault(); e.returnValue = ''; } });
-        navigator.usb.addEventListener('disconnect', (event) => {
-            if (usbDevice && event.device === usbDevice) {
-                usbDevice = null; isAdbReady = false; isReaderRunning = false;
-                if (isCampaignActive) pararCampanha(true); else atualizarEstadoUSBUI(false);
-            }
-        });
-
-        // --- 2. SISTEMA DE TOASTS E UI ---
-        function showToast(msg, type = 'info') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            let iconClass = 'fa-circle-info text-blue-500';
+        const codigoDoRobo = `
+        (function() {
+            const PANEL_ID = 'sistema-disparai-pro';
+            if (document.getElementById(PANEL_ID)) document.getElementById(PANEL_ID).remove();
             
-            if (type === 'error') { iconClass = 'fa-circle-exclamation text-red-500'; }
-            else if (type === 'success') { iconClass = 'fa-circle-check text-wa-green'; }
-            else if (type === 'warning') { iconClass = 'fa-triangle-exclamation text-amber-500'; }
-            
-            toast.className = `bg-white border border-gray-100 px-5 py-3.5 rounded-2xl shadow-lg flex items-center gap-3 transform transition-all duration-300 translate-y-10 opacity-0 pointer-events-auto z-[250]`;
-            toast.innerHTML = `<i class="fa-solid ${iconClass} text-lg"></i><span class="text-sm font-medium text-wa-text">${msg}</span>`;
-            container.appendChild(toast);
-            requestAnimationFrame(() => toast.classList.remove('translate-y-10', 'opacity-0'));
-            setTimeout(() => { toast.classList.add('translate-y-10', 'opacity-0'); setTimeout(() => toast.remove(), 300); }, 5000);
-        }
+            const host = document.createElement('div');
+            host.id = PANEL_ID;
+            document.body.appendChild(host);
+            const shadow = host.attachShadow({mode: 'open'});
 
-        function renderPipelineUI() {
-            const container = document.getElementById('pipeline-container');
-            container.innerHTML = '';
-            pipelineActions.forEach((action, index) => {
-                const div = document.createElement('div');
-                div.className = `bg-white border border-gray-200 rounded-2xl p-4 shrink-0 shadow-sm`;
-                
-                let innerHtml = `
-                    <div class="flex justify-between items-center mb-3">
-                        <span class="text-[10px] font-bold uppercase tracking-wider text-wa-muted bg-gray-100 px-2 py-1 rounded">
-                            Bloco ${index + 1}: ${action.type === 'TEXT' ? 'Mensagem' : 'Áudio'}
-                        </span>
-                        <button onclick="removerPipelineAction(${index})" class="text-gray-400 hover:text-red-500 transition-colors w-6 h-6 flex items-center justify-center rounded-full hover:bg-red-50"><i class="fa-solid fa-trash text-xs"></i></button>
+            const style = document.createElement('style');
+            style.textContent = \`
+                :host { all: initial; --c-bg-base: #131314; --c-bg-panel: #1e1f20; --c-bg-hover: #282a2c; --c-text-main: #e3e3e3; --c-text-muted: #c4c7c5; --c-border: #444746; --c-primary: #8ab4f8; --c-success: #81c995; --c-danger: #f28b82; --c-warning: #fde293; font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+                .ui-container { position: fixed; top: 0; right: 0; width: 420px; height: 100vh; background: var(--c-bg-panel); z-index: 2147483647; color: var(--c-text-main); display: flex; flex-direction: column; box-shadow: -5px 0 30px rgba(0,0,0,0.6); border-left: 1px solid var(--c-border); animation: slideIn 0.3s ease-out; }
+                @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+                .header { padding: 20px; border-bottom: 1px solid var(--c-border); display: flex; justify-content: space-between; align-items: center; }
+                .header h2 { margin: 0; font-size: 18px; font-weight: 700; background: linear-gradient(90deg, #8ab4f8, #c58af9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+                .btn-close { background: none; border: none; color: var(--c-text-muted); cursor: pointer; font-size: 20px; }
+                .btn-close:hover { color: var(--c-danger); }
+                .content { padding: 20px; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; flex: 1; }
+                label { font-size: 12px; font-weight: 600; color: var(--c-text-muted); text-transform: uppercase; }
+                textarea { background: var(--c-bg-base); border: 1px solid var(--c-border); border-radius: 12px; padding: 15px; color: var(--c-text-main); font-size: 14px; width: 100%; outline: none; resize: none; min-height: 100px; box-sizing: border-box; }
+                textarea:focus { border-color: var(--c-primary); }
+                select { background: var(--c-bg-base); border: 1px solid var(--c-border); border-radius: 12px; padding: 15px; color: var(--c-text-main); font-size: 14px; width: 100%; outline: none; }
+                .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+                .stat-card { background: var(--c-bg-base); padding: 15px; border-radius: 12px; border: 1px solid var(--c-border); display: flex; flex-direction: column; }
+                .stat-val { font-size: 24px; font-weight: 700; color: var(--c-primary); }
+                .btn-run { background: var(--c-primary); color: var(--c-bg-base); border: none; padding: 16px; border-radius: 12px; font-weight: 700; cursor: pointer; text-transform: uppercase; font-size: 14px; transition: all 0.2s; }
+                .btn-run:hover { background: #aecbfa; transform: translateY(-2px); }
+                .btn-danger { background: var(--c-danger); color: var(--c-bg-base); }
+            \`;
+            shadow.appendChild(style);
+
+            const ui = document.createElement('div');
+            ui.className = 'ui-container';
+            ui.innerHTML = \`
+                <div class="header">
+                    <h2>DisparaAI Web Pro</h2>
+                    <button class="btn-close" id="dr-close">✖</button>
+                </div>
+                <div class="content">
+                    <div style="display:flex; flex-direction:column; gap:8px;">
+                        <label>Matriz de Contatos (Cole aqui)</label>
+                        <textarea id="dr-contacts" placeholder="5511999999999 João\n5521888888888 Maria"></textarea>
                     </div>
-                `;
-
-                if (action.type === 'TEXT') {
-                    innerHtml += `<textarea rows="3" class="w-full wa-input p-3 text-sm text-wa-text font-medium placeholder-gray-400 resize-none" placeholder="use :re para puxar o nome e personalizar a mensagem..." onchange="updatePipelineAction(${index}, 'TEXT', this.value)">${action.content}</textarea>`;
-                } else if (action.type === 'AUDIO') {
-                    innerHtml += `
-                        <div class="flex items-center gap-4 bg-gray-50 p-3 rounded-xl border border-gray-100">
-                            <i class="fa-solid fa-microphone-lines text-2xl text-blue-500 w-8 text-center"></i>
-                            <div class="flex-1">
-                                <label class="block text-[10px] font-semibold text-wa-muted uppercase tracking-wider mb-1">Anexar Áudio (MP3/OGG)</label>
-                                <input type="file" accept="audio/*" id="audio-file-${action.id}" class="w-full text-xs font-medium text-wa-text file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-white file:text-wa-text file:border file:border-gray-200 hover:file:bg-gray-50 cursor-pointer transition-colors">
-                            </div>
+                    <div style="display:flex; flex-direction:column; gap:8px;">
+                        <label>Texto Base (Use :re: para Nome)</label>
+                        <textarea id="dr-msgs" placeholder="Olá :re:, tudo bem? Temos uma oferta especial."></textarea>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:8px;">
+                        <label>Velocidade de Operação</label>
+                        <select id="dr-speed">
+                            <option value="5000">Rápido (Pausa de 5 segundos)</option>
+                            <option value="12000" selected>Normal Orgânico (Pausa de 12 segundos)</option>
+                            <option value="25000">Seguro Absoluto (Pausa de 25 segundos)</option>
+                        </select>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <label>Restantes</label>
+                            <span class="stat-val" id="st-pend">0</span>
                         </div>
-                    `;
-                }
-                div.innerHTML = innerHtml; container.appendChild(div);
-            });
-        }
-        function addPipelineAction(type) { pipelineActions.push({ id: Date.now(), type, content: "", file: null }); renderPipelineUI(); }
-        function removerPipelineAction(index) { pipelineActions.splice(index, 1); renderPipelineUI(); }
-        function updatePipelineAction(index, type, val) { if(type === 'TEXT') pipelineActions[index].content = val; }
+                        <div class="stat-card">
+                            <label>Enviados</label>
+                            <span class="stat-val" style="color:var(--c-success)" id="st-sent">0</span>
+                        </div>
+                    </div>
+                    <button class="btn-run" id="dr-start">INICIAR DISPAROS</button>
+                </div>
+            \`;
+            shadow.appendChild(ui);
 
-        function limparFila() {
-            if(isCampaignActive) return showToast("Pare a operação para limpar a fila.", "warning");
-            contatosBase = []; contatosTemp = []; currentIndex = 0; statsData = { sucesso: 0, invalidos: 0 };
-            document.getElementById('paste-area').value = '';
-            atualizarMetricas();
-            document.getElementById('stage-status').innerText = "Aguardando Início";
-            document.getElementById('stage-name').innerText = "...";
-            document.getElementById('stage-phone').innerText = "...";
-            setActionUI('fa-robot', 'Aguardando Ação...', false, 'text-wa-green', 'bg-green-50');
-            showToast("Lista limpa com sucesso!", "success");
-        }
+            // LOGICA DA APLICAÇÃO
+            let app = { active: false, contacts: [], currentIndex: 0, msgs: [] };
 
-        // --- 3. PROCESSAMENTO DE DADOS (CÓDIGO/NÚMERO) ---
-        function processarEntradas() {
-            const rawText = document.getElementById('paste-area').value;
-            if(!rawText.trim()) return showToast("Cole os dados primeiro.", "warning");
-            
-            contatosTemp = []; let total = 0;
-            rawText.split('\n').forEach(linha => {
-                let s = linha.trim(); if (!s) return;
-                let words = s.split(/\s+/), numbersBlock = [], nameParts = [];
-                for (let word of words) {
-                    let clean = word.replace(/[^a-zA-Z0-9]/g, '');
-                    if (/^\d+$/.test(clean) || (/\d/.test(clean) && /[a-zA-Z]/.test(clean))) numbersBlock.push(clean);
-                    else nameParts.push(word);
-                }
-                let code = "", phone = "";
-                // O primeiro bloco numerico eh o codigo, o ultimo eh o telefone (se tiver tamanho)
-                if (numbersBlock.length >= 2) { code = numbersBlock[0]; phone = numbersBlock[numbersBlock.length - 1]; }
-                else if (numbersBlock.length === 1) { let n = numbersBlock[0].replace(/\D/g, ''); if (n.length >= 10) phone = n; else code = numbersBlock[0]; }
-                
-                if (phone && phone.replace(/\D/g, '').length === 10) { let p = phone.replace(/\D/g, ''); phone = p.substring(0, 2) + '9' + p.substring(2); }
-                if (!phone && !code) return;
-                
-                let name = nameParts.join(' ').replace(/[^\w\sÀ-ÿ]/g, '').trim() || "Contato";
-                total++; contatosTemp.push({ name, code: code || "N/A", phone: phone || "N/A", statusEnvio: 'Pendente' });
+            shadow.getElementById('dr-close').onclick = () => host.remove();
+
+            shadow.getElementById('dr-contacts').addEventListener('input', (e) => {
+                let lines = e.target.value.split('\\n').filter(l => l.trim() !== '');
+                shadow.getElementById('st-pend').innerText = lines.length;
             });
 
-            if (total === 0) return showToast("Nenhum dado legível encontrado.", "error");
-            const tbody = document.getElementById('preview-table-body'); tbody.innerHTML = ''; document.getElementById('preview-count').innerText = `${total} Registros`;
-            contatosTemp.forEach(c => {
-                let tr = document.createElement('tr');
-                tr.innerHTML = `<td class="py-3 px-6 text-xs font-semibold text-wa-text">${c.name}</td><td class="py-3 px-6 font-mono text-xs text-center text-wa-muted"><span class="bg-gray-100 px-2 py-1 rounded">${c.code}</span></td><td class="py-3 px-6 font-mono font-bold text-xs text-right ${c.phone !== 'N/A' ? 'text-wa-dark-green' : 'text-amber-500'}">${c.phone !== 'N/A' ? c.phone : 'Busca por Código'}</td>`;
-                tbody.appendChild(tr);
-            });
-            document.getElementById('modal-preview').classList.remove('hidden'); document.getElementById('modal-preview').classList.add('flex');
-        }
+            const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-        function confirmarImportacao() {
-            let add = 0, dup = 0;
-            contatosTemp.forEach(novo => {
-                let isDup = (novo.phone !== "N/A") ? contatosBase.find(c => c.phone === novo.phone) : contatosBase.find(c => c.code === novo.code);
-                if (!isDup) { contatosBase.push(novo); add++; } else dup++;
-            });
-            atualizarMetricas(); document.getElementById('paste-area').value = ''; fecharModal();
-            if (add > 0) showToast(`${add} injetados na fila. (${dup} repetidos barrados)`, 'success'); else showToast(`Sem contatos novos.`, 'warning');
-        }
-        function fecharModal() { document.getElementById('modal-preview').classList.add('hidden'); document.getElementById('modal-preview').classList.remove('flex'); }
-
-        function parseMensagem(template, nome) {
-            let txt = template.replace(/:re:?/gi, nome);
-            const regex = /\{([^{}]+)\}/g; let match;
-            while ((match = regex.exec(txt)) !== null) { txt = txt.replace(match[0], match[1].split('|')[Math.floor(Math.random() * match[1].split('|').length)]); regex.lastIndex = 0; }
-            return txt;
-        }
-
-        function atualizarMetricas() {
-            const pen = contatosBase.filter(c => c.statusEnvio === 'Pendente').length;
-            document.getElementById('stat-pendentes').innerText = pen; document.getElementById('stat-feitos').innerText = statsData.sucesso; document.getElementById('stat-invalidos').innerText = statsData.invalidos;
-            if(pen > 0 && isAdbReady && !isCampaignActive) document.getElementById('btn-start').disabled = false; else if(pen === 0 && !isCampaignActive) document.getElementById('btn-start').disabled = true;
-            if (pen === 0) document.getElementById('stat-eta').innerText = "00h 00m";
-            else {
-                let pipeTime = pipelineActions.reduce((acc, a) => acc + (a.type === 'TEXT' ? 2 : 10), 0);
-                const secs = Math.ceil(pen * (((parseInt(document.getElementById('cfg-delay-min').value)||10) + (parseInt(document.getElementById('cfg-delay-max').value)||25))/2 + 6 + pipeTime));
-                document.getElementById('stat-eta').innerText = (Math.floor(secs / 3600) > 0 ? `${Math.floor(secs / 3600)}h ` : "") + `${Math.floor((secs % 3600)/60)}m`;
-            }
-        }
-
-        function setActionUI(icon, text, isPulsing = false, iconColor = 'text-wa-green', bgColor = 'bg-green-50') {
-            document.getElementById('action-feedback').classList.remove('hidden'); document.getElementById('action-feedback').classList.add('flex');
-            document.getElementById('action-icon-box').className = `w-20 h-20 rounded-full ${bgColor} flex items-center justify-center mb-4 transition-all ${isPulsing ? 'animate-pulse' : ''}`;
-            document.getElementById('action-icon').className = `fa-solid ${icon} text-3xl ${iconColor}`;
-            document.getElementById('action-text').innerText = text;
-        }
-
-        // --- 4. CONTROLES DO MOTOR ---
-        function pararCampanha(emergencia = false) {
-            isCampaignActive = false; skipCurrent = true;
-            document.getElementById('btn-controls').style.display = 'none'; document.getElementById('btn-start').style.display = 'none';
-            if (emergencia) {
-                document.getElementById('stage-status').innerText = "Cabo Desconectado";
-                document.getElementById('stage-status').className = "px-4 py-1.5 rounded-full bg-red-50 text-[10px] font-bold text-red-600 uppercase";
-                setActionUI('fa-plug-circle-xmark', 'Aguardando USB...', false, 'text-red-500', 'bg-red-50');
-            } else {
-                document.getElementById('stage-status').innerText = "Pausado";
-                document.getElementById('stage-status').className = "px-4 py-1.5 rounded-full bg-amber-50 text-[10px] font-bold text-amber-600 uppercase";
-                setActionUI('fa-hand', 'Pausado', false, 'text-amber-500', 'bg-amber-50');
-                document.getElementById('btn-resume').style.display = 'flex';
-            }
-        }
-
-        function pularCliente() { if(!isCampaignActive) return; skipCurrent = true; showToast("Pulando contato...", "warning"); }
-        function retomarCampanha() {
-            if (!isAdbReady) return showToast("Aguardando conexão USB estável.", "error");
-            document.getElementById('btn-resume').style.display = 'none'; document.getElementById('btn-start').style.display = 'none'; document.getElementById('btn-controls').style.display = 'flex';
-            document.getElementById('stage-status').className = "px-4 py-1.5 rounded-full bg-gray-100 text-[10px] font-bold text-wa-muted uppercase";
-            isCampaignActive = true; skipCurrent = false; processarProximo();
-        }
-
-        async function iniciarCampanha() {
-            if (!isAdbReady) return showToast("Aguardando conexão USB estável.", "error"); 
-            if (pipelineActions.length === 0) return showToast("Adicione conteúdo de texto ou áudio primeiro.", "error");
-            isCampaignActive = true; skipCurrent = false;
-            document.getElementById('btn-start').style.display = 'none'; document.getElementById('btn-controls').style.display = 'flex';
-            processarProximo();
-        }
-
-        // --- 5. NÚCLEO ADB (RÁPIDO, SILENCIOSO E SEGURO) ---
-        async function adbReaderLoop() {
-            if (isReaderRunning) return; isReaderRunning = true;
-            while (isAdbReady && usbDevice && epIn) {
-                try {
-                    let r = await readPacket(); 
-                    if (!r || r.error) continue;
-                    if (r.cmd === 0x57525445) { // WRTE
-                        let lId = r.arg1;
-                        if (adbStreams[lId]) adbStreams[lId].data += new TextDecoder().decode(r.data);
-                        await sendPacket(0x59414B4F, lId, r.arg0); // OKAY
-                    }
-                    if (r.cmd === 0x45534C43) { // CLSE
-                        let lId = r.arg1;
-                        if (adbStreams[lId] && !adbStreams[lId].closed) { adbStreams[lId].closed = true; adbStreams[lId].resolve(adbStreams[lId].data); }
-                        await sendPacket(0x45534C43, lId, r.arg0); 
-                    }
-                } catch(e) { await sleep(100); } 
-            }
-            isReaderRunning = false;
-        }
-
-        async function runAdb(command, timeoutMs = 3500) {
-            if (!isAdbReady || !usbDevice) return "";
-            return new Promise(async (resolve) => {
-                const myId = localIdCounter++;
-                adbStreams[myId] = { data: "", closed: false, resolve: resolve };
-                await sendPacket(0x4E45504F, myId, 0, new TextEncoder().encode("shell:" + command + "\0"));
-                // Timeout absoluto: O navegador NUNCA vai travar se o celular bugar.
-                setTimeout(() => { if (!adbStreams[myId].closed) { adbStreams[myId].closed = true; resolve(adbStreams[myId].data); } }, timeoutMs);
-            });
-        }
-
-        async function safeSleep(ms) {
-            let waited = 0; while (waited < ms) { if (skipCurrent || !isCampaignActive) return; await sleep(100); waited += 100; }
-        }
-
-        // --- 6. CÉREBRO DE EXECUÇÃO (ESTEIRA) ---
-        async function processarProximo() {
-            if (!isCampaignActive || isProcessingCore) return;
-            isProcessingCore = true; skipCurrent = false; 
-            
-            while (currentIndex < contatosBase.length && contatosBase[currentIndex].statusEnvio !== 'Pendente') currentIndex++;
-            if (currentIndex >= contatosBase.length) {
-                isCampaignActive = false; isProcessingCore = false;
-                document.getElementById('stage-status').innerText = "OPERAÇÃO CONCLUÍDA";
-                document.getElementById('stage-name').innerText = "Base Finalizada"; document.getElementById('stage-phone').innerText = "";
-                document.getElementById('btn-controls').style.display = 'none'; document.getElementById('btn-start').style.display = 'flex';
-                setActionUI('fa-check', 'Finalizado', false, 'text-wa-green', 'bg-green-50');
-                showToast("Envios finalizados com sucesso!", "success"); atualizarMetricas(); return;
-            }
-
-            let contato = contatosBase[currentIndex];
-            document.getElementById('stage-status').innerText = `Enviando: ${currentIndex + 1}/${contatosBase.length}`;
-            document.getElementById('stage-name').innerText = contato.name;
-            document.getElementById('stage-phone').innerText = contato.phone !== "N/A" ? `+55 ${contato.phone}` : `Código: ${contato.code}`;
-            
-            try {
-                const appPackage = document.getElementById('cfg-app').value; 
-                await runAdb("input keyevent 224"); await runAdb("input swipe 500 1500 500 200"); await runAdb("input keyevent 3"); 
-                if (skipCurrent || !isCampaignActive) { abortarTurno(contato); return; }
-                await safeSleep(800); // Dá um respiro pro celular limpar a RAM
-
-                if (contato.phone !== "N/A") {
-                    setActionUI('fa-magnifying-glass', 'Carregando Chat...', true, 'text-blue-500', 'bg-blue-50');
-                    // Abre a conversa vazia primeiro
-                    await runAdb(`am start -a android.intent.action.VIEW -d 'whatsapp://send?phone=55${contato.phone}' -p ${appPackage}`);
-                    await safeSleep(3500); if (skipCurrent || !isCampaignActive) { abortarTurno(contato); return; }
-
-                    // Checa se o número existe na base do WhatsApp
-                    await runAdb("uiautomator dump /data/local/tmp/uidump.xml", 4000);
-                    const screenDump = await runAdb("cat /data/local/tmp/uidump.xml", 2000);
-                    
-                    if (screenDump && (screenDump.includes("O número de telefone") || screenDump.includes("isn't on WhatsApp") || screenDump.includes("registrado no WhatsApp"))) {
-                        setActionUI('fa-ban', 'Número Inválido', false, 'text-red-500', 'bg-red-50');
-                        await runAdb("input keyevent 66"); await runAdb("input keyevent 3"); 
-                        contato.statusEnvio = 'Inválido'; statsData.invalidos++; currentIndex++; atualizarMetricas();
-                        isProcessingCore = false; if(isCampaignActive && !skipCurrent) setTimeout(processarProximo, 500); return; 
-                    }
-                } else {
-                    setActionUI('fa-magnifying-glass', 'Pesquisando Código...', true, 'text-amber-500', 'bg-amber-50');
-                    await runAdb(`am start -n ${appPackage}/com.whatsapp.Main`);
-                    await safeSleep(2000); if(skipCurrent) { abortarTurno(contato); return; }
-                    await runAdb("input keyevent 84"); await safeSleep(1000);
-                    const cleanCode = contato.code.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                    await runAdb(`input text ${cleanCode}`);
-                    await safeSleep(2000); if(skipCurrent) { abortarTurno(contato); return; }
-                    await runAdb("input keyevent 66"); await safeSleep(1500); // Abre a conversa encontrada
+            shadow.getElementById('dr-start').onclick = async () => {
+                if (app.active) {
+                    app.active = false;
+                    shadow.getElementById('dr-start').innerText = "INICIAR DISPAROS";
+                    shadow.getElementById('dr-start').className = "btn-run";
+                    return;
                 }
 
-                if (skipCurrent || !isCampaignActive) { abortarTurno(contato); return; }
+                let rawContacts = shadow.getElementById('dr-contacts').value.split('\\n').filter(l => l.trim() !== '');
+                let rawMsg = shadow.getElementById('dr-msgs').value.trim();
 
-                // O CHAT ESTÁ ABERTO AQUI. VAMOS INJETAR O CONTEÚDO SEQUENCIALMENTE:
-                for (let i = 0; i < pipelineActions.length; i++) {
-                    if(skipCurrent || !isCampaignActive) break;
-                    let acao = pipelineActions[i];
-                    
-                    if (acao.type === 'TEXT') {
-                        setActionUI('fa-font', `Injetando Texto...`, true, 'text-wa-dark-green', 'bg-green-50');
-                        const msg = parseMensagem(acao.content, contato.name);
-                        
-                        if(contato.phone === "N/A") {
-                            // Envio por Código (Digitação segura)
-                            let cleanMsg = msg.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\n/g, '%s').replace(/\s/g, '%s').replace(/[&<>"']/g, ''); 
-                            await runAdb(`input text ${cleanMsg}`); 
-                            await safeSleep(1000); // Tempo pro texto cair na caixa do celular
-                            await runAdb("input keyevent 66"); // Envia
-                            await safeSleep(500);
-                        } else {
-                            // Envio por Telefone (Deep Link Rápido)
-                            const encodedMsg = encodeURIComponent(msg).replace(/'/g, "%27").replace(/"/g, "%22");
-                            await runAdb(`am start -a android.intent.action.VIEW -d 'whatsapp://send?phone=55${contato.phone}&text=${encodedMsg}' -p ${appPackage}`);
-                            await safeSleep(1500); if(skipCurrent) break;
-                            await runAdb("input keyevent 66"); // Dispara o texto preenchido
-                            await safeSleep(300);
-                            await runAdb("input keyevent 66"); // Dispara o enter duplo pra garantir
-                            await safeSleep(500);
+                if (rawContacts.length === 0 || rawMsg === '') return alert("Preencha a lista e a mensagem!");
+
+                app.contacts = rawContacts.map(linha => {
+                    let parts = linha.split(/[\\s\\t]+/);
+                    let phone = parts.find(p => /^\\d{10,14}$/.test(p.replace(/\\D/g, ''))) || '';
+                    let name = parts.filter(p => p !== phone).join(' ') || 'Cliente';
+                    return { phone: phone.replace(/\\D/g, ''), name, status: 'PENDENTE' };
+                }).filter(c => c.phone !== '');
+
+                app.msgs = [rawMsg];
+                app.currentIndex = 0;
+                app.active = true;
+
+                shadow.getElementById('dr-start').innerText = "🛑 PARAR MOTOR";
+                shadow.getElementById('dr-start').className = "btn-run btn-danger";
+
+                // INICIA O LOOP DE DISPARO SEM RECARREGAR A PÁGINA
+                while(app.active && app.currentIndex < app.contacts.length) {
+                    let contato = app.contacts[app.currentIndex];
+                    let msgFinal = rawMsg.replace(/:re:/gi, contato.name);
+                    let urlPausa = parseInt(shadow.getElementById('dr-speed').value);
+
+                    // O TRUQUE MÁGICO DO SPA (SINGLE PAGE APP) -> Clica num link simulado em vez de alterar window.location
+                    let a = document.getElementById('wa-magic-link');
+                    if(!a) { a = document.createElement('a'); a.id = 'wa-magic-link'; document.body.appendChild(a); }
+                    a.href = \`https://web.whatsapp.com/send?phone=55\${contato.phone}&text=\${encodeURIComponent(msgFinal)}\`;
+                    a.click(); // WA Web intercepta isso sem recarregar a tela!
+
+                    let enviou = false;
+                    // Fica buscando o botão verde de enviar por até 15 segundos
+                    for(let i=0; i<15; i++) {
+                        if(!app.active) break;
+                        await sleep(1000);
+
+                        // Checa se deu "Número Inválido"
+                        let errorModal = document.querySelector('[data-animate-modal-popup="true"]');
+                        if(errorModal && errorModal.innerText.toLowerCase().includes('inválid')) {
+                            let okBtn = errorModal.querySelector('button');
+                            if(okBtn) okBtn.click();
+                            contato.status = 'INVÁLIDO';
+                            enviou = true;
+                            break;
                         }
-                    } else if (acao.type === 'AUDIO') {
-                        setActionUI('fa-microphone', `Gravando Áudio (Cabo P2)...`, true, 'text-blue-500', 'bg-blue-50');
-                        const fileEl = document.getElementById(`audio-file-${acao.id}`);
-                        if(fileEl && fileEl.files && fileEl.files.length > 0) {
-                            await new Promise((resolve) => {
-                                const audioUrl = URL.createObjectURL(fileEl.files[0]), audio = new Audio(audioUrl);
-                                audio.onloadedmetadata = async () => {
-                                    if(skipCurrent) { resolve(); return; }
-                                    const durMs = Math.ceil(audio.duration * 1000);
-                                    // Segura o dedo no microfone (coordenadas universais inferiores)
-                                    runAdb(`input swipe 950 1450 950 1450 ${durMs + 1500}`, durMs + 5000); 
-                                    await safeSleep(400); 
-                                    audio.play(); // Toca o audio no PC
-                                    await safeSleep(durMs + 1800); // Espera o áudio acabar + margem pro app soltar
-                                    URL.revokeObjectURL(audioUrl); resolve();
-                                };
-                            });
+
+                        // Acha a seta verde e clica
+                        let btnEnviar = document.querySelector('span[data-icon="send"]') || document.querySelector('button[aria-label="Enviar"]');
+                        if(btnEnviar) {
+                            await sleep(1000); // Respiro antes do clique
+                            btnEnviar.click();
+                            contato.status = 'ENVIADO';
+                            enviou = true;
+                            shadow.getElementById('st-sent').innerText = app.contacts.filter(c => c.status === 'ENVIADO').length;
+                            await sleep(2000); // Respiro após o clique pro WA processar a rede
+                            break;
                         }
                     }
-                }
 
-                if (skipCurrent || !isCampaignActive) { abortarTurno(contato); return; }
-                await runAdb("input keyevent 3"); // Botão home para sair da conversa
-                contato.statusEnvio = 'Enviado'; statsData.sucesso++; currentIndex++; atualizarMetricas();
-
-                const delaySegundos = rnd(parseInt(document.getElementById('cfg-delay-min').value) || 10, parseInt(document.getElementById('cfg-delay-max').value) || 25);
-                setActionUI('fa-hourglass-half', `Resfriando: ${delaySegundos}s...`, false, 'text-gray-400', 'bg-gray-50');
-                await safeSleep(delaySegundos * 1000); 
-                
-                isProcessingCore = false; if(isCampaignActive && !skipCurrent) processarProximo();
-                
-            } catch (e) {
-                console.error(e); contato.statusEnvio = 'Erro'; currentIndex++; statsData.invalidos++; atualizarMetricas(); 
-                isProcessingCore = false; if(isCampaignActive) processarProximo();
-            }
-        }
-
-        function abortarTurno(contato) {
-            runAdb("input keyevent 3"); 
-            contato.statusEnvio = 'Pulado'; statsData.invalidos++; currentIndex++; atualizarMetricas();
-            isProcessingCore = false;
-            if (isCampaignActive) setTimeout(processarProximo, 500);
-        }
-
-        function exportarRelatorio() {
-            if (contatosBase.length === 0) return showToast("Fila vazia", "warning"); 
-            let csv = "Código,Nome,Telefone,Status\n"; contatosBase.forEach(c => csv += `${c.code},${c.name},${c.phone},${c.statusEnvio}\n`); 
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "Relatorio.csv"; link.click();
-        }
-
-        // --- 7. CONEXÃO USB WEB-ADB (BLINDADA CONTRA QUEDAS) ---
-        function atualizarEstadoUSBUI(conectado, txtBtn = "Iniciar") {
-            const box = document.getElementById('usb-status'), dot = document.getElementById('usb-status-dot'), txt = document.getElementById('usb-status-text'), btn = document.getElementById('btn-conectar'), spanBtn = document.getElementById('txt-btn-conectar');
-            if (conectado) {
-                box.classList.remove('hidden'); box.classList.add('flex');
-                dot.className = "w-2.5 h-2.5 rounded-full bg-wa-green animate-pulse";
-                txt.innerText = "Conectado e Seguro"; txt.className = "text-xs font-semibold text-wa-dark-green";
-                btn.style.display = 'none';
-                if (contatosBase.length > 0 && !isCampaignActive) { if (currentIndex > 0) document.getElementById('btn-resume').style.display = 'flex'; else document.getElementById('btn-start').disabled = false; }
-            } else {
-                box.className = "hidden items-center gap-2 px-4 py-2 bg-red-50 rounded-full flex";
-                dot.className = "w-2.5 h-2.5 rounded-full bg-red-500";
-                txt.innerText = "Desconectado"; txt.className = "text-xs font-semibold text-red-600";
-                btn.style.display = 'flex'; spanBtn.innerText = txtBtn; btn.disabled = false;
-                document.getElementById('btn-resume').style.display = 'none'; document.getElementById('btn-start').disabled = true;
-            }
-        }
-
-        async function getAdbKeyPair() { return await crypto.subtle.generateKey({ name: "RSASSA-PKCS1-v1_5", modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" }, true, ["sign", "verify"]); }
-        async function signAdbToken(keyPair, token) { return new Uint8Array(await crypto.subtle.sign("RSASSA-PKCS1-v1_5", keyPair.privateKey, token)); }
-        async function getAdbPublicKeyPayload(keyPair) {
-            const exported = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
-            const binaryStr = atob(exported.n.replace(/-/g, '+').replace(/_/g, '/')), modBytes = new Uint8Array(binaryStr.length);
-            for (let i = 0; i < binaryStr.length; i++) modBytes[i] = binaryStr.charCodeAt(i);
-            let n = 0n; for (let i = 0; i < modBytes.length; i++) n = (n << 8n) | BigInt(modBytes[i]);
-            const r32 = 1n << 32n, n0 = n % r32; let inv = 1n; for (let i = 0; i < 32; i++) inv = (inv * (2n - n0 * inv)) % r32;
-            const buffer = new ArrayBuffer(524), view = new DataView(buffer), bytes = new Uint8Array(buffer);
-            view.setUint32(0, 64, true); view.setUint32(4, Number((r32 - inv) % r32), true);
-            let tempN = n; for (let i = 0; i < 256; i++) { bytes[8 + i] = Number(tempN & 0xffn); tempN >>= 8n; }
-            let tempRR = ((1n << 2048n) * (1n << 2048n)) % n; for (let i = 0; i < 256; i++) { bytes[264 + i] = Number(tempRR & 0xffn); tempRR >>= 8n; }
-            view.setUint32(520, 65537, true); const nameBytes = new TextEncoder().encode("DisparaAI_Pro\0");
-            const fullPayload = new Uint8Array(buffer.byteLength + nameBytes.length); fullPayload.set(bytes, 0); fullPayload.set(nameBytes, buffer.byteLength); return fullPayload;
-        }
-        
-        async function sendPacket(cmd, arg0, arg1, data = new Uint8Array(0)) {
-            if (!usbDevice || !epOut) return;
-            const header = new ArrayBuffer(24), view = new DataView(header); let checksum = 0; for (let i = 0; i < data.length; i++) checksum = (checksum + data[i]) & 0xffffffff;
-            view.setUint32(0, cmd, true); view.setUint32(4, arg0, true); view.setUint32(8, arg1, true); view.setUint32(12, data.length, true); view.setUint32(16, checksum, true); view.setUint32(20, (cmd ^ 0xffffffff) >>> 0, true);
-            const buffer = new Uint8Array(24 + data.length); buffer.set(new Uint8Array(header), 0); buffer.set(data, 24); await usbDevice.transferOut(epOut, buffer);
-        }
-        
-        async function readPacket() {
-            if (!usbDevice || !epIn) return null;
-            try {
-                const headerRes = await usbDevice.transferIn(epIn, 24); if (!headerRes.data || headerRes.data.byteLength < 24) return null;
-                const view = new DataView(headerRes.data.buffer), cmd = view.getUint32(0, true), arg0 = view.getUint32(4, true), arg1 = view.getUint32(8, true), len = view.getUint32(12, true);
-                let payload = new Uint8Array(0); if (len > 0) { const dataRes = await usbDevice.transferIn(epIn, len); if (dataRes.data) payload = new Uint8Array(dataRes.data.buffer); }
-                return { cmd, arg0, arg1, data: payload };
-            } catch (e) { return { error: true }; } 
-        }
-
-        async function conectarUSB() {
-            const btn = document.getElementById('btn-conectar');
-            const spanBtn = document.getElementById('txt-btn-conectar');
-            
-            try {
-                btn.disabled = true;
-                spanBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Conectando...';
-
-                if(usbDevice) { try { await usbDevice.close(); } catch(e){} usbDevice = null; }
-                
-                usbDevice = await navigator.usb.requestDevice({ filters: [{ classCode: 255, subclassCode: 66, protocolCode: 1 }] }); 
-                await usbDevice.open();
-                if (usbDevice.configuration === null) await usbDevice.selectConfiguration(1);
-                
-                let intfNum = -1;
-                for (const conf of usbDevice.configurations) { for (const intf of conf.interfaces) { for (const alt of intf.alternates) { if (alt.interfaceClass === 255 && alt.interfaceSubclass === 66 && alt.interfaceProtocol === 1) { intfNum = intf.interfaceNumber; epIn = alt.endpoints.find(e => e.direction === 'in').endpointNumber; epOut = alt.endpoints.find(e => e.direction === 'out').endpointNumber; break; } } } }
-                if(intfNum === -1) throw new Error("Interface ADB não encontrada. Ative a depuração USB.");
-                
-                await usbDevice.claimInterface(intfNum);
-                
-                // Flush de segurança
-                try { await usbDevice.transferOut(epOut, new Uint8Array(0)); } catch(e){}
-
-                await sendPacket(0x4E584E43, 0x01000000, 4096, new TextEncoder().encode("host::DisparaAI\0"));
-                
-                let keyPair = await getAdbKeyPair();
-                let resp = await readPacket();
-                
-                if(!resp) throw new Error("Celular não respondeu.");
-
-                if (resp.cmd === 0x4E584E43) { 
-                    isAdbReady = true; adbReaderLoop(); 
-                } else if (resp.cmd === 0x48545541 && resp.arg0 === 1) { 
-                    await sendPacket(0x48545541, 2, 0, await signAdbToken(keyPair, resp.data)); 
-                    let resp2 = await readPacket();
+                    app.currentIndex++;
+                    shadow.getElementById('st-pend').innerText = app.contacts.length - app.currentIndex;
                     
-                    if (resp2 && resp2.cmd === 0x4E584E43) { 
-                        isAdbReady = true; adbReaderLoop(); 
-                    } else if (resp2 && resp2.cmd === 0x48545541) { 
-                        await sendPacket(0x48545541, 3, 0, await getAdbPublicKeyPayload(keyPair)); 
-                        
-                        showToast("⚠️ Olhe para o seu celular e clique em PERMITIR.", "warning"); 
-                        spanBtn.innerHTML = 'Aguardando celular...';
-                        
-                        // Espera paciente infinita para o usuário apertar na tela do Android
-                        while(!isAdbReady) {
-                            let waitResp = await readPacket();
-                            if (waitResp && waitResp.cmd === 0x4E584E43) { 
-                                isAdbReady = true; adbReaderLoop(); break;
-                            }
-                            if (waitResp && waitResp.error) {
-                                throw new Error("Conexão interrompida pelo Android.");
-                            }
-                            await sleep(500);
-                        }
-                    } 
+                    if(app.active) {
+                        shadow.getElementById('dr-start').innerText = \`⏳ Pausando (\${urlPausa/1000}s)...\`;
+                        await sleep(urlPausa);
+                        shadow.getElementById('dr-start').innerText = "🛑 PARAR MOTOR";
+                    }
                 }
-                
-                if (isAdbReady) {
-                    atualizarEstadoUSBUI(true); 
-                    showToast("Conexão estabelecida e blindada!", "success");
-                }
-            } catch (e) { 
-                usbDevice = null;
-                atualizarEstadoUSBUI(false, "Reconectar");
-                showToast("Erro: " + e.message, "error"); 
-            }
-        }
+
+                app.active = false;
+                shadow.getElementById('dr-start').innerText = "✅ FINALIZADO! REINICIAR?";
+                shadow.getElementById('dr-start').className = "btn-run";
+            };
+        })();
+        `;
+
+        // Transforma o código acima num link executável (Bookmarklet)
+        const botao = document.getElementById('btn-magico');
+        botao.href = 'javascript:' + encodeURIComponent(codigoDoRobo);
     </script>
 </body>
 </html>
+```eof
+
+### Passo a Passo (Hospedando e Usando):
+1. Crie um novo repositório no seu GitHub com o nome `disparador`.
+2. Suba esse arquivo `index.html` lá.
+3. Ative o **GitHub Pages** nas configurações do repositório.
+4. Acesse o site que o GitHub vai gerar para você.
+5. Quando o site abrir, simplesmente **clique e arraste o botão azul para a barra de favoritos do Chrome**.
+6. Agora, abra o `web.whatsapp.com`. Assim que carregar o QR Code, **clique no Favorito**. O painel negro vai aparecer do lado direito.
+
+Ele vai abrir a conversa e colar o texto sem **nunca dar F5 e sem perder o console**. Pode testar!
