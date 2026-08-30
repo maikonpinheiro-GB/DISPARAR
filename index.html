@@ -382,7 +382,7 @@
         function updatePipelineAction(index, type, val) { if(type === 'TEXT') pipelineActions[index].content = val; }
 
         function limparFila() {
-            if(isCampaignActive) return showToast("Pause a operação antes de limpar.", "warning");
+            if(isCampaignActive) return showToast("Pare a operação para limpar a fila.", "warning");
             contatosBase = []; contatosTemp = []; currentIndex = 0; statsData = { sucesso: 0, invalidos: 0 };
             document.getElementById('paste-area').value = '';
             atualizarMetricas();
@@ -390,7 +390,7 @@
             document.getElementById('stage-name').innerText = "...";
             document.getElementById('stage-phone').innerText = "...";
             setActionUI('fa-robot', 'Aguardando Ação...', false, 'text-wa-green', 'bg-green-50');
-            showToast("Memória e fila esvaziadas com sucesso!", "success");
+            showToast("Lista e memória zeradas com sucesso!", "success");
         }
 
         function processarEntradas() {
@@ -476,11 +476,12 @@
                 box.className = "hidden items-center gap-2 px-4 py-2 bg-red-50 rounded-full flex";
                 dot.className = "w-2.5 h-2.5 rounded-full bg-red-500";
                 txt.innerText = "Desconectado"; txt.className = "text-xs font-semibold text-red-600";
-                btn.style.display = 'flex'; btn.innerText = "Iniciar";
+                btn.style.display = 'flex'; btn.innerHTML = 'Reconectar Cabo';
                 document.getElementById('btn-resume').style.display = 'none'; document.getElementById('btn-start').disabled = true;
             }
         }
 
+        // --- EMERGÊNCIA ---
         function pararCampanha(emergencia = false) {
             isCampaignActive = false; skipCurrent = true;
             document.getElementById('btn-controls').style.display = 'none'; document.getElementById('btn-start').style.display = 'none';
@@ -498,20 +499,21 @@
 
         function pularCliente() { if(!isCampaignActive) return; skipCurrent = true; showToast("Pulando...", "warning"); }
         function retomarCampanha() {
-            if (!isAdbReady) return showToast("Verifique se o USB está conectado no seu celular, lembrando que tem que ter ativado a depuração do usb.", "error");
+            if (!isAdbReady) return showToast("Verifique se o USB está conectado no seu celular e depuração ativa.", "error");
             document.getElementById('btn-resume').style.display = 'none'; document.getElementById('btn-start').style.display = 'none'; document.getElementById('btn-controls').style.display = 'flex';
             document.getElementById('stage-status').className = "px-4 py-1.5 rounded-full bg-gray-100 text-[10px] font-bold text-wa-muted uppercase";
             isCampaignActive = true; skipCurrent = false; processarProximo();
         }
 
         async function iniciarCampanha() {
-            if (!isAdbReady) return showToast("Verifique se o USB está conectado no seu celular, lembrando que tem que ter ativado a depuração do usb.", "error"); 
+            if (!isAdbReady) return showToast("Verifique a conexão USB do celular.", "error"); 
             if (pipelineActions.length === 0) return showToast("Adicione conteúdo primeiro.", "error");
             isCampaignActive = true; skipCurrent = false;
             document.getElementById('btn-start').style.display = 'none'; document.getElementById('btn-controls').style.display = 'flex';
             processarProximo();
         }
 
+        // --- NÚCLEO ADB ASSÍNCRONO ABSOLUTO ---
         async function adbReaderLoop() {
             if (isReaderRunning) return; isReaderRunning = true;
             while (isAdbReady && usbDevice && epIn) {
@@ -539,6 +541,7 @@
                 const myId = localIdCounter++;
                 adbStreams[myId] = { data: "", closed: false, resolve: resolve };
                 await sendPacket(0x4E45504F, myId, 0, new TextEncoder().encode("shell:" + command + "\0"));
+                // Timeout de Segurança: Libera o código caso o celular não responda
                 setTimeout(() => { if (!adbStreams[myId].closed) { adbStreams[myId].closed = true; resolve(adbStreams[myId].data); } }, timeoutMs);
             });
         }
@@ -572,24 +575,10 @@
                 if (skipCurrent || !isCampaignActive) { abortarTurno(contato); return; }
                 await safeSleep(500);
 
-                let startLoopIndex = 0;
-                let firstText = "";
-                
-                // OTIMIZAÇÃO: Se a primeira ação é texto, já injeta junto na abertura da tela
-                if (pipelineActions.length > 0 && pipelineActions[0].type === 'TEXT') {
-                    firstText = parseMensagem(pipelineActions[0].content, contato.name);
-                }
-
                 if (contato.phone !== "N/A") {
                     setActionUI('fa-magnifying-glass', 'Abrindo Conversa...', true, 'text-blue-500', 'bg-blue-50');
-                    
-                    let openUrl = `whatsapp://send?phone=55${contato.phone}`;
-                    if (firstText !== "") {
-                        openUrl += `&text=${encodeURIComponent(firstText).replace(/'/g, "%27").replace(/"/g, "%22")}`;
-                        startLoopIndex = 1; // Pula a primeira ação na esteira pois já foi injetada
-                    }
-                    
-                    await runAdb(`am start -a android.intent.action.VIEW -d '${openUrl}' -p ${appPackage}`);
+                    // Abertura primária sem texto só para focar/validar o chat
+                    await runAdb(`am start -a android.intent.action.VIEW -d 'whatsapp://send?phone=55${contato.phone}' -p ${appPackage}`);
                     await safeSleep(3500); if (skipCurrent || !isCampaignActive) { abortarTurno(contato); return; }
 
                     await runAdb("uiautomator dump /data/local/tmp/uidump.xml", 4000);
@@ -601,18 +590,6 @@
                         contato.statusEnvio = 'Inválido'; statsData.invalidos++; currentIndex++; atualizarMetricas();
                         isProcessingCore = false; if(isCampaignActive && !skipCurrent) setTimeout(processarProximo, 500); return; 
                     }
-
-                    // Se a conversa abriu e existia o primeiro texto, dá Enter
-                    if (firstText !== "") {
-                        setActionUI('fa-paper-plane', 'Enviando Texto Inicial...', true, 'text-wa-dark-green', 'bg-green-50');
-                        
-                        // Confia na opção "Enviar com Enter" nativa
-                        await runAdb("input keyevent 66"); // Enter
-                        await safeSleep(300);
-                        await runAdb("input keyevent 66"); // Fallback extra de segurança
-                        await safeSleep(1000);
-                    }
-
                 } else {
                     setActionUI('fa-magnifying-glass', 'Pesquisando Código...', true, 'text-amber-500', 'bg-amber-50');
                     await runAdb(`am start -n ${appPackage}/com.whatsapp.Main`);
@@ -622,12 +599,11 @@
                     await runAdb(`input text ${cleanCode}`);
                     await safeSleep(2000); if(skipCurrent) { abortarTurno(contato); return; }
                     await runAdb("input keyevent 66"); await safeSleep(1500);
-                    startLoopIndex = 0; // Quando é código, não injetamos na url inicial
                 }
 
                 if (skipCurrent || !isCampaignActive) { abortarTurno(contato); return; }
 
-                for (let i = startLoopIndex; i < pipelineActions.length; i++) {
+                for (let i = 0; i < pipelineActions.length; i++) {
                     if(skipCurrent || !isCampaignActive) break;
                     let acao = pipelineActions[i];
                     
@@ -640,13 +616,11 @@
                             await runAdb(`input text ${cleanMsg}`); await safeSleep(500);
                             await runAdb("input keyevent 66"); await safeSleep(300); await runAdb("input keyevent 66");
                         } else {
-                            const sendUrl = `whatsapp://send?phone=55${contato.phone}&text=${encodeURIComponent(msg).replace(/'/g, "%27").replace(/"/g, "%22")}`;
-                            await runAdb(`am start -a android.intent.action.VIEW -d '${sendUrl}' -p ${appPackage}`);
+                            // Envio direto garantido pelo Intent, em vez de input text que quebra com linhas
+                            const encodedMsg = encodeURIComponent(msg).replace(/'/g, "%27").replace(/"/g, "%22");
+                            await runAdb(`am start -a android.intent.action.VIEW -d 'whatsapp://send?phone=55${contato.phone}&text=${encodedMsg}' -p ${appPackage}`);
                             await safeSleep(1500); if(skipCurrent) break;
-                            
-                            // Confia na opção "Enviar com Enter"
-                            await runAdb("input keyevent 66"); await safeSleep(300); 
-                            await runAdb("input keyevent 66"); 
+                            await runAdb("input keyevent 66"); await safeSleep(300); await runAdb("input keyevent 66"); // Dois enters garantem envio
                         }
                     } else if (acao.type === 'AUDIO') {
                         setActionUI('fa-microphone', `Áudio...`, true, 'text-blue-500', 'bg-blue-50');
@@ -693,16 +667,16 @@
             if (contatosBase.length === 0) return showToast("Sem relatórios ainda", "warning"); 
             let csv = "Código,Nome,Telefone,Status\n"; contatosBase.forEach(c => csv += `${c.code},${c.name},${c.phone},${c.statusEnvio}\n`); 
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "Relatorio.csv"; link.click();
+            const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "Relatorio_DisparaAI.csv"; link.click();
         }
 
+        // --- USB CORE (BLINDADO) ---
         let adbKeyPair = null;
         async function getAdbKeyPair() { 
-            if (adbKeyPair) return adbKeyPair; 
-            adbKeyPair = await crypto.subtle.generateKey({ name: "RSASSA-PKCS1-v1_5", modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" }, true, ["sign", "verify"]); 
-            return adbKeyPair;
+            if(adbKeyPair) return adbKeyPair;
+            adbKeyPair = await crypto.subtle.generateKey({ name: "RSASSA-PKCS1-v1_5", modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" }, true, ["sign", "verify"]);
+            return adbKeyPair; 
         }
-
         async function signAdbToken(keyPair, token) { return new Uint8Array(await crypto.subtle.sign("RSASSA-PKCS1-v1_5", keyPair.privateKey, token)); }
         async function getAdbPublicKeyPayload(keyPair) {
             const exported = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
@@ -738,22 +712,38 @@
         }
 
         async function conectarUSB() {
+            const btn = document.getElementById('btn-conectar');
+            const originalText = btn.innerHTML;
+            
             try {
-                if(usbDevice) { usbDevice = null; }
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Conectando...';
+
+                if(usbDevice) { try { await usbDevice.close(); } catch(e){} usbDevice = null; }
+                
                 usbDevice = await navigator.usb.requestDevice({ filters: [{ classCode: 255, subclassCode: 66, protocolCode: 1 }] }); 
                 await usbDevice.open();
                 if (usbDevice.configuration === null) await usbDevice.selectConfiguration(1);
+                
                 let intfNum = -1;
                 for (const conf of usbDevice.configurations) { for (const intf of conf.interfaces) { for (const alt of intf.alternates) { if (alt.interfaceClass === 255 && alt.interfaceSubclass === 66 && alt.interfaceProtocol === 1) { intfNum = intf.interfaceNumber; epIn = alt.endpoints.find(e => e.direction === 'in').endpointNumber; epOut = alt.endpoints.find(e => e.direction === 'out').endpointNumber; break; } } } }
+                if(intfNum === -1) throw new Error("Interface incompatível.");
+                
                 await usbDevice.claimInterface(intfNum);
-                await sendPacket(0x4E584E43, 0x01000000, 4096, new TextEncoder().encode("host::DisparaAI\0"));
+                
+                // Flush da porta USB para limpar conexões pendentes do Windows
+                try { await usbDevice.transferOut(epOut, new Uint8Array(0)); } catch(e){}
+
+                await sendPacket(0x4E584E43, 0x01000000, 4096, new TextEncoder().encode("host::DisparaAI_Pro\0"));
                 
                 let keyPair = await getAdbKeyPair();
                 let resp = await readPacket();
                 
-                if (resp && resp.cmd === 0x4E584E43) { 
+                if(!resp) throw new Error("Sem resposta do aparelho.");
+
+                if (resp.cmd === 0x4E584E43) { 
                     isAdbReady = true; adbReaderLoop(); 
-                } else if (resp && resp.cmd === 0x48545541 && resp.arg0 === 1) { 
+                } else if (resp.cmd === 0x48545541 && resp.arg0 === 1) { 
                     await sendPacket(0x48545541, 2, 0, await signAdbToken(keyPair, resp.data)); 
                     let resp2 = await readPacket();
                     
@@ -761,16 +751,31 @@
                         isAdbReady = true; adbReaderLoop(); 
                     } else if (resp2 && resp2.cmd === 0x48545541) { 
                         await sendPacket(0x48545541, 3, 0, await getAdbPublicKeyPayload(keyPair)); 
-                        showToast("⚠️ Autorize na tela do seu celular e CLIQUE EM INICIAR NOVAMENTE.", "warning");
-                        usbDevice = null; return;
+                        
+                        showToast("⚠️ Olhe para o celular e clique em PERMITIR.", "warning"); 
+                        btn.innerHTML = '<i class="fa-solid fa-mobile-screen"></i> Autorize no Celular...';
+                        
+                        // Fica pendente até o usuário bater o dedo na tela
+                        let waitResp = await readPacket();
+                        if (waitResp && waitResp.cmd === 0x4E584E43) { 
+                            isAdbReady = true; adbReaderLoop(); 
+                        } else {
+                            throw new Error("Autorização recusada.");
+                        }
                     } 
                 }
                 
                 if (isAdbReady) {
-                    atualizarEstadoUSBUI(true); showToast("Conectado com sucesso!", "success");
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                    atualizarEstadoUSBUI(true); 
+                    showToast("Conexão estabelecida e blindada!", "success");
                 }
             } catch (e) { 
-                showToast("Verifique se o USB está conectado no seu celular, lembrando que tem que ter ativado a depuração do usb.", "error"); 
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+                usbDevice = null;
+                showToast("Conexão interrompida. Tente retirar e colocar o cabo novamente.", "error"); 
             }
         }
     </script>
