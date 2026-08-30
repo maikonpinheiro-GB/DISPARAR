@@ -17,9 +17,9 @@
                 extend: {
                     fontFamily: { sans: ['"Inter"', 'sans-serif'] },
                     colors: { 
-                        'boti-green': '#007367', /* Verde escuro corporativo */
-                        'boti-light': '#C4D600', /* Verde folha claro */
-                        'boti-bg': '#F4F6F8',    /* Cinza fundo ERP */
+                        'boti-green': '#007367', 
+                        'boti-light': '#C4D600', 
+                        'boti-bg': '#F4F6F8',    
                         'boti-dark': '#2D3748',
                         'boti-gray': '#718096'
                     },
@@ -35,7 +35,6 @@
     <style>
         body { background-color: #F4F6F8; color: #2D3748; }
         
-        /* Estilos de input corporativos */
         .input-corp {
             background-color: #ffffff;
             border: 1px solid #E2E8F0;
@@ -48,7 +47,6 @@
             outline: none;
         }
 
-        /* Botões padronizados */
         .btn-corp {
             transition: all 0.2s ease;
             font-weight: 600;
@@ -81,7 +79,6 @@
             border-color: #CBD5E0;
         }
 
-        /* Animações e Scrollbar */
         @keyframes pulse-ring-corp {
             0% { transform: scale(0.85); box-shadow: 0 0 0 0 rgba(0, 115, 103, 0.4); }
             70% { transform: scale(1); box-shadow: 0 0 0 15px rgba(0, 115, 103, 0); }
@@ -104,7 +101,7 @@
             </div>
             <div>
                 <h1 class="font-bold text-xl tracking-tight text-boti-dark leading-none">Dispara AI <span class="font-light text-boti-gray">Mobile</span></h1>
-                <p class="text-[10px] text-boti-green uppercase tracking-widest font-semibold mt-1">Ambiente Seguro</p>
+                <p class="text-[10px] text-boti-green uppercase tracking-widest font-semibold mt-1">Desenvolvido por Maikon Nattan</p>
             </div>
         </div>
         
@@ -116,8 +113,8 @@
                     <span class="text-[9px] text-green-600 uppercase tracking-wider">Interface Ativa</span>
                 </div>
             </div>
-            <button id="btn-conectar" onclick="conectarUSB()" class="btn-corp btn-primary px-5 py-2.5 rounded-md text-sm">
-                <i class="fa-brands fa-usb text-white/80"></i> Iniciar Conexão
+            <button id="btn-conectar" onclick="conectarUSB()" class="btn-corp btn-primary px-5 py-2.5 rounded-md text-sm shadow-sm">
+                <i class="fa-brands fa-usb text-white/80"></i> Iniciar
             </button>
         </div>
     </header>
@@ -126,31 +123,29 @@
         
         <div class="xl:col-span-5 flex flex-col gap-6">
             
-            <!-- Importação de Dados -->
             <div class="bg-white rounded-lg shadow-corp border border-gray-100 p-6">
                 <div class="flex items-center gap-2 mb-4">
                     <h2 class="text-boti-dark font-semibold text-sm uppercase tracking-wide">Cole os Dados</h2>
                 </div>
-                <textarea id="paste-area" rows="3" class="w-full input-corp p-4 text-sm text-boti-dark placeholder-gray-400 resize-none" placeholder="Copie Código, Nome e Telefone da VDI e cole aqui..."></textarea>
+                <textarea id="paste-area" rows="3" class="w-full input-corp p-4 text-sm text-boti-dark placeholder-gray-400 resize-none" placeholder="DENTRO DA VDI COPIE CÓDIGO, NOME E TELEFONE DO REVENDEDOR E COLE AQUI DENTRO"></textarea>
                 <button onclick="processarEntradas()" class="w-full mt-4 btn-corp btn-outline py-3 rounded-md text-sm">
-                    <i class="fa-solid fa-filter text-boti-green"></i> Processar Dados
+                    <i class="fa-solid fa-filter text-boti-green"></i> Processar
                 </button>
             </div>
 
-            <!-- Pipeline de Conteúdo -->
             <div class="bg-white rounded-lg shadow-corp border border-gray-100 p-6">
                 <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-boti-dark font-semibold text-sm uppercase tracking-wide">Conteúdo da Campanha</h2>
+                    <h2 class="text-boti-dark font-semibold text-sm uppercase tracking-wide">Conteúdo</h2>
                 </div>
                 
                 <div class="bg-blue-50 border border-blue-100 p-3 rounded-md mb-4">
                     <p class="text-[11px] text-blue-800 font-medium leading-relaxed">
-                        <i class="fa-solid fa-circle-info mr-1"></i> Para adicionar variações adicione texto ou áudio, o sistema vai mandar de forma aleatória para cada RE.
+                        <i class="fa-solid fa-circle-info mr-1"></i> Para adicionar variações adicone texto ou audio, o sistema vai mandar de forma aleatoria para cada RE.
                     </p>
                 </div>
 
                 <div id="pipeline-container" class="flex flex-col gap-3 mb-4 max-h-[350px] overflow-y-auto pr-2">
-                    <!-- Cards injetados via JS (Inicia Vazio) -->
+                    <!-- Ações Injetadas (Vazio por Padrão) -->
                 </div>
                 
                 <div class="grid grid-cols-2 gap-3 mt-4">
@@ -163,16 +158,15 @@
                 </div>
             </div>
             
-            <!-- Configurações Gerais -->
             <div class="bg-white rounded-lg shadow-corp border border-gray-100 p-6">
                 <div class="flex items-center gap-2 mb-4">
-                    <h2 class="text-boti-dark font-semibold text-sm uppercase tracking-wide">Configurações</h2>
+                    <h2 class="text-boti-dark font-semibold text-sm uppercase tracking-wide">Configuração</h2>
                 </div>
 
                 <div class="bg-yellow-50 p-4 rounded-md border border-yellow-200 mb-5">
-                    <h3 class="text-xs font-bold text-yellow-800 uppercase tracking-wide mb-1 flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation"></i> Requisito do WhatsApp</h3>
+                    <h3 class="text-xs font-bold text-yellow-800 uppercase tracking-wide mb-1 flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation"></i> Obrigatório no WhatsApp</h3>
                     <p class="text-[11px] text-yellow-700 leading-relaxed">
-                        Nas <b>Configurações > Conversas</b> do seu WhatsApp celular, ative a opção <b>"Enviar com Enter"</b> para o envio de texto funcionar.
+                        Nas <b>Configurações > Conversas</b> do seu WhatsApp celular, ative a opção <b>"Enviar com Enter"</b> para o envio de texto funcionar perfeitamente.
                     </p>
                 </div>
 
@@ -187,7 +181,7 @@
                     <div>
                         <label class="block text-xs font-semibold text-boti-gray mb-1">Operação</label>
                         <div class="w-full bg-gray-50 border border-gray-200 text-boti-dark font-medium text-xs rounded-md p-2.5 flex items-center gap-2">
-                            <i class="fa-solid fa-microchip text-boti-green"></i> Modo Inteligente
+                            <i class="fa-solid fa-microchip text-boti-green"></i> Motor Inteligente
                         </div>
                     </div>
                 </div>
@@ -207,9 +201,7 @@
 
         <div class="xl:col-span-7 flex flex-col gap-6">
             
-            <!-- Palco de Ação -->
             <div class="bg-white rounded-lg shadow-corp border border-gray-100 p-10 flex flex-col items-center justify-center relative min-h-[500px] overflow-hidden">
-                <!-- Elementos decorativos de fundo corporativo -->
                 <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(#007367 1px, transparent 1px); background-size: 20px 20px;"></div>
 
                 <div class="text-center relative z-10 w-full max-w-lg flex flex-col items-center">
@@ -232,19 +224,18 @@
 
                     <div class="flex gap-4 w-full mt-4">
                         <button id="btn-start" onclick="iniciarCampanha()" class="btn-corp btn-primary w-full py-4 rounded-md text-base shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
-                            <i class="fa-solid fa-play"></i> Iniciar Processamento
+                            <i class="fa-solid fa-play"></i> Iniciar Multitask
                         </button>
                         <button id="btn-resume" onclick="retomarCampanha()" class="hidden btn-corp bg-yellow-500 hover:bg-yellow-600 text-white w-full py-4 rounded-md text-base shadow-sm">
-                            <i class="fa-solid fa-bolt"></i> Retomar Processamento
+                            <i class="fa-solid fa-bolt"></i> Retomar Disparos
                         </button>
                         <button id="btn-stop" onclick="pararCampanha(false)" class="hidden btn-corp bg-red-600 hover:bg-red-700 text-white w-full py-4 rounded-md text-base shadow-sm">
-                            <i class="fa-solid fa-pause"></i> Interromper
+                            <i class="fa-solid fa-pause"></i> Interromper Motor
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Dashboard Métricas Estilo ERP -->
             <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mt-auto">
                 <div class="bg-white rounded-lg border border-gray-100 shadow-sm p-4 text-center">
                     <p class="text-[10px] text-boti-gray uppercase font-semibold mb-1">Pendentes</p>
@@ -270,7 +261,6 @@
         </div>
     </main>
 
-    <!-- Modal Inspeção -->
     <div id="modal-preview" class="fixed inset-0 bg-boti-dark/70 backdrop-blur-sm z-[100] hidden items-center justify-center p-4">
         <div class="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden shadow-corp-lg">
             <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
@@ -279,7 +269,7 @@
             </div>
             
             <div class="p-4 bg-white border-b border-gray-100 flex justify-between items-center px-6">
-                <span class="text-xs font-medium text-blue-800 bg-blue-50 px-3 py-1 rounded-full border border-blue-100"><i class="fa-solid fa-shield-check mr-1"></i> Filtro de Desduplicação Ativo</span>
+                <span class="text-xs font-medium text-blue-800 bg-blue-50 px-3 py-1 rounded-full border border-blue-100"><i class="fa-solid fa-shield-halved mr-1"></i> Desduplicação Ativa</span>
                 <span class="text-sm font-semibold text-boti-gray" id="preview-count">0 Registros</span>
             </div>
 
@@ -288,25 +278,23 @@
                     <thead class="text-xs uppercase text-gray-500 bg-gray-50 border-b border-gray-200 sticky top-0">
                         <tr>
                             <th class="py-3 px-6 font-medium">Nome Extraído</th>
-                            <th class="py-3 px-6 font-medium text-center">Código</th>
-                            <th class="py-3 px-6 font-medium text-right">Telefone Identificado</th>
+                            <th class="py-3 px-6 font-medium text-center">Código Identificado</th>
+                            <th class="py-3 px-6 font-medium text-right">Telefone Limpo</th>
                         </tr>
                     </thead>
                     <tbody id="preview-table-body" class="divide-y divide-gray-100 text-boti-dark"></tbody>
                 </table>
             </div>
             <div class="px-6 py-4 bg-gray-50 flex justify-end gap-3 border-t border-gray-200">
-                <button onclick="fecharModal()" class="btn-corp btn-outline px-5 py-2 rounded-md text-sm">Cancelar</button>
-                <button onclick="confirmarImportacao()" class="btn-corp btn-primary px-6 py-2 rounded-md text-sm">Importar Base</button>
+                <button onclick="fecharModal()" class="btn-corp btn-outline px-5 py-2 rounded-md text-sm">Descartar</button>
+                <button onclick="confirmarImportacao()" class="btn-corp btn-primary px-6 py-2 rounded-md text-sm">Aprovar Base</button>
             </div>
         </div>
     </div>
 
-    <!-- Container Toasts -->
     <div id="toast-container" class="fixed bottom-6 right-6 z-[200] flex flex-col gap-3 pointer-events-none"></div>
 
     <script>
-        // ESTADO GLOBAL LIMPO
         let contatosBase = [];
         let contatosTemp = [];
         let currentIndex = 0;
@@ -314,11 +302,8 @@
         let isProcessingCore = false;
         let statsData = { sucesso: 0, invalidos: 0 };
         let wakeLock = null;
-        
-        // AÇÕES DA ESTEIRA (Inicia VAZIO)
         let pipelineActions = [];
 
-        // ESTADO WEBUSB
         let usbDevice = null;
         let epIn = null, epOut = null;
         let isAdbReady = false;
@@ -347,12 +332,11 @@
 
         async function requestWakeLock() { try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch (err) {} }
 
-        // --- TOASTS CORPORATIVOS ---
         function showToast(msg, type = 'info') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
             
-            let borderClass = 'border-l-4 border-boti-green', iconClass = 'fa-circle-info text-boti-green';
+            let borderClass = 'border-l-4 border-blue-500', iconClass = 'fa-circle-info text-blue-500';
             if (type === 'error') { borderClass = 'border-l-4 border-red-500'; iconClass = 'fa-circle-exclamation text-red-500'; }
             else if (type === 'success') { borderClass = 'border-l-4 border-boti-green'; iconClass = 'fa-check-circle text-boti-green'; }
             else if (type === 'warning') { borderClass = 'border-l-4 border-yellow-400'; iconClass = 'fa-triangle-exclamation text-yellow-500'; }
@@ -365,7 +349,6 @@
             setTimeout(() => { toast.classList.add('translate-y-10', 'opacity-0'); setTimeout(() => toast.remove(), 300); }, 5000);
         }
 
-        // --- GESTOR PIPELINE ---
         function renderPipelineUI() {
             const container = document.getElementById('pipeline-container');
             container.innerHTML = '';
@@ -375,22 +358,22 @@
                 
                 let innerHtml = `
                     <div class="flex justify-between items-center mb-3">
-                        <span class="text-[10px] font-semibold text-gray-500 uppercase tracking-wide bg-gray-100 px-2 py-0.5 rounded">
-                            Passo ${index + 1}: ${action.type === 'TEXT' ? 'Mensagem de Texto' : 'Gravação de Áudio'}
+                        <span class="text-[10px] font-semibold text-gray-500 uppercase tracking-wide bg-gray-100 px-2 py-0.5 rounded border border-gray-200">
+                            Ação ${index + 1}: ${action.type === 'TEXT' ? 'Mensagem de Texto' : 'Gravação de Áudio'}
                         </span>
                         <button onclick="removerPipelineAction(${index})" class="text-gray-400 hover:text-red-500 transition-colors p-1"><i class="fa-solid fa-trash-can text-sm"></i></button>
                     </div>
                 `;
 
                 if (action.type === 'TEXT') {
-                    innerHtml += `<textarea rows="3" class="w-full input-corp rounded-md p-3 text-sm text-boti-dark resize-none" placeholder="Use :re: para puxar o nome e personalizar a mensagem..." onchange="updatePipelineAction(${index}, 'TEXT', this.value)">${action.content}</textarea>`;
+                    innerHtml += `<textarea rows="3" class="w-full input-corp rounded-md p-3 text-sm text-boti-dark placeholder-gray-400 resize-none font-medium" placeholder="use :re: para puxar o nome e personalizar a mensagem..." onchange="updatePipelineAction(${index}, 'TEXT', this.value)">${action.content}</textarea>`;
                 } else if (action.type === 'AUDIO') {
                     innerHtml += `
                         <div class="flex items-center gap-3 bg-gray-50 p-3 rounded-md border border-gray-200">
                             <i class="fa-solid fa-file-audio text-xl text-blue-500"></i>
                             <div class="flex-1">
                                 <label class="block text-[10px] font-semibold text-boti-gray uppercase mb-1">Arquivo de Áudio (MP3/OGG)</label>
-                                <input type="file" accept="audio/*" id="audio-file-${action.id}" class="text-[11px] text-boti-dark file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-[11px] file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 cursor-pointer">
+                                <input type="file" accept="audio/*" id="audio-file-${action.id}" class="text-[11px] text-boti-dark font-medium file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-[11px] file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 cursor-pointer">
                             </div>
                         </div>
                     `;
@@ -409,26 +392,23 @@
         function removerPipelineAction(index) { pipelineActions.splice(index, 1); renderPipelineUI(); }
         function updatePipelineAction(index, type, val) { if(type === 'TEXT') pipelineActions[index].content = val; }
 
-        // --- EXTRATOR INTELIGENTE ---
         function processarEntradas() {
             const rawText = document.getElementById('paste-area').value;
-            if(!rawText.trim()) return showToast("Por favor, cole os dados na área indicada.", "warning");
+            if(!rawText.trim()) return showToast("Por favor, cole os dados copiados na área indicada.", "warning");
             
             contatosTemp = []; let total = 0;
             rawText.split('\n').forEach(linha => {
-                let s = linha.trim(); if (!s) return;
+                let s = linha.trim().replace(/(?:\b|\+)(?:55|0055)\s?/g, ''); if (!s) return;
                 
                 let words = s.split(/\s+/);
                 let numbersBlock = [];
                 let nameParts = [];
                 
                 for (let word of words) {
-                    let clean = word.replace(/[^a-zA-Z0-9]/g, '');
-                    if (/^\d+$/.test(clean) || (/\d/.test(clean) && /[a-zA-Z]/.test(clean))) {
-                        numbersBlock.push(clean);
-                    } else {
-                        nameParts.push(word);
-                    }
+                    let cleanNumbers = word.replace(/\D/g, ''); 
+                    if (cleanNumbers.length >= 10 && cleanNumbers.length <= 11) { numbersBlock.push(cleanNumbers); } 
+                    else if (/^[a-zA-Z0-9]+$/.test(word) && /\d/.test(word) || (cleanNumbers.length > 0 && cleanNumbers.length <= 8)) { numbersBlock.push(word); }
+                    else { nameParts.push(word); }
                 }
 
                 let code = ""; let phone = "";
@@ -441,28 +421,27 @@
                 }
 
                 if (phone && phone.replace(/\D/g, '').length === 10) {
-                    let p = phone.replace(/\D/g, '');
-                    phone = p.substring(0, 2) + '9' + p.substring(2);
+                    let p = phone.replace(/\D/g, ''); phone = p.substring(0, 2) + '9' + p.substring(2);
                 }
 
                 if (!phone && !code) return;
 
-                let name = nameParts.join(' ').replace(/[^\w\sÀ-ÿ]/g, '').trim() || "Revendedor";
+                let name = nameParts.join(' ').replace(/[^\w\sÀ-ÿ]/g, '').trim() || "Revendedora";
                 total++;
-                contatosTemp.push({ name, code: code || "-", phone: phone || "-", statusEnvio: 'Pendente' });
+                contatosTemp.push({ name, code: code || "N/A", phone: phone || "N/A", statusEnvio: 'Pendente' });
             });
 
-            if (total === 0) return showToast("Nenhum dado legível foi identificado.", "error");
+            if (total === 0) return showToast("Nenhum dado legível foi identificado no texto.", "error");
             
             const tbody = document.getElementById('preview-table-body'); tbody.innerHTML = '';
-            document.getElementById('preview-count').innerText = `${total} Registros Localizados`;
+            document.getElementById('preview-count').innerText = `${total} Registros Mapeados`;
             contatosTemp.forEach(c => {
                 let tr = document.createElement('tr');
                 tr.className = "hover:bg-gray-50 transition-colors";
                 tr.innerHTML = `
-                    <td class="py-3 px-6 text-xs text-gray-700">${c.name}</td>
+                    <td class="py-3 px-6 text-xs text-gray-700 font-medium">${c.name}</td>
                     <td class="py-3 px-6 font-mono text-[11px] text-center"><span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded border border-gray-200">${c.code}</span></td>
-                    <td class="py-3 px-6 font-mono text-sm text-right text-boti-green font-medium">${c.phone !== '-' ? c.phone : '<span class="text-orange-500 text-[11px]">Busca via Cód.</span>'}</td>
+                    <td class="py-3 px-6 font-mono text-sm text-right text-boti-green font-semibold">${c.phone !== 'N/A' ? c.phone : '<span class="text-orange-500 text-[11px]">Busca via Cód.</span>'}</td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -473,8 +452,8 @@
             let add = 0, dup = 0;
             contatosTemp.forEach(novo => {
                 let isDup = false;
-                if(novo.phone !== "-") { isDup = contatosBase.find(c => c.phone === novo.phone); }
-                else if(novo.code !== "-") { isDup = contatosBase.find(c => c.code === novo.code); }
+                if(novo.phone !== "N/A") { isDup = contatosBase.find(c => c.phone === novo.phone); }
+                else if(novo.code !== "N/A") { isDup = contatosBase.find(c => c.code === novo.code); }
                 
                 if (!isDup) { contatosBase.push(novo); add++; } else dup++;
             });
@@ -485,7 +464,6 @@
 
         function fecharModal() { document.getElementById('modal-preview').classList.add('hidden'); document.getElementById('modal-preview').classList.remove('flex'); }
 
-        // --- MACROS & SPINTAX ---
         function parseMensagem(template, nomeContato) {
             let texto = template.replace(/:re:?/gi, nomeContato);
             const regex = /\{([^{}]+)\}/g; let match;
@@ -496,7 +474,6 @@
             return texto;
         }
 
-        // --- RELÓGIO & DASHBOARD ---
         function atualizarMetricas() {
             const pendentes = contatosBase.filter(c => c.statusEnvio === 'Pendente').length;
             document.getElementById('stat-pendentes').innerText = pendentes;
@@ -548,26 +525,37 @@
             isCampaignActive = true; processarProximo();
         }
 
-        // --- EXECUÇÃO ADB ---
         async function runAdbShellWithOutput(command) {
             if (!isAdbReady || !usbDevice) return null;
             try {
-                const myId = localIdCounter++; await sendPacket(0x4E45504F, myId, 0, new TextEncoder().encode("shell:" + command + "\0"));
+                const myId = localIdCounter++; 
+                await sendPacket(0x4E45504F, myId, 0, new TextEncoder().encode("shell:" + command + "\0"));
                 let output = "", isClosed = false;
-                let timeout = setTimeout(() => { isClosed = true; }, 5000); 
+                
+                // Timeout aumentado para proteger operações lentas do celular
+                let timeout = setTimeout(() => { isClosed = true; }, 8000); 
+                
                 while(!isClosed) {
-                    let r = await readPacket(); if(!r || r.error) break;
-                    if(r.cmd === 0x57525445 && r.arg1 === myId) { output += new TextDecoder().decode(r.data); await sendPacket(0x59414B4F, myId, r.arg0); }
-                    if(r.cmd === 0x45534C43 && r.arg1 === myId) { await sendPacket(0x45534C43, myId, r.arg0); break; }
+                    let r = await readPacket(); 
+                    if(!r || r.error) break;
+                    
+                    // Tratamento seguro: Avisamos o Android que recebemos todos os pacotes, impedindo travamento
+                    if(r.cmd === 0x57525445) {
+                        if(r.arg1 === myId) output += new TextDecoder().decode(r.data);
+                        await sendPacket(0x59414B4F, r.arg1, r.arg0); // OBRIGATÓRIO: Confirmar recebimento ao Android
+                    }
+                    else if(r.cmd === 0x45534C43) {
+                        await sendPacket(0x45534C43, r.arg1, r.arg0);
+                        if (r.arg1 === myId) break;
+                    }
                 }
                 clearTimeout(timeout); return output;
             } catch(e) { return null; }
         }
 
-        // --- MOTOR MULTITASK ---
         async function iniciarCampanha() {
             if (!isAdbReady) return showToast("Dispositivo não detectado. Verifique a conexão.", "error"); 
-            if (pipelineActions.length === 0) return showToast("Adicione conteúdo à campanha antes de iniciar.", "warning");
+            if (pipelineActions.length === 0) return showToast("Adicione conteúdo à campanha (Texto ou Áudio) antes de iniciar.", "warning");
             
             for(let a of pipelineActions) {
                 if(a.type === 'TEXT' && !a.content.trim()) return showToast("Existem blocos de texto vazios na campanha.", "warning");
@@ -597,7 +585,7 @@
                 document.getElementById('stage-code').classList.add('hidden');
                 document.getElementById('btn-stop').style.display = 'none'; document.getElementById('btn-start').style.display = 'block';
                 setActionUI('fa-flag-checkered', 'Processamento Finalizado', false, 'text-boti-green', 'bg-green-50');
-                showToast("Processamento da base concluído.", "success"); atualizarMetricas(); return;
+                showToast("Processamento da fila concluído.", "success"); atualizarMetricas(); return;
             }
 
             let contato = contatosBase[currentIndex];
@@ -605,13 +593,13 @@
             document.getElementById('stage-status').innerText = `Processando: ${currentIndex + 1} de ${contatosBase.length}`;
             document.getElementById('stage-name').innerText = contato.name;
             
-            if(contato.phone !== "-") {
+            if(contato.phone !== "N/A") {
                 let p = contato.phone; document.getElementById('stage-phone').innerText = `+55 (${p.substring(0,2)}) ${p.substring(2,7)}-${p.substring(7)}`;
             } else {
                 document.getElementById('stage-phone').innerText = `Busca Sistêmica`;
             }
             
-            if(contato.code && contato.code !== '-') { 
+            if(contato.code && contato.code !== 'N/A') { 
                 document.getElementById('stage-code').innerText = `CÓDIGO: ${contato.code}`; 
                 document.getElementById('stage-code').classList.remove('hidden'); 
             } else {
@@ -623,7 +611,7 @@
                 
                 await runAdbShellWithOutput("input keyevent 224"); await runAdbShellWithOutput("input swipe 500 1500 500 200"); await runAdbShellWithOutput("input keyevent 3"); await sleep(500);
 
-                if (contato.phone !== "-") {
+                if (contato.phone !== "N/A") {
                     setActionUI('fa-magnifying-glass', 'Localizando Contato...', true, 'text-blue-500', 'bg-blue-50');
                     const checkUrl = `whatsapp://send?phone=55${contato.phone}`;
                     await runAdbShellWithOutput(`am start -a android.intent.action.VIEW -d '${checkUrl}' -p ${appPackage}`);
@@ -652,16 +640,16 @@
                     await sleep(1500);
                 }
 
-                // Processamento de Blocos
+                // Processamento de Blocos do Multitask
                 for (let i = 0; i < pipelineActions.length; i++) {
                     if(!isCampaignActive) break;
                     let acao = pipelineActions[i];
                     
                     if (acao.type === 'TEXT') {
-                        setActionUI('fa-comment-dots', `Executando Passo ${i+1}: Texto...`, true, 'text-boti-green', 'bg-green-50');
+                        setActionUI('fa-comment-dots', `Ação ${i+1}: Injetando Texto...`, true, 'text-boti-green', 'bg-green-50');
                         const msg = parseMensagem(acao.content, contato.name);
                         
-                        if(contato.phone === "-") {
+                        if(contato.phone === "N/A") {
                             let cleanMsg = msg.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); 
                             cleanMsg = cleanMsg.replace(/\s/g, '%s'); 
                             await runAdbShellWithOutput(`input text ${cleanMsg}`);
@@ -678,7 +666,7 @@
                         }
                         
                     } else if (acao.type === 'AUDIO') {
-                        setActionUI('fa-microphone', `Executando Passo ${i+1}: Áudio...`, true, 'text-boti-green', 'bg-green-50');
+                        setActionUI('fa-microphone', `Ação ${i+1}: Reproduzindo Áudio...`, true, 'text-boti-green', 'bg-green-50');
                         const fileEl = document.getElementById(`audio-file-${acao.id}`);
                         const micX = 950, micY = 1450; 
                         
@@ -723,13 +711,12 @@
         }
 
         function exportarRelatorio() {
-            if (contatosBase.length === 0) return showToast("Não há registros para exportação.", "warning"); 
+            if (contatosBase.length === 0) return showToast("Sem relatórios ainda.", "warning"); 
             let csv = "Código,Nome,Telefone,Status\n"; contatosBase.forEach(c => csv += `${c.code},${c.name},${c.phone},${c.statusEnvio}\n`); 
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "Relatorio_Extracao.csv"; link.click();
         }
 
-        // --- NÚCLEO NATIVO DE ADB ---
         async function getAdbKeyPair() { return await crypto.subtle.generateKey({ name: "RSASSA-PKCS1-v1_5", modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" }, true, ["sign", "verify"]); }
         async function signAdbToken(keyPair, token) { return new Uint8Array(await crypto.subtle.sign("RSASSA-PKCS1-v1_5", keyPair.privateKey, token)); }
         async function getAdbPublicKeyPayload(keyPair) {
@@ -765,8 +752,6 @@
 
         function atualizarEstadoUSBUI(conectado) {
             const statusBox = document.getElementById('usb-status');
-            const dot = document.getElementById('usb-status-dot');
-            const text = document.getElementById('usb-status-text');
             const btnConnect = document.getElementById('btn-conectar');
 
             if (conectado) {
@@ -795,15 +780,30 @@
                 await usbDevice.claimInterface(intfNum);
                 await sendPacket(0x4E584E43, 0x01000000, 4096, new TextEncoder().encode("host::Corp_Mobile\0"));
                 let keyPair = await getAdbKeyPair(), resp = await readPacket();
-                if (resp && resp.cmd === 0x4E584E43) isAdbReady = true; 
+                
+                if (resp && resp.cmd === 0x4E584E43) {
+                    isAdbReady = true; 
+                }
                 else if (resp && resp.cmd === 0x48545541 && resp.arg0 === 1) { 
                     await sendPacket(0x48545541, 2, 0, await signAdbToken(keyPair, resp.data)); 
                     let resp2 = await readPacket();
-                    if (resp2 && resp2.cmd === 0x4E584E43) isAdbReady = true;
-                    else { 
+                    
+                    if (resp2 && resp2.cmd === 0x4E584E43) {
+                        isAdbReady = true;
+                    }
+                    else if (resp2 && resp2.cmd === 0x48545541) { 
                         await sendPacket(0x48545541, 3, 0, await getAdbPublicKeyPayload(keyPair)); 
-                        showToast("Acesse o dispositivo móvel e conceda a permissão.", "warning"); 
-                        while(!isAdbReady) { let waitResp = await readPacket(); if(waitResp && waitResp.error) return; if(waitResp && waitResp.cmd === 0x4E584E43) isAdbReady = true; } 
+                        showToast("Olhe para a tela do seu celular e permita a depuração USB.", "warning"); 
+                        while(!isAdbReady) { 
+                            let waitResp = await readPacket(); 
+                            if(waitResp && waitResp.error) {
+                                // O Android reinicia a placa USB quando autorizamos pela primeira vez.
+                                showToast("✅ Celular Autorizado! Clique em INICIAR novamente para conectar.", "success");
+                                usbDevice = null;
+                                return;
+                            }
+                            if(waitResp && waitResp.cmd === 0x4E584E43) isAdbReady = true; 
+                        } 
                     } 
                 }
                 if (isAdbReady) {
@@ -811,14 +811,11 @@
                     await runAdbShellWithOutput("settings put global stay_on_while_plugged_in 7"); 
                     await runAdbShellWithOutput("settings put system screen_off_timeout 2147483647"); 
                     await runAdbShellWithOutput("svc power stayon usb"); await runAdbShellWithOutput("input keyevent 224"); 
-                    showToast("Interface estabelecida. Dispositivo protegido.", "success");
+                    showToast("Interface conectada com sucesso. Aparelho protegido.", "success");
                 }
             } catch (e) { 
-                if (e.message.includes('requestDevice') || e.message.includes('disallowed')) {
-                    showToast("Verifique se o cabo USB está conectado e a depuração ativa no aparelho.", "error");
-                } else {
-                    showToast("Falha técnica de comunicação USB: " + e.message, "error"); 
-                }
+                if (e.message.includes("No device selected")) return; // Usuário cancelou
+                showToast("Verifique se o cabo USB está conectado e a depuração ativa no aparelho.", "error");
             }
         }
     </script>
