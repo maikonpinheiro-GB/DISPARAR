@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CRM WhatsApp - Atendimento WebUSB</title>
+    <title>Dispara AI - Acesso Corporativo</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
 
@@ -13,19 +15,17 @@
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Roboto', 'sans-serif'] },
-                    colors: {
-                        crm: {
-                            bg: '#F3F4F6',
-                            sidebar: '#FFFFFF',
-                            header: '#FFFFFF',
-                            primary: '#0B3B60', // Azul escuro da imagem
-                            secondary: '#E0E7FF',
-                            bubbleIn: '#FFFFFF',
-                            bubbleOut: '#0B3B60',
-                            textOut: '#FFFFFF',
-                            textIn: '#374151'
-                        }
+                    fontFamily: { sans: ['"Inter"', 'sans-serif'] },
+                    colors: { 
+                        'boti-green': '#007367', /* Verde escuro corporativo */
+                        'boti-light': '#C4D600', /* Verde folha claro */
+                        'boti-bg': '#F4F6F8',    /* Cinza fundo ERP */
+                        'boti-dark': '#2D3748',
+                        'boti-gray': '#718096'
+                    },
+                    boxShadow: {
+                        'corp': '0 2px 10px rgba(0, 0, 0, 0.05)',
+                        'corp-lg': '0 10px 25px rgba(0, 0, 0, 0.08)'
                     }
                 }
             }
@@ -33,646 +33,793 @@
     </script>
 
     <style>
-        body { background-color: theme('colors.crm.bg'); color: #374151; overflow: hidden; }
+        body { background-color: #F4F6F8; color: #2D3748; }
         
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
-        
-        /* Pattern de fundo do chat (simulando a imagem) */
-        .chat-bg {
-            background-color: #F8F9FA;
-            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        /* Estilos de input corporativos */
+        .input-corp {
+            background-color: #ffffff;
+            border: 1px solid #E2E8F0;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+        }
+        .input-corp:focus {
+            border-color: #007367;
+            box-shadow: 0 0 0 3px rgba(0, 115, 103, 0.15);
+            outline: none;
         }
 
-        .contact-active { border-left: 4px solid theme('colors.crm.primary'); background-color: #F3F4F6; }
+        /* Botões padronizados */
+        .btn-corp {
+            transition: all 0.2s ease;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .btn-corp:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .btn-corp:active:not(:disabled) {
+            transform: translateY(0);
+        }
         
-        /* Loader */
-        .loader-small { border: 2px solid #E5E7EB; border-top-color: theme('colors.crm.primary'); border-radius: 50%; width: 14px; height: 14px; animation: spin 1s linear infinite; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .btn-primary {
+            background-color: #007367;
+            color: white;
+        }
+        .btn-primary:hover:not(:disabled) { background-color: #005c52; }
+
+        .btn-outline {
+            background-color: white;
+            border: 1px solid #E2E8F0;
+            color: #4A5568;
+        }
+        .btn-outline:hover:not(:disabled) {
+            background-color: #F7FAFC;
+            border-color: #CBD5E0;
+        }
+
+        /* Animações e Scrollbar */
+        @keyframes pulse-ring-corp {
+            0% { transform: scale(0.85); box-shadow: 0 0 0 0 rgba(0, 115, 103, 0.4); }
+            70% { transform: scale(1); box-shadow: 0 0 0 15px rgba(0, 115, 103, 0); }
+            100% { transform: scale(0.85); box-shadow: 0 0 0 0 rgba(0, 115, 103, 0); }
+        }
+        .sending-pulse { animation: pulse-ring-corp 2s infinite; }
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #F4F6F8; }
+        ::-webkit-scrollbar-thumb { background: #CBD5E0; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #A0AEC0; }
     </style>
 </head>
-<body class="flex h-screen w-screen antialiased">
+<body class="min-h-screen flex flex-col font-sans antialiased overflow-x-hidden selection:bg-boti-green selection:text-white">
 
-    <aside class="w-[320px] bg-crm-sidebar border-r border-gray-200 flex flex-col h-full z-20 shrink-0">
+    <header class="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center z-50 sticky top-0 shadow-sm">
+        <div class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded-lg bg-boti-green flex items-center justify-center shadow-md">
+                <i class="fa-brands fa-whatsapp text-white text-xl"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-xl tracking-tight text-boti-dark leading-none">Dispara AI <span class="font-light text-boti-gray">Mobile</span></h1>
+                <p class="text-[10px] text-boti-green uppercase tracking-widest font-semibold mt-1">Ambiente Seguro</p>
+            </div>
+        </div>
         
-        <!-- Header Sidebar -->
-        <div class="p-4 border-b border-gray-200">
-            <div class="flex justify-between items-center mb-4">
-                <h1 class="font-bold text-gray-800 text-lg flex items-center gap-2">
-                    <i class="fa-brands fa-whatsapp text-green-500 text-xl"></i>
-                </h1>
-                <button onclick="conectarUSB()" id="btn-conectar" class="text-xs bg-crm-primary text-white px-3 py-1.5 rounded font-medium hover:bg-blue-900 transition">
-                    Conectar USB
+        <div class="flex items-center gap-4">
+            <div id="usb-status" class="hidden items-center gap-3 px-4 py-2 rounded-md bg-green-50 border border-green-200 transition-colors">
+                <div id="usb-status-dot" class="w-2.5 h-2.5 rounded-full bg-boti-green animate-pulse"></div>
+                <div class="flex flex-col">
+                    <span id="usb-status-text" class="text-xs font-semibold text-green-800">Conectado</span>
+                    <span class="text-[9px] text-green-600 uppercase tracking-wider">Interface Ativa</span>
+                </div>
+            </div>
+            <button id="btn-conectar" onclick="conectarUSB()" class="btn-corp btn-primary px-5 py-2.5 rounded-md text-sm">
+                <i class="fa-brands fa-usb text-white/80"></i> Iniciar Conexão
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-1 w-full max-w-[1600px] mx-auto p-6 grid grid-cols-1 xl:grid-cols-12 gap-6">
+        
+        <div class="xl:col-span-5 flex flex-col gap-6">
+            
+            <!-- Importação de Dados -->
+            <div class="bg-white rounded-lg shadow-corp border border-gray-100 p-6">
+                <div class="flex items-center gap-2 mb-4">
+                    <h2 class="text-boti-dark font-semibold text-sm uppercase tracking-wide">Cole os Dados</h2>
+                </div>
+                <textarea id="paste-area" rows="3" class="w-full input-corp p-4 text-sm text-boti-dark placeholder-gray-400 resize-none" placeholder="Copie Código, Nome e Telefone da VDI e cole aqui..."></textarea>
+                <button onclick="processarEntradas()" class="w-full mt-4 btn-corp btn-outline py-3 rounded-md text-sm">
+                    <i class="fa-solid fa-filter text-boti-green"></i> Processar Dados
                 </button>
-                <div id="status-badge" class="hidden items-center gap-2 text-xs font-bold text-green-600 bg-green-50 px-3 py-1.5 rounded border border-green-200">
-                    <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div> USB Ativo
+            </div>
+
+            <!-- Pipeline de Conteúdo -->
+            <div class="bg-white rounded-lg shadow-corp border border-gray-100 p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-boti-dark font-semibold text-sm uppercase tracking-wide">Conteúdo da Campanha</h2>
+                </div>
+                
+                <div class="bg-blue-50 border border-blue-100 p-3 rounded-md mb-4">
+                    <p class="text-[11px] text-blue-800 font-medium leading-relaxed">
+                        <i class="fa-solid fa-circle-info mr-1"></i> Para adicionar variações adicione texto ou áudio, o sistema vai mandar de forma aleatória para cada RE.
+                    </p>
+                </div>
+
+                <div id="pipeline-container" class="flex flex-col gap-3 mb-4 max-h-[350px] overflow-y-auto pr-2">
+                    <!-- Cards injetados via JS (Inicia Vazio) -->
+                </div>
+                
+                <div class="grid grid-cols-2 gap-3 mt-4">
+                    <button onclick="addPipelineAction('TEXT')" class="btn-corp btn-outline py-2.5 rounded-md text-xs font-semibold text-boti-dark">
+                        <i class="fa-solid fa-comment-dots text-boti-green"></i> Adicionar Texto
+                    </button>
+                    <button onclick="addPipelineAction('AUDIO')" class="btn-corp btn-outline py-2.5 rounded-md text-xs font-semibold text-boti-dark">
+                        <i class="fa-solid fa-microphone text-boti-green"></i> Adicionar Áudio
+                    </button>
                 </div>
             </div>
             
-            <div class="relative">
-                <input type="text" placeholder="Buscar nas conversas ativas..." class="w-full pl-8 pr-3 py-2 bg-gray-100 border-none rounded text-sm focus:outline-none focus:ring-1 focus:ring-crm-primary">
-                <i class="fa-solid fa-search absolute left-3 top-2.5 text-gray-400 text-xs"></i>
-            </div>
-        </div>
-
-        <!-- Lista de Contatos -->
-        <div id="contact-list" class="flex-1 overflow-y-auto">
-            <!-- Aviso Vazio Inicial -->
-            <div id="empty-contacts" class="p-6 text-center text-gray-400 mt-10">
-                <i class="fa-solid fa-inbox text-3xl mb-3 opacity-50"></i>
-                <p class="text-sm font-medium">Nenhuma conversa ativa.</p>
-                <p class="text-[10px] mt-1">Aguardando notificações de mensagens via USB...</p>
-                <p class="text-[10px] mt-4 text-amber-600 font-bold"><i class="fa-solid fa-triangle-exclamation"></i> Mantenha a tela do celular apagada para o radar funcionar.</p>
-            </div>
-            <!-- Contatos serão injetados aqui -->
-        </div>
-    </aside>
-
-    <main class="flex-1 flex flex-col h-full relative bg-white">
-        
-        <!-- Header do Chat Ativo -->
-        <header id="chat-header" class="h-[70px] bg-crm-header border-b border-gray-200 flex items-center justify-between px-6 shrink-0 hidden">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded bg-gray-200 flex items-center justify-center text-gray-500 font-bold text-lg" id="active-avatar">
-                    #
+            <!-- Configurações Gerais -->
+            <div class="bg-white rounded-lg shadow-corp border border-gray-100 p-6">
+                <div class="flex items-center gap-2 mb-4">
+                    <h2 class="text-boti-dark font-semibold text-sm uppercase tracking-wide">Configurações</h2>
                 </div>
-                <div>
-                    <h2 class="font-bold text-gray-800 text-sm uppercase tracking-wide" id="active-name">Nome do Contato</h2>
-                    <div class="flex items-center gap-2 mt-0.5" id="active-phone-container">
-                        <span class="text-xs text-gray-500" id="active-phone">Número não vinculado</span>
-                        <button onclick="abrirModalVinculo()" class="text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded border border-amber-200 hover:bg-amber-200 transition">
-                            Vincular Número
+
+                <div class="bg-yellow-50 p-4 rounded-md border border-yellow-200 mb-5">
+                    <h3 class="text-xs font-bold text-yellow-800 uppercase tracking-wide mb-1 flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation"></i> Requisito do WhatsApp</h3>
+                    <p class="text-[11px] text-yellow-700 leading-relaxed">
+                        Nas <b>Configurações > Conversas</b> do seu WhatsApp celular, ative a opção <b>"Enviar com Enter"</b> para o envio de texto funcionar.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mb-5">
+                    <div>
+                        <label class="block text-xs font-semibold text-boti-gray mb-1">App Alvo</label>
+                        <select id="cfg-app" class="w-full input-corp text-boti-dark text-sm rounded-md p-2.5">
+                            <option value="com.whatsapp.w4b">WA Business</option>
+                            <option value="com.whatsapp">WA Normal</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-boti-gray mb-1">Operação</label>
+                        <div class="w-full bg-gray-50 border border-gray-200 text-boti-dark font-medium text-xs rounded-md p-2.5 flex items-center gap-2">
+                            <i class="fa-solid fa-microchip text-boti-green"></i> Modo Inteligente
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-boti-gray mb-1">Pausa Mínima (s)</label>
+                        <input type="number" id="cfg-delay-min" value="10" onchange="atualizarMetricas()" class="w-full input-corp text-boti-dark text-center rounded-md p-2.5 font-semibold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-boti-gray mb-1">Pausa Máxima (s)</label>
+                        <input type="number" id="cfg-delay-max" value="25" onchange="atualizarMetricas()" class="w-full input-corp text-boti-dark text-center rounded-md p-2.5 font-semibold">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="xl:col-span-7 flex flex-col gap-6">
+            
+            <!-- Palco de Ação -->
+            <div class="bg-white rounded-lg shadow-corp border border-gray-100 p-10 flex flex-col items-center justify-center relative min-h-[500px] overflow-hidden">
+                <!-- Elementos decorativos de fundo corporativo -->
+                <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(#007367 1px, transparent 1px); background-size: 20px 20px;"></div>
+
+                <div class="text-center relative z-10 w-full max-w-lg flex flex-col items-center">
+                    <div class="flex justify-center mb-8">
+                        <span id="stage-status" class="px-4 py-1.5 rounded-full bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wide border border-gray-200 transition-colors">
+                            Aguardando Início
+                        </span>
+                    </div>
+
+                    <h2 id="stage-name" class="text-3xl font-bold text-boti-dark mb-2 tracking-tight line-clamp-2">---</h2>
+                    <p id="stage-phone" class="text-lg font-medium text-boti-gray mb-1 tracking-wide">---</p>
+                    <p id="stage-code" class="text-xs font-semibold text-boti-green bg-boti-green/10 px-3 py-1 rounded-md hidden mb-8 mt-2">CÓDIGO: ---</p>
+
+                    <div id="action-feedback" class="hidden flex-col items-center justify-center mb-10 mt-6">
+                        <div id="action-icon-box" class="w-20 h-20 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center mb-4 transition-all shadow-sm">
+                            <i id="action-icon" class="fa-solid fa-robot text-3xl text-boti-gray"></i>
+                        </div>
+                        <p id="action-text" class="text-xs font-bold text-boti-dark uppercase tracking-wide">Aguardando...</p>
+                    </div>
+
+                    <div class="flex gap-4 w-full mt-4">
+                        <button id="btn-start" onclick="iniciarCampanha()" class="btn-corp btn-primary w-full py-4 rounded-md text-base shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                            <i class="fa-solid fa-play"></i> Iniciar Processamento
+                        </button>
+                        <button id="btn-resume" onclick="retomarCampanha()" class="hidden btn-corp bg-yellow-500 hover:bg-yellow-600 text-white w-full py-4 rounded-md text-base shadow-sm">
+                            <i class="fa-solid fa-bolt"></i> Retomar Processamento
+                        </button>
+                        <button id="btn-stop" onclick="pararCampanha(false)" class="hidden btn-corp bg-red-600 hover:bg-red-700 text-white w-full py-4 rounded-md text-base shadow-sm">
+                            <i class="fa-solid fa-pause"></i> Interromper
                         </button>
                     </div>
                 </div>
             </div>
-            
-            <div class="flex items-center gap-4">
-                <div class="text-right">
-                    <p class="text-[10px] text-gray-400 uppercase font-bold">App Destino</p>
-                    <select id="input-app" class="text-xs bg-gray-50 border border-gray-200 rounded px-2 py-1 focus:outline-none">
-                        <option value="com.whatsapp">WhatsApp Normal</option>
-                        <option value="com.whatsapp.w4b">WA Business</option>
-                    </select>
+
+            <!-- Dashboard Métricas Estilo ERP -->
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mt-auto">
+                <div class="bg-white rounded-lg border border-gray-100 shadow-sm p-4 text-center">
+                    <p class="text-[10px] text-boti-gray uppercase font-semibold mb-1">Pendentes</p>
+                    <p id="stat-pendentes" class="text-2xl font-bold text-boti-dark">0</p>
                 </div>
-            </div>
-        </header>
-
-        <!-- Placeholder Tela Vazia -->
-        <div id="chat-placeholder" class="flex-1 flex flex-col items-center justify-center bg-gray-50">
-            <i class="fa-brands fa-whatsapp text-6xl text-gray-300 mb-4"></i>
-            <h2 class="text-xl font-medium text-gray-500">Central de Mensagens</h2>
-            <p class="text-sm text-gray-400 mt-2">Selecione uma conversa na lateral ou aguarde uma mensagem chegar.</p>
-        </div>
-
-        <!-- Área de Mensagens (Fundo com Pattern) -->
-        <div id="chat-messages" class="flex-1 chat-bg overflow-y-auto p-6 flex flex-col gap-4 hidden">
-            <!-- Balões injetados via JS -->
-        </div>
-
-        <div id="chat-input-area" class="bg-white border-t border-gray-200 p-4 shrink-0 hidden items-end gap-3 relative">
-            
-            <!-- Botão de Anexo -->
-            <button onclick="document.getElementById('input-file').click()" class="w-10 h-10 shrink-0 rounded-full text-gray-400 hover:bg-gray-100 flex items-center justify-center transition" title="Anexar Arquivo">
-                <i class="fa-solid fa-paperclip text-lg"></i>
-            </button>
-            <input type="file" id="input-file" class="hidden" onchange="tratarAnexo(this)">
-
-            <!-- Caixa de Texto -->
-            <div class="flex-1 bg-white border border-gray-300 rounded-lg shadow-sm relative overflow-hidden">
-                <!-- Preview de Arquivo Anexado (Oculto por padrão) -->
-                <div id="attachment-preview" class="hidden bg-gray-50 border-b border-gray-200 p-2 flex justify-between items-center">
-                    <span class="text-xs font-medium text-gray-600 flex items-center gap-2">
-                        <i class="fa-solid fa-file-lines text-crm-primary"></i>
-                        <span id="attachment-name">arquivo.pdf</span>
-                    </span>
-                    <button onclick="removerAnexo()" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-xmark"></i></button>
+                <div class="bg-white rounded-lg border border-gray-100 shadow-sm p-4 text-center border-b-4 border-boti-green">
+                    <p class="text-[10px] text-boti-gray uppercase font-semibold mb-1">Enviados</p>
+                    <p id="stat-feitos" class="text-2xl font-bold text-boti-green">0</p>
                 </div>
-                
-                <textarea id="msg-input" rows="1" class="w-full max-h-32 p-3 text-sm text-gray-700 resize-none focus:outline-none" placeholder="Digite uma mensagem (CTRL+ENTER para enviar)..." oninput="this.style.height = '';this.style.height = this.scrollHeight + 'px'"></textarea>
-            </div>
-
-            <!-- Botão Enviar -->
-            <button id="btn-enviar" onclick="enviarMensagem()" class="w-10 h-10 shrink-0 rounded-full bg-crm-primary text-white hover:bg-blue-900 flex items-center justify-center transition shadow-md">
-                <i class="fa-solid fa-paper-plane"></i>
-            </button>
-            <!-- Loader Enviando -->
-            <div id="btn-enviando" class="w-10 h-10 shrink-0 rounded-full bg-gray-200 flex items-center justify-center hidden">
-                <div class="loader-small"></div>
+                <div class="bg-white rounded-lg border border-gray-100 shadow-sm p-4 text-center border-b-4 border-red-500">
+                    <p class="text-[10px] text-boti-gray uppercase font-semibold mb-1">Inválidos</p>
+                    <p id="stat-invalidos" class="text-2xl font-bold text-red-500">0</p>
+                </div>
+                <div class="bg-white rounded-lg border border-gray-100 shadow-sm p-4 text-center">
+                    <p class="text-[10px] text-boti-gray uppercase font-semibold mb-1">Término em</p>
+                    <p id="stat-eta" class="text-lg font-bold text-boti-dark mt-1">00h 00m</p>
+                </div>
+                <div class="bg-boti-green rounded-lg shadow-sm p-4 text-center cursor-pointer hover:bg-teal-800 transition-colors flex flex-col justify-center items-center group" onclick="exportarRelatorio()">
+                    <i class="fa-solid fa-file-arrow-down text-xl text-white/90 mb-1 group-hover:-translate-y-0.5 transition-transform"></i>
+                    <p class="text-[9px] font-semibold text-white uppercase tracking-wider">Relatório</p>
+                </div>
             </div>
         </div>
     </main>
 
-    <!-- Modal Vinculo de Número -->
-    <div id="modal-vinculo" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center backdrop-blur-sm">
-        <div class="bg-white rounded-lg shadow-xl w-[400px] overflow-hidden">
-            <div class="bg-crm-primary p-4 text-white">
-                <h3 class="font-bold">Vincular Número de Telefone</h3>
+    <!-- Modal Inspeção -->
+    <div id="modal-preview" class="fixed inset-0 bg-boti-dark/70 backdrop-blur-sm z-[100] hidden items-center justify-center p-4">
+        <div class="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden shadow-corp-lg">
+            <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+                <h2 class="text-base font-semibold text-boti-dark"><i class="fa-solid fa-list-check text-boti-green mr-2"></i> Inspeção de Registros</h2>
+                <button onclick="fecharModal()" class="text-gray-400 hover:text-gray-600 transition-colors"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-            <div class="p-5">
-                <p class="text-sm text-gray-600 mb-4">O Android não informa o número na notificação. Para responder a <strong id="vinculo-nome">---</strong>, digite o número com DDD.</p>
-                <input type="text" id="vinculo-input" placeholder="Ex: 11999999999" class="w-full border border-gray-300 rounded p-2 text-sm focus:outline-none focus:border-crm-primary" maxlength="11">
-                
-                <div class="flex justify-end gap-3 mt-6">
-                    <button onclick="fecharModalVinculo()" class="px-4 py-2 text-sm text-gray-500 hover:bg-gray-100 rounded">Cancelar</button>
-                    <button onclick="salvarVinculo()" class="px-4 py-2 text-sm bg-crm-primary text-white rounded hover:bg-blue-900 shadow">Salvar Número</button>
-                </div>
+            
+            <div class="p-4 bg-white border-b border-gray-100 flex justify-between items-center px-6">
+                <span class="text-xs font-medium text-blue-800 bg-blue-50 px-3 py-1 rounded-full border border-blue-100"><i class="fa-solid fa-shield-check mr-1"></i> Filtro de Desduplicação Ativo</span>
+                <span class="text-sm font-semibold text-boti-gray" id="preview-count">0 Registros</span>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-0">
+                <table class="w-full text-left text-sm">
+                    <thead class="text-xs uppercase text-gray-500 bg-gray-50 border-b border-gray-200 sticky top-0">
+                        <tr>
+                            <th class="py-3 px-6 font-medium">Nome Extraído</th>
+                            <th class="py-3 px-6 font-medium text-center">Código</th>
+                            <th class="py-3 px-6 font-medium text-right">Telefone Identificado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="preview-table-body" class="divide-y divide-gray-100 text-boti-dark"></tbody>
+                </table>
+            </div>
+            <div class="px-6 py-4 bg-gray-50 flex justify-end gap-3 border-t border-gray-200">
+                <button onclick="fecharModal()" class="btn-corp btn-outline px-5 py-2 rounded-md text-sm">Cancelar</button>
+                <button onclick="confirmarImportacao()" class="btn-corp btn-primary px-6 py-2 rounded-md text-sm">Importar Base</button>
             </div>
         </div>
     </div>
 
-    <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
+    <!-- Container Toasts -->
+    <div id="toast-container" class="fixed bottom-6 right-6 z-[200] flex flex-col gap-3 pointer-events-none"></div>
 
     <script>
-        // === BANCO DE DADOS EM MEMÓRIA ===
-        // Estrutura: { "Nome do Contato": { phone: "11999...", unread: 0, msgs: [ {type: 'in', text: 'oi', time: '10:00'}, ... ] } }
-        let chatDB = {};
-        let contatoAtivo = null;
-        let arquivoAnexado = null;
+        // ESTADO GLOBAL LIMPO
+        let contatosBase = [];
+        let contatosTemp = [];
+        let currentIndex = 0;
+        let isCampaignActive = false;
+        let isProcessingCore = false;
+        let statsData = { sucesso: 0, invalidos: 0 };
+        let wakeLock = null;
+        
+        // AÇÕES DA ESTEIRA (Inicia VAZIO)
+        let pipelineActions = [];
 
-        // === VARIÁVEIS WEBUSB ===
+        // ESTADO WEBUSB
         let usbDevice = null;
-        let epIn = null;
-        let epOut = null;
+        let epIn = null, epOut = null;
         let isAdbReady = false;
         let localIdCounter = 1;
-        let radarRodando = false;
 
-        // === UTILITÁRIOS ===
-        const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
-        const getTime = () => new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        const sleep = ms => new Promise(r => setTimeout(r, ms));
+        const rnd = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
-        function showToast(msg, type = 'info') {
-            const c = document.getElementById('toast-container');
-            const t = document.createElement('div');
-            const color = type === 'error' ? 'bg-red-50 text-red-600 border-red-200' : 'bg-white text-gray-700 border-gray-200';
-            const icon = type === 'error' ? 'fa-triangle-exclamation text-red-500' : 'fa-check-circle text-green-500';
-            t.className = `${color} border px-4 py-3 rounded shadow-lg flex items-center gap-3 transform transition-all duration-300 translate-x-10 opacity-0 pointer-events-auto text-sm`;
-            t.innerHTML = `<i class="fa-solid ${icon}"></i> ${msg}`;
-            c.appendChild(t);
-            requestAnimationFrame(() => t.classList.remove('translate-x-10', 'opacity-0'));
-            setTimeout(() => { t.classList.add('translate-x-10', 'opacity-0'); setTimeout(() => t.remove(), 300); }, 3000);
-        }
+        window.onload = function() {
+            renderPipelineUI(); 
+            atualizarMetricas();
+            requestWakeLock();
+        };
 
-        // === GERENCIAMENTO DE UI DO CHAT ===
-        function atualizarSidebar() {
-            const list = document.getElementById('contact-list');
-            const empty = document.getElementById('empty-contacts');
-            
-            if (Object.keys(chatDB).length === 0) {
-                empty.style.display = 'block';
-                return;
-            }
-            empty.style.display = 'none';
+        window.addEventListener('beforeunload', function (e) {
+            if (isCampaignActive || contatosBase.length > 0) { e.preventDefault(); e.returnValue = ''; }
+        });
 
-            // Salva os elementos atuais para não recriar do zero se não precisar
-            let html = '';
-            
-            // Ordena (na prática deveria ordenar pelo mais recente, aqui faremos simples)
-            for (let nome in chatDB) {
-                const data = chatDB[nome];
-                const lastMsg = data.msgs.length > 0 ? data.msgs[data.msgs.length - 1].text : 'Arquivo enviado';
-                const unreadBadge = data.unread > 0 ? `<div class="bg-green-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">${data.unread}</div>` : '';
-                const activeClass = contatoAtivo === nome ? 'contact-active' : 'border-l-4 border-transparent hover:bg-gray-50';
-
-                html += `
-                    <div class="flex items-center gap-3 p-3 border-b border-gray-100 cursor-pointer transition ${activeClass}" onclick="abrirConversa('${nome.replace(/'/g, "\\'")}')">
-                        <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-bold shrink-0">
-                            ${nome.charAt(0).toUpperCase()}
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex justify-between items-center mb-0.5">
-                                <h4 class="text-sm font-bold text-gray-800 truncate">${nome}</h4>
-                                <span class="text-[10px] text-gray-400 shrink-0">${data.msgs.length > 0 ? data.msgs[data.msgs.length - 1].time : ''}</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <p class="text-xs text-gray-500 truncate pr-2">${lastMsg}</p>
-                                ${unreadBadge}
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }
-            list.innerHTML = html;
-        }
-
-        function abrirConversa(nome) {
-            contatoAtivo = nome;
-            chatDB[nome].unread = 0; // Marca como lido
-            
-            // UI Toggle
-            document.getElementById('chat-placeholder').classList.add('hidden');
-            document.getElementById('chat-header').classList.remove('hidden');
-            document.getElementById('chat-messages').classList.remove('hidden');
-            document.getElementById('chat-input-area').classList.remove('hidden');
-            document.getElementById('chat-input-area').classList.add('flex');
-
-            // Header Info
-            document.getElementById('active-name').innerText = nome;
-            document.getElementById('active-avatar').innerText = nome.charAt(0).toUpperCase();
-            
-            const btnVinculo = document.querySelector('#active-phone-container button');
-            const spanPhone = document.getElementById('active-phone');
-            
-            if (chatDB[nome].phone) {
-                spanPhone.innerText = chatDB[nome].phone;
-                spanPhone.classList.remove('text-amber-500');
-                btnVinculo.classList.add('hidden');
-            } else {
-                spanPhone.innerText = "Número Pendente";
-                spanPhone.classList.add('text-amber-500');
-                btnVinculo.classList.remove('hidden');
-            }
-
-            renderizarMensagens();
-            atualizarSidebar();
-            
-            // Foca no input
-            setTimeout(() => document.getElementById('msg-input').focus(), 100);
-        }
-
-        function renderizarMensagens() {
-            if (!contatoAtivo || !chatDB[contatoAtivo]) return;
-            const container = document.getElementById('chat-messages');
-            container.innerHTML = '';
-
-            const msgs = chatDB[contatoAtivo].msgs;
-            
-            msgs.forEach(m => {
-                const isOut = m.type === 'out';
-                const alignClass = isOut ? 'self-end' : 'self-start';
-                const bubbleClass = isOut ? 'bg-crm-bubbleOut text-crm-textOut rounded-tl-lg rounded-tr-lg rounded-bl-lg' : 'bg-crm-bubbleIn text-crm-textIn rounded-tr-lg rounded-br-lg rounded-bl-lg border border-gray-200';
-                
-                const timeColor = isOut ? 'text-blue-200' : 'text-gray-400';
-                const check = isOut ? `<i class="fa-solid fa-check-double text-[10px] ml-1"></i>` : '';
-
-                // Suporte visual para anexos fakes na UI
-                let contentHTML = `<p class="text-sm leading-relaxed whitespace-pre-wrap">${m.text}</p>`;
-                if (m.isFile) {
-                    contentHTML = `
-                        <div class="flex items-center gap-2 mb-2 p-2 bg-black/10 rounded">
-                            <i class="fa-solid fa-file-pdf text-2xl"></i>
-                            <span class="text-xs font-bold truncate max-w-[150px]">Arquivo Anexado</span>
-                        </div>
-                        ${m.text ? `<p class="text-sm">${m.text}</p>` : ''}
-                    `;
-                }
-
-                const html = `
-                    <div class="max-w-[75%] flex flex-col ${alignClass} mb-2 shadow-sm">
-                        <div class="px-4 py-2 ${bubbleClass}">
-                            ${contentHTML}
-                            <div class="text-[10px] ${timeColor} text-right mt-1 flex items-center justify-end gap-1">
-                                ${m.time} ${check}
-                            </div>
-                        </div>
-                    </div>
-                `;
-                container.innerHTML += html;
-            });
-
-            // Scroll para baixo
-            container.scrollTop = container.scrollHeight;
-        }
-
-        // === INJEÇÃO NO BANCO E RADAR ===
-        function registrarNovaMensagem(nome, texto) {
-            if (!chatDB[nome]) {
-                chatDB[nome] = { phone: "", unread: 0, msgs: [] };
-            }
-            
-            // Evita duplicatas pela restrição de tempo/texto simples
-            const ultimas = chatDB[nome].msgs;
-            if (ultimas.length > 0) {
-                const ultima = ultimas[ultimas.length - 1];
-                if (ultima.text === texto && ultima.type === 'in') return; // Já registrou
-            }
-
-            chatDB[nome].msgs.push({ type: 'in', text: texto, time: getTime(), isFile: false });
-            
-            if (contatoAtivo !== nome) {
-                chatDB[nome].unread += 1;
-            }
-
-            atualizarSidebar();
-            if (contatoAtivo === nome) renderizarMensagens();
-        }
-
-        async function iniciarRadar() {
-            if (radarRodando) return;
-            radarRodando = true;
-            
-            while (isAdbReady && radarRodando) {
-                try {
-                    // Dumpsys Notification limpo e filtrado (Menos peso no USB)
-                    let output = await runAdbShell("dumpsys notification --noredact | grep -E 'pkg=com.whatsapp|android.title=|android.text='");
-                    
-                    if (output && output.includes("android.text=")) {
-                        // O regex aqui precisa ser forte. A estrutura no grep fica bagunçada, mas as tags ficam.
-                        // Solução: Split por linhas e procura pares Title/Text
-                        let linhas = output.split('\n');
-                        let currentTitle = null;
-
-                        for (let l of linhas) {
-                            if (l.includes("android.title=")) {
-                                let m = l.match(/android\.title=([^]+?)$/);
-                                if(m) {
-                                    currentTitle = m[1].replace(/String \((.+?)\)/, "$1").trim();
-                                }
-                            } else if (l.includes("android.text=") && currentTitle) {
-                                let m = l.match(/android\.text=([^]+?)$/);
-                                if(m) {
-                                    let msgText = m[1].replace(/String \((.+?)\)/, "$1").trim();
-                                    
-                                    // Filtra sistema
-                                    if (currentTitle !== "WhatsApp" && !msgText.includes("novas mensagens")) {
-                                        registrarNovaMensagem(currentTitle, msgText);
-                                    }
-                                }
-                                currentTitle = null; // Reseta para o próximo bloco
-                            }
-                        }
-                    }
-                } catch (e) { console.log("Erro radar:", e); }
-                
-                await sleep(3000); // Polling a cada 3s
-            }
-        }
-
-        // === ENVIO DE MENSAGENS E ARQUIVOS (O DESPACHANTE) ===
-        function tratarAnexo(input) {
-            if(input.files.length > 0) {
-                arquivoAnexado = input.files[0];
-                document.getElementById('attachment-preview').classList.remove('hidden');
-                document.getElementById('attachment-preview').classList.add('flex');
-                document.getElementById('attachment-name').innerText = arquivoAnexado.name;
-            }
-        }
-
-        function removerAnexo() {
-            arquivoAnexado = null;
-            document.getElementById('input-file').value = '';
-            document.getElementById('attachment-preview').classList.add('hidden');
-            document.getElementById('attachment-preview').classList.remove('flex');
-        }
-
-        document.getElementById('msg-input').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && e.ctrlKey) {
-                e.preventDefault();
-                enviarMensagem();
+        navigator.usb.addEventListener('disconnect', (event) => {
+            if (usbDevice && event.device === usbDevice) {
+                usbDevice = null; isAdbReady = false;
+                if (isCampaignActive) pararCampanha(true); 
+                else atualizarEstadoUSBUI(false);
             }
         });
 
-        async function enviarMensagem() {
-            if (!contatoAtivo) return;
-            const data = chatDB[contatoAtivo];
+        async function requestWakeLock() { try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch (err) {} }
+
+        // --- TOASTS CORPORATIVOS ---
+        function showToast(msg, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
             
-            if (!data.phone) {
-                abrirModalVinculo();
-                return;
-            }
-
-            const inputTxt = document.getElementById('msg-input');
-            const texto = inputTxt.value;
-            const pkg = document.getElementById('input-app').value;
+            let borderClass = 'border-l-4 border-boti-green', iconClass = 'fa-circle-info text-boti-green';
+            if (type === 'error') { borderClass = 'border-l-4 border-red-500'; iconClass = 'fa-circle-exclamation text-red-500'; }
+            else if (type === 'success') { borderClass = 'border-l-4 border-boti-green'; iconClass = 'fa-check-circle text-boti-green'; }
+            else if (type === 'warning') { borderClass = 'border-l-4 border-yellow-400'; iconClass = 'fa-triangle-exclamation text-yellow-500'; }
             
-            if (!texto.trim() && !arquivoAnexado) return showToast("Digite uma mensagem ou anexe arquivo", "error");
+            toast.className = `bg-white ${borderClass} shadow-corp-lg rounded-r-md px-4 py-3 flex items-center gap-3 transform transition-all duration-300 translate-y-10 opacity-0 pointer-events-auto z-[250] min-w-[250px]`;
+            toast.innerHTML = `<i class="fa-solid ${iconClass} text-lg"></i><span class="text-xs font-semibold text-boti-dark">${msg}</span>`;
+            
+            container.appendChild(toast);
+            requestAnimationFrame(() => toast.classList.remove('translate-y-10', 'opacity-0'));
+            setTimeout(() => { toast.classList.add('translate-y-10', 'opacity-0'); setTimeout(() => toast.remove(), 300); }, 5000);
+        }
 
-            // UI Feedback
-            document.getElementById('btn-enviar').classList.add('hidden');
-            document.getElementById('btn-enviando').classList.remove('hidden');
-            document.getElementById('btn-enviando').classList.add('flex');
-            radarRodando = false; // Pausa radar para usar a banda do USB
+        // --- GESTOR PIPELINE ---
+        function renderPipelineUI() {
+            const container = document.getElementById('pipeline-container');
+            container.innerHTML = '';
+            pipelineActions.forEach((action, index) => {
+                const div = document.createElement('div');
+                div.className = `relative group bg-white border border-gray-200 rounded-lg p-4 shadow-sm ${action.type === 'AUDIO' ? 'border-l-4 border-l-blue-400' : 'border-l-4 border-l-boti-green'}`;
+                
+                let innerHtml = `
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-[10px] font-semibold text-gray-500 uppercase tracking-wide bg-gray-100 px-2 py-0.5 rounded">
+                            Passo ${index + 1}: ${action.type === 'TEXT' ? 'Mensagem de Texto' : 'Gravação de Áudio'}
+                        </span>
+                        <button onclick="removerPipelineAction(${index})" class="text-gray-400 hover:text-red-500 transition-colors p-1"><i class="fa-solid fa-trash-can text-sm"></i></button>
+                    </div>
+                `;
 
-            try {
-                // 1. Acorda Tela
-                await runAdbShell("input keyevent 224");
-                await runAdbShell("input keyevent 3");
-                await sleep(500);
+                if (action.type === 'TEXT') {
+                    innerHtml += `<textarea rows="3" class="w-full input-corp rounded-md p-3 text-sm text-boti-dark resize-none" placeholder="Use :re: para puxar o nome e personalizar a mensagem..." onchange="updatePipelineAction(${index}, 'TEXT', this.value)">${action.content}</textarea>`;
+                } else if (action.type === 'AUDIO') {
+                    innerHtml += `
+                        <div class="flex items-center gap-3 bg-gray-50 p-3 rounded-md border border-gray-200">
+                            <i class="fa-solid fa-file-audio text-xl text-blue-500"></i>
+                            <div class="flex-1">
+                                <label class="block text-[10px] font-semibold text-boti-gray uppercase mb-1">Arquivo de Áudio (MP3/OGG)</label>
+                                <input type="file" accept="audio/*" id="audio-file-${action.id}" class="text-[11px] text-boti-dark file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-[11px] file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 cursor-pointer">
+                            </div>
+                        </div>
+                    `;
+                }
+                div.innerHTML = innerHtml;
+                container.appendChild(div);
+            });
+        }
 
-                if (arquivoAnexado) {
-                    showToast("Enviando arquivo para o celular...", "info");
-                    
-                    const base64 = await new Promise((resolve) => {
-                        const reader = new FileReader();
-                        reader.onload = () => resolve(reader.result.split(',')[1]);
-                        reader.readAsDataURL(arquivoAnexado);
-                    });
+        function addPipelineAction(type) { 
+            const id = Date.now();
+            if(type === 'TEXT') pipelineActions.push({ id, type: 'TEXT', content: "" });
+            else pipelineActions.push({ id, type: 'AUDIO', file: null });
+            renderPipelineUI(); 
+        }
+        function removerPipelineAction(index) { pipelineActions.splice(index, 1); renderPipelineUI(); }
+        function updatePipelineAction(index, type, val) { if(type === 'TEXT') pipelineActions[index].content = val; }
 
-                    const nomeSeguro = arquivoAnexado.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-                    const pathTmp = `/sdcard/tmp_crm.txt`;
-                    const pathFinal = `/sdcard/Download/${nomeSeguro}`;
-
-                    await runAdbShell(`rm -f ${pathTmp}`);
-                    
-                    const chunkSize = 2048;
-                    for (let i = 0; i < base64.length; i += chunkSize) {
-                        const chunk = base64.substring(i, i + chunkSize);
-                        await runAdbShell(`echo -n '${chunk}' >> ${pathTmp}`);
+        // --- EXTRATOR INTELIGENTE ---
+        function processarEntradas() {
+            const rawText = document.getElementById('paste-area').value;
+            if(!rawText.trim()) return showToast("Por favor, cole os dados na área indicada.", "warning");
+            
+            contatosTemp = []; let total = 0;
+            rawText.split('\n').forEach(linha => {
+                let s = linha.trim(); if (!s) return;
+                
+                let words = s.split(/\s+/);
+                let numbersBlock = [];
+                let nameParts = [];
+                
+                for (let word of words) {
+                    let clean = word.replace(/[^a-zA-Z0-9]/g, '');
+                    if (/^\d+$/.test(clean) || (/\d/.test(clean) && /[a-zA-Z]/.test(clean))) {
+                        numbersBlock.push(clean);
+                    } else {
+                        nameParts.push(word);
                     }
-
-                    await runAdbShell(`base64 -d ${pathTmp} > ${pathFinal}`);
-                    await runAdbShell(`rm -f ${pathTmp}`);
-
-                    let intentCmd = `am start -a android.intent.action.SEND -t "*/*" -f 1 --eu android.intent.extra.STREAM "file://${pathFinal}" -e jid "55${data.phone}@s.whatsapp.net"`;
-                    
-                    if (texto.trim()) {
-                        let textoEscapado = texto.replace(/"/g, '\\"').replace(/'/g, "\\'").replace(/ /g, "%s").replace(/&/g, "\\&");
-                        intentCmd += ` --es android.intent.extra.TEXT "${textoEscapado}"`;
-                    }
-                    
-                    intentCmd += ` -p ${pkg}`;
-                    await runAdbShell(intentCmd);
-                    
-                    await sleep(3500); // Aguarda zap abrir o preview da foto
-                    await runAdbShell(`input keyevent 66`); // Enter envia (se configurado)
-
-                } else {
-                    // Só Texto
-                    const encodedMsg = encodeURIComponent(texto).replace(/'/g, "%27").replace(/"/g, "%22");
-                    const intentUrl = `whatsapp://send?phone=55${data.phone}&text=${encodedMsg}`;
-                    
-                    await runAdbShell(`am start -a android.intent.action.VIEW -d '${intentUrl}' -p ${pkg}`);
-                    await sleep(3000); 
-                    await runAdbShell(`input keyevent 66`); // Enter para enviar direto
                 }
 
-                // Volta pra home para limpar a tela e o Radar voltar a funcionar
-                await sleep(1000);
-                await runAdbShell("input keyevent 3"); 
+                let code = ""; let phone = "";
 
-                // Registra na UI localmente (Fake sucesso)
-                chatDB[contatoAtivo].msgs.push({ 
-                    type: 'out', 
-                    text: texto, 
-                    time: getTime(),
-                    isFile: arquivoAnexado !== null 
-                });
+                if (numbersBlock.length >= 2) {
+                    code = numbersBlock[0]; phone = numbersBlock[numbersBlock.length - 1];
+                } else if (numbersBlock.length === 1) {
+                    let n = numbersBlock[0].replace(/\D/g, '');
+                    if (n.length >= 10) phone = n; else code = numbersBlock[0];
+                }
+
+                if (phone && phone.replace(/\D/g, '').length === 10) {
+                    let p = phone.replace(/\D/g, '');
+                    phone = p.substring(0, 2) + '9' + p.substring(2);
+                }
+
+                if (!phone && !code) return;
+
+                let name = nameParts.join(' ').replace(/[^\w\sÀ-ÿ]/g, '').trim() || "Revendedor";
+                total++;
+                contatosTemp.push({ name, code: code || "-", phone: phone || "-", statusEnvio: 'Pendente' });
+            });
+
+            if (total === 0) return showToast("Nenhum dado legível foi identificado.", "error");
+            
+            const tbody = document.getElementById('preview-table-body'); tbody.innerHTML = '';
+            document.getElementById('preview-count').innerText = `${total} Registros Localizados`;
+            contatosTemp.forEach(c => {
+                let tr = document.createElement('tr');
+                tr.className = "hover:bg-gray-50 transition-colors";
+                tr.innerHTML = `
+                    <td class="py-3 px-6 text-xs text-gray-700">${c.name}</td>
+                    <td class="py-3 px-6 font-mono text-[11px] text-center"><span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded border border-gray-200">${c.code}</span></td>
+                    <td class="py-3 px-6 font-mono text-sm text-right text-boti-green font-medium">${c.phone !== '-' ? c.phone : '<span class="text-orange-500 text-[11px]">Busca via Cód.</span>'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+            document.getElementById('modal-preview').classList.remove('hidden'); document.getElementById('modal-preview').classList.add('flex');
+        }
+
+        function confirmarImportacao() {
+            let add = 0, dup = 0;
+            contatosTemp.forEach(novo => {
+                let isDup = false;
+                if(novo.phone !== "-") { isDup = contatosBase.find(c => c.phone === novo.phone); }
+                else if(novo.code !== "-") { isDup = contatosBase.find(c => c.code === novo.code); }
                 
-                inputTxt.value = '';
-                removerAnexo();
-                renderizarMensagens();
-                atualizarSidebar();
+                if (!isDup) { contatosBase.push(novo); add++; } else dup++;
+            });
+            atualizarMetricas(); document.getElementById('paste-area').value = ''; fecharModal();
+            if (add > 0) showToast(`${add} registros adicionados à fila. (${dup} ignorados)`, 'success');
+            else showToast(`Nenhum registro novo. Todos já constam na base.`, 'warning');
+        }
 
-            } catch(e) {
-                showToast("Erro no envio.", "error");
+        function fecharModal() { document.getElementById('modal-preview').classList.add('hidden'); document.getElementById('modal-preview').classList.remove('flex'); }
+
+        // --- MACROS & SPINTAX ---
+        function parseMensagem(template, nomeContato) {
+            let texto = template.replace(/:re:?/gi, nomeContato);
+            const regex = /\{([^{}]+)\}/g; let match;
+            while ((match = regex.exec(texto)) !== null) {
+                const options = match[1].split('|');
+                texto = texto.replace(match[0], options[Math.floor(Math.random() * options.length)]); regex.lastIndex = 0; 
+            }
+            return texto;
+        }
+
+        // --- RELÓGIO & DASHBOARD ---
+        function atualizarMetricas() {
+            const pendentes = contatosBase.filter(c => c.statusEnvio === 'Pendente').length;
+            document.getElementById('stat-pendentes').innerText = pendentes;
+            document.getElementById('stat-feitos').innerText = statsData.sucesso;
+            document.getElementById('stat-invalidos').innerText = statsData.invalidos;
+
+            if(pendentes > 0 && isAdbReady && !isCampaignActive) document.getElementById('btn-start').disabled = false;
+            else if(pendentes === 0 && !isCampaignActive) document.getElementById('btn-start').disabled = true;
+
+            if (pendentes === 0) document.getElementById('stat-eta').innerText = "00h 00m";
+            else {
+                const min = parseInt(document.getElementById('cfg-delay-min').value) || 10;
+                const max = parseInt(document.getElementById('cfg-delay-max').value) || 25;
+                let pipeTime = 0; 
+                pipelineActions.forEach(a => { if(a.type === 'TEXT') pipeTime+=2; if(a.type === 'AUDIO') pipeTime+=12; }); 
+                
+                const totalSeconds = Math.ceil(pendentes * (((min + max) / 2) + 6 + pipeTime));
+                const hours = Math.floor(totalSeconds / 3600), minutes = Math.floor((totalSeconds % 3600) / 60);
+                document.getElementById('stat-eta').innerText = (hours > 0 ? `${hours}h ` : "") + `${minutes}m`;
+            }
+        }
+
+        function setActionUI(icon, text, isPulsing = false, iconColor = 'text-boti-gray', bgColor = 'bg-gray-50') {
+            document.getElementById('action-feedback').classList.remove('hidden'); document.getElementById('action-feedback').classList.add('flex');
+            document.getElementById('action-icon-box').className = `w-20 h-20 rounded-full ${bgColor} border border-gray-100 flex items-center justify-center mb-4 transition-all shadow-sm ${isPulsing ? 'sending-pulse' : ''}`;
+            document.getElementById('action-icon').className = `fa-solid ${icon} text-3xl ${iconColor}`;
+            document.getElementById('action-text').innerText = text;
+        }
+
+        function pararCampanha(emergencia = false) {
+            isCampaignActive = false;
+            document.getElementById('btn-stop').style.display = 'none'; document.getElementById('btn-start').style.display = 'none';
+            if (emergencia) {
+                document.getElementById('stage-status').innerText = "Conexão Interrompida";
+                document.getElementById('stage-status').className = "px-4 py-1.5 rounded-full bg-red-100 text-xs font-semibold text-red-700 uppercase tracking-wide border border-red-200";
+                setActionUI('fa-plug-circle-xmark', 'Aguardando Cabo USB', false, 'text-red-500', 'bg-red-50');
+            } else {
+                document.getElementById('stage-status').innerText = "Processo Pausado";
+                document.getElementById('stage-status').className = "px-4 py-1.5 rounded-full bg-yellow-100 text-xs font-semibold text-yellow-700 uppercase tracking-wide border border-yellow-200";
+                setActionUI('fa-hand', 'Sistema em Pausa', false, 'text-yellow-600', 'bg-yellow-50');
+                document.getElementById('btn-resume').style.display = 'block';
+            }
+        }
+
+        function retomarCampanha() {
+            if (!isAdbReady) return showToast("Autorize a conexão USB no aparelho.", "warning");
+            document.getElementById('btn-resume').style.display = 'none'; document.getElementById('btn-start').style.display = 'none'; document.getElementById('btn-stop').style.display = 'block';
+            document.getElementById('stage-status').className = "px-4 py-1.5 rounded-full bg-green-100 text-xs font-semibold text-green-700 uppercase tracking-wide border border-green-200";
+            isCampaignActive = true; processarProximo();
+        }
+
+        // --- EXECUÇÃO ADB ---
+        async function runAdbShellWithOutput(command) {
+            if (!isAdbReady || !usbDevice) return null;
+            try {
+                const myId = localIdCounter++; await sendPacket(0x4E45504F, myId, 0, new TextEncoder().encode("shell:" + command + "\0"));
+                let output = "", isClosed = false;
+                let timeout = setTimeout(() => { isClosed = true; }, 5000); 
+                while(!isClosed) {
+                    let r = await readPacket(); if(!r || r.error) break;
+                    if(r.cmd === 0x57525445 && r.arg1 === myId) { output += new TextDecoder().decode(r.data); await sendPacket(0x59414B4F, myId, r.arg0); }
+                    if(r.cmd === 0x45534C43 && r.arg1 === myId) { await sendPacket(0x45534C43, myId, r.arg0); break; }
+                }
+                clearTimeout(timeout); return output;
+            } catch(e) { return null; }
+        }
+
+        // --- MOTOR MULTITASK ---
+        async function iniciarCampanha() {
+            if (!isAdbReady) return showToast("Dispositivo não detectado. Verifique a conexão.", "error"); 
+            if (pipelineActions.length === 0) return showToast("Adicione conteúdo à campanha antes de iniciar.", "warning");
+            
+            for(let a of pipelineActions) {
+                if(a.type === 'TEXT' && !a.content.trim()) return showToast("Existem blocos de texto vazios na campanha.", "warning");
+                if(a.type === 'AUDIO') {
+                    const el = document.getElementById(`audio-file-${a.id}`);
+                    if(!el || !el.files || el.files.length === 0) return showToast("Selecione um arquivo para os blocos de áudio.", "warning");
+                }
             }
 
-            // Restaura UI
-            document.getElementById('btn-enviando').classList.add('hidden');
-            document.getElementById('btn-enviando').classList.remove('flex');
-            document.getElementById('btn-enviar').classList.remove('hidden');
+            isCampaignActive = true; document.getElementById('btn-start').style.display = 'none'; document.getElementById('btn-stop').style.display = 'block';
+            document.getElementById('stage-status').className = "px-4 py-1.5 rounded-full bg-green-100 text-xs font-semibold text-green-700 uppercase tracking-wide border border-green-200";
+            processarProximo();
+        }
+
+        async function processarProximo() {
+            if (!isCampaignActive || isProcessingCore) return;
+            isProcessingCore = true;
             
-            // Retoma Radar
-            iniciarRadar();
-        }
+            while (currentIndex < contatosBase.length && contatosBase[currentIndex].statusEnvio !== 'Pendente') currentIndex++;
 
-        // === MODAL VINCULO DE NÚMERO ===
-        function abrirModalVinculo() {
-            if(!contatoAtivo) return;
-            document.getElementById('vinculo-nome').innerText = contatoAtivo;
-            document.getElementById('vinculo-input').value = chatDB[contatoAtivo].phone;
-            document.getElementById('modal-vinculo').classList.remove('hidden');
-            document.getElementById('modal-vinculo').classList.add('flex');
-        }
+            if (currentIndex >= contatosBase.length) {
+                isCampaignActive = false; isProcessingCore = false;
+                document.getElementById('stage-status').innerText = "Operação Concluída";
+                document.getElementById('stage-status').className = "px-4 py-1.5 rounded-full bg-blue-100 text-xs font-semibold text-blue-700 uppercase tracking-wide border border-blue-200";
+                document.getElementById('stage-name').innerText = "Base Finalizada";
+                document.getElementById('stage-phone').innerText = "---";
+                document.getElementById('stage-code').classList.add('hidden');
+                document.getElementById('btn-stop').style.display = 'none'; document.getElementById('btn-start').style.display = 'block';
+                setActionUI('fa-flag-checkered', 'Processamento Finalizado', false, 'text-boti-green', 'bg-green-50');
+                showToast("Processamento da base concluído.", "success"); atualizarMetricas(); return;
+            }
 
-        function fecharModalVinculo() {
-            document.getElementById('modal-vinculo').classList.add('hidden');
-            document.getElementById('modal-vinculo').classList.remove('flex');
-        }
-
-        function salvarVinculo() {
-            const num = document.getElementById('vinculo-input').value.replace(/\D/g, '');
-            if(num.length < 10) return showToast("Número inválido.", "error");
+            let contato = contatosBase[currentIndex];
             
-            if(contatoAtivo && chatDB[contatoAtivo]) {
-                chatDB[contatoAtivo].phone = num;
-                fecharModalVinculo();
-                abrirConversa(contatoAtivo); // Força refresh do header
-                showToast("Número salvo na memória!", "info");
+            document.getElementById('stage-status').innerText = `Processando: ${currentIndex + 1} de ${contatosBase.length}`;
+            document.getElementById('stage-name').innerText = contato.name;
+            
+            if(contato.phone !== "-") {
+                let p = contato.phone; document.getElementById('stage-phone').innerText = `+55 (${p.substring(0,2)}) ${p.substring(2,7)}-${p.substring(7)}`;
+            } else {
+                document.getElementById('stage-phone').innerText = `Busca Sistêmica`;
+            }
+            
+            if(contato.code && contato.code !== '-') { 
+                document.getElementById('stage-code').innerText = `CÓDIGO: ${contato.code}`; 
+                document.getElementById('stage-code').classList.remove('hidden'); 
+            } else {
+                document.getElementById('stage-code').classList.add('hidden');
+            }
+            
+            try {
+                const appPackage = document.getElementById('cfg-app').value; 
+                
+                await runAdbShellWithOutput("input keyevent 224"); await runAdbShellWithOutput("input swipe 500 1500 500 200"); await runAdbShellWithOutput("input keyevent 3"); await sleep(500);
+
+                if (contato.phone !== "-") {
+                    setActionUI('fa-magnifying-glass', 'Localizando Contato...', true, 'text-blue-500', 'bg-blue-50');
+                    const checkUrl = `whatsapp://send?phone=55${contato.phone}`;
+                    await runAdbShellWithOutput(`am start -a android.intent.action.VIEW -d '${checkUrl}' -p ${appPackage}`);
+                    await sleep(3500); 
+
+                    await runAdbShellWithOutput("uiautomator dump /data/local/tmp/uidump.xml");
+                    const screenDump = await runAdbShellWithOutput("cat /data/local/tmp/uidump.xml");
+                    
+                    if (screenDump && (screenDump.includes("O número de telefone") || screenDump.includes("isn't on WhatsApp") || screenDump.includes("registrado no WhatsApp"))) {
+                        setActionUI('fa-ban', 'Registro Inexistente no App', false, 'text-red-500', 'bg-red-50');
+                        await runAdbShellWithOutput("input keyevent 66"); await sleep(500); await runAdbShellWithOutput("input keyevent 3"); 
+                        contato.statusEnvio = 'Inválido'; statsData.invalidos++; currentIndex++; atualizarMetricas();
+                        isProcessingCore = false; if(isCampaignActive) setTimeout(processarProximo, 1000); return; 
+                    }
+                } else {
+                    setActionUI('fa-magnifying-glass', 'Consultando por Código...', true, 'text-blue-500', 'bg-blue-50');
+                    await runAdbShellWithOutput(`am start -n ${appPackage}/com.whatsapp.Main`);
+                    await sleep(2500);
+                    await runAdbShellWithOutput("input keyevent 84"); 
+                    await sleep(1500);
+                    
+                    const cleanCode = contato.code.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                    await runAdbShellWithOutput(`input text ${cleanCode}`);
+                    await sleep(2000); 
+                    await runAdbShellWithOutput("input keyevent 66"); 
+                    await sleep(1500);
+                }
+
+                // Processamento de Blocos
+                for (let i = 0; i < pipelineActions.length; i++) {
+                    if(!isCampaignActive) break;
+                    let acao = pipelineActions[i];
+                    
+                    if (acao.type === 'TEXT') {
+                        setActionUI('fa-comment-dots', `Executando Passo ${i+1}: Texto...`, true, 'text-boti-green', 'bg-green-50');
+                        const msg = parseMensagem(acao.content, contato.name);
+                        
+                        if(contato.phone === "-") {
+                            let cleanMsg = msg.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); 
+                            cleanMsg = cleanMsg.replace(/\s/g, '%s'); 
+                            await runAdbShellWithOutput(`input text ${cleanMsg}`);
+                            await sleep(1000);
+                            await runAdbShellWithOutput("input keyevent 66"); 
+                            await sleep(300);
+                            await runAdbShellWithOutput("input keyevent 66"); 
+                        } else {
+                            const encodedMsg = encodeURIComponent(msg).replace(/'/g, "%27").replace(/"/g, "%22");
+                            const sendUrl = `whatsapp://send?phone=55${contato.phone}&text=${encodedMsg}`;
+                            await runAdbShellWithOutput(`am start -a android.intent.action.VIEW -d '${sendUrl}' -p ${appPackage}`);
+                            await sleep(2000);
+                            await runAdbShellWithOutput("input keyevent 66"); await sleep(300); await runAdbShellWithOutput("input keyevent 66");
+                        }
+                        
+                    } else if (acao.type === 'AUDIO') {
+                        setActionUI('fa-microphone', `Executando Passo ${i+1}: Áudio...`, true, 'text-boti-green', 'bg-green-50');
+                        const fileEl = document.getElementById(`audio-file-${acao.id}`);
+                        const micX = 950, micY = 1450; 
+                        
+                        await new Promise((resolve) => {
+                            if(fileEl && fileEl.files && fileEl.files.length > 0) {
+                                const audioUrl = URL.createObjectURL(fileEl.files[0]);
+                                const audio = new Audio(audioUrl);
+                                audio.onloadedmetadata = async () => {
+                                    const durMs = Math.ceil(audio.duration * 1000);
+                                    runAdbShellWithOutput(`input swipe ${micX} ${micY} ${micX} ${micY} ${durMs + 1000}`);
+                                    await sleep(400); 
+                                    audio.play(); 
+                                    await sleep(durMs + 1200);
+                                    URL.revokeObjectURL(audioUrl);
+                                    resolve();
+                                };
+                            } else { resolve(); }
+                        });
+                    }
+                }
+
+                await runAdbShellWithOutput("input keyevent 3"); 
+                contato.statusEnvio = 'Enviado'; 
+                statsData.sucesso++; currentIndex++; atualizarMetricas();
+
+                if (!isCampaignActive) { isProcessingCore = false; return; }
+
+                const delaySegundos = rnd(parseInt(document.getElementById('cfg-delay-min').value) || 10, parseInt(document.getElementById('cfg-delay-max').value) || 25);
+                setActionUI('fa-clock-rotate-left', `Intervalo de Segurança: ${delaySegundos}s`, false, 'text-gray-500', 'bg-gray-100');
+                
+                for(let i=0; i<delaySegundos; i++) {
+                    if(!isCampaignActive) break;
+                    if(i > 0 && i % 10 === 0) runAdbShellWithOutput("input keyevent 224"); 
+                    await sleep(1000);
+                }
+                
+                isProcessingCore = false; if(isCampaignActive) processarProximo();
+                
+            } catch (e) {
+                console.error(e); contato.statusEnvio = 'Erro Sistêmico'; currentIndex++; atualizarMetricas(); isProcessingCore = false; if(isCampaignActive) processarProximo();
             }
         }
 
-        // === NÚCLEO WEBUSB E ADB COM CAPTURA (O MOTOR) ===
+        function exportarRelatorio() {
+            if (contatosBase.length === 0) return showToast("Não há registros para exportação.", "warning"); 
+            let csv = "Código,Nome,Telefone,Status\n"; contatosBase.forEach(c => csv += `${c.code},${c.name},${c.phone},${c.statusEnvio}\n`); 
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "Relatorio_Extracao.csv"; link.click();
+        }
+
+        // --- NÚCLEO NATIVO DE ADB ---
         async function getAdbKeyPair() { return await crypto.subtle.generateKey({ name: "RSASSA-PKCS1-v1_5", modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" }, true, ["sign", "verify"]); }
         async function signAdbToken(keyPair, token) { return new Uint8Array(await crypto.subtle.sign("RSASSA-PKCS1-v1_5", keyPair.privateKey, token)); }
         async function getAdbPublicKeyPayload(keyPair) {
             const exported = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
-            const binaryStr = atob(exported.n.replace(/-/g, '+').replace(/_/g, '/'));
-            const modBytes = new Uint8Array(binaryStr.length);
+            const binaryStr = atob(exported.n.replace(/-/g, '+').replace(/_/g, '/')), modBytes = new Uint8Array(binaryStr.length);
             for (let i = 0; i < binaryStr.length; i++) modBytes[i] = binaryStr.charCodeAt(i);
             let n = 0n; for (let i = 0; i < modBytes.length; i++) n = (n << 8n) | BigInt(modBytes[i]);
-            const r32 = 1n << 32n, n0 = n % r32;
-            let inv = 1n; for (let i = 0; i < 32; i++) inv = (inv * (2n - n0 * inv)) % r32;
+            const r32 = 1n << 32n, n0 = n % r32; let inv = 1n; for (let i = 0; i < 32; i++) inv = (inv * (2n - n0 * inv)) % r32;
             const buffer = new ArrayBuffer(524), view = new DataView(buffer), bytes = new Uint8Array(buffer);
             view.setUint32(0, 64, true); view.setUint32(4, Number((r32 - inv) % r32), true);
             let tempN = n; for (let i = 0; i < 256; i++) { bytes[8 + i] = Number(tempN & 0xffn); tempN >>= 8n; }
             let tempRR = ((1n << 2048n) * (1n << 2048n)) % n; for (let i = 0; i < 256; i++) { bytes[264 + i] = Number(tempRR & 0xffn); tempRR >>= 8n; }
-            view.setUint32(520, 65537, true);
-            const nameBytes = new TextEncoder().encode("CRM_Sync\0");
-            const fullPayload = new Uint8Array(buffer.byteLength + nameBytes.length);
-            fullPayload.set(bytes, 0); fullPayload.set(nameBytes, buffer.byteLength); 
-            return fullPayload;
+            view.setUint32(520, 65537, true); const nameBytes = new TextEncoder().encode("Corp_Mobile\0");
+            const fullPayload = new Uint8Array(buffer.byteLength + nameBytes.length); fullPayload.set(bytes, 0); fullPayload.set(nameBytes, buffer.byteLength); return fullPayload;
         }
         
         async function sendPacket(cmd, arg0, arg1, data = new Uint8Array(0)) {
             if (!usbDevice || !epOut) return;
-            const header = new ArrayBuffer(24), view = new DataView(header);
-            let checksum = 0; for (let i = 0; i < data.length; i++) checksum = (checksum + data[i]) & 0xffffffff;
-            view.setUint32(0, cmd, true); view.setUint32(4, arg0, true); view.setUint32(8, arg1, true);
-            view.setUint32(12, data.length, true); view.setUint32(16, checksum, true); view.setUint32(20, (cmd ^ 0xffffffff) >>> 0, true);
-            const buffer = new Uint8Array(24 + data.length); 
-            buffer.set(new Uint8Array(header), 0); buffer.set(data, 24);
-            await usbDevice.transferOut(epOut, buffer);
+            const header = new ArrayBuffer(24), view = new DataView(header); let checksum = 0; for (let i = 0; i < data.length; i++) checksum = (checksum + data[i]) & 0xffffffff;
+            view.setUint32(0, cmd, true); view.setUint32(4, arg0, true); view.setUint32(8, arg1, true); view.setUint32(12, data.length, true); view.setUint32(16, checksum, true); view.setUint32(20, (cmd ^ 0xffffffff) >>> 0, true);
+            const buffer = new Uint8Array(24 + data.length); buffer.set(new Uint8Array(header), 0); buffer.set(data, 24); await usbDevice.transferOut(epOut, buffer);
         }
         
         async function readPacket() {
             if (!usbDevice || !epIn) return null;
             try {
-                const head = await usbDevice.transferIn(epIn, 24);
-                if (!head.data || head.data.byteLength < 24) return null;
-                const view = new DataView(head.data.buffer);
-                const cmd = view.getUint32(0, true), arg0 = view.getUint32(4, true), arg1 = view.getUint32(8, true), len = view.getUint32(12, true);
-                let payload = new Uint8Array(0);
-                if (len > 0) { 
-                    const dat = await usbDevice.transferIn(epIn, len); 
-                    if (dat.data) payload = new Uint8Array(dat.data.buffer); 
-                }
+                const headerRes = await usbDevice.transferIn(epIn, 24); if (!headerRes.data || headerRes.data.byteLength < 24) return null;
+                const view = new DataView(headerRes.data.buffer), cmd = view.getUint32(0, true), arg0 = view.getUint32(4, true), arg1 = view.getUint32(8, true), len = view.getUint32(12, true);
+                let payload = new Uint8Array(0); if (len > 0) { const dataRes = await usbDevice.transferIn(epIn, len); if (dataRes.data) payload = new Uint8Array(dataRes.data.buffer); }
                 return { cmd, arg0, arg1, data: payload };
-            } catch (e) { return null; }
+            } catch (e) { return { error: true, msg: e.message }; }
+        }
+
+        function atualizarEstadoUSBUI(conectado) {
+            const statusBox = document.getElementById('usb-status');
+            const dot = document.getElementById('usb-status-dot');
+            const text = document.getElementById('usb-status-text');
+            const btnConnect = document.getElementById('btn-conectar');
+
+            if (conectado) {
+                statusBox.classList.remove('hidden'); statusBox.classList.add('flex');
+                btnConnect.style.display = 'none';
+                
+                if (contatosBase.length > 0 && !isCampaignActive) {
+                    if (currentIndex > 0) document.getElementById('btn-resume').style.display = 'block';
+                    else document.getElementById('btn-start').disabled = false;
+                }
+            } else {
+                statusBox.classList.add('hidden'); statusBox.classList.remove('flex');
+                btnConnect.style.display = 'inline-flex';
+                document.getElementById('btn-resume').style.display = 'none';
+                document.getElementById('btn-start').disabled = true;
+            }
         }
 
         async function conectarUSB() {
             try {
-                usbDevice = await navigator.usb.requestDevice({ filters: [{ classCode: 255, subclassCode: 66, protocolCode: 1 }] });
+                usbDevice = await navigator.usb.requestDevice({ filters: [{ classCode: 255, subclassCode: 66, protocolCode: 1 }] }); 
                 await usbDevice.open();
                 if (usbDevice.configuration === null) await usbDevice.selectConfiguration(1);
                 let intfNum = -1;
-                for (const conf of usbDevice.configurations) { for (const intf of conf.interfaces) { for (const alt of intf.alternates) {
-                    if (alt.interfaceClass === 255 && alt.interfaceSubclass === 66 && alt.interfaceProtocol === 1) {
-                        intfNum = intf.interfaceNumber; epIn = alt.endpoints.find(e => e.direction === 'in').endpointNumber; epOut = alt.endpoints.find(e => e.direction === 'out').endpointNumber; break;
-                    } 
-                } } }
-                
+                for (const conf of usbDevice.configurations) { for (const intf of conf.interfaces) { for (const alt of intf.alternates) { if (alt.interfaceClass === 255 && alt.interfaceSubclass === 66 && alt.interfaceProtocol === 1) { intfNum = intf.interfaceNumber; epIn = alt.endpoints.find(e => e.direction === 'in').endpointNumber; epOut = alt.endpoints.find(e => e.direction === 'out').endpointNumber; break; } } } }
                 await usbDevice.claimInterface(intfNum);
-                await sendPacket(0x4E584E43, 0x01000000, 4096, new TextEncoder().encode("host::CRMSync\0"));
-                
-                let keyPair = await getAdbKeyPair();
-                let resp = await readPacket();
-                
+                await sendPacket(0x4E584E43, 0x01000000, 4096, new TextEncoder().encode("host::Corp_Mobile\0"));
+                let keyPair = await getAdbKeyPair(), resp = await readPacket();
                 if (resp && resp.cmd === 0x4E584E43) isAdbReady = true; 
                 else if (resp && resp.cmd === 0x48545541 && resp.arg0 === 1) { 
-                    await sendPacket(0x48545541, 2, 0, await signAdbToken(keyPair, resp.data));
+                    await sendPacket(0x48545541, 2, 0, await signAdbToken(keyPair, resp.data)); 
                     let resp2 = await readPacket();
                     if (resp2 && resp2.cmd === 0x4E584E43) isAdbReady = true;
-                    else {
-                        await sendPacket(0x48545541, 3, 0, await getAdbPublicKeyPayload(keyPair));
-                        showToast("Aceite a depuração no seu celular!", 'error');
-                        while(!isAdbReady) { 
-                            let waitResp = await readPacket(); 
-                            if(waitResp && waitResp.cmd === 0x4E584E43) isAdbReady = true; 
-                        }
-                    }
+                    else { 
+                        await sendPacket(0x48545541, 3, 0, await getAdbPublicKeyPayload(keyPair)); 
+                        showToast("Acesse o dispositivo móvel e conceda a permissão.", "warning"); 
+                        while(!isAdbReady) { let waitResp = await readPacket(); if(waitResp && waitResp.error) return; if(waitResp && waitResp.cmd === 0x4E584E43) isAdbReady = true; } 
+                    } 
                 }
-                
                 if (isAdbReady) {
-                    document.getElementById('btn-conectar').classList.add('hidden');
-                    document.getElementById('status-badge').classList.remove('hidden');
-                    document.getElementById('status-badge').classList.add('flex');
-                    
-                    // Impede tela do PC apagar
-                    if ('wakeLock' in navigator) navigator.wakeLock.request('screen');
-                    
-                    // Inicia Radar
-                    iniciarRadar();
+                    atualizarEstadoUSBUI(true);
+                    await runAdbShellWithOutput("settings put global stay_on_while_plugged_in 7"); 
+                    await runAdbShellWithOutput("settings put system screen_off_timeout 2147483647"); 
+                    await runAdbShellWithOutput("svc power stayon usb"); await runAdbShellWithOutput("input keyevent 224"); 
+                    showToast("Interface estabelecida. Dispositivo protegido.", "success");
                 }
-            } catch (e) { showToast("Erro: " + e.message, 'error'); }
-        }
-        
-        async function runAdbShell(command) {
-            if (!isAdbReady) return null;
-            try {
-                const myId = localIdCounter++;
-                await sendPacket(0x4E45504F, myId, 0, new TextEncoder().encode("shell:" + command + "\0"));
-                
-                let output = "";
-                // Loop de leitura maior para dar tempo de capturar logs longos
-                for(let i = 0; i < 40; i++) {
-                    let r = await readPacket(); 
-                    if(!r) break;
-                    if(r.cmd === 0x45545257 && r.arg1 === myId) {
-                        output += new TextDecoder().decode(r.data);
-                        await sendPacket(0x59414B4F, myId, r.arg0); 
-                    }
-                    if(r.cmd === 0x45534C43 && r.arg1 === myId) { 
-                        await sendPacket(0x45534C43, myId, r.arg0); 
-                        break; 
-                    }
+            } catch (e) { 
+                if (e.message.includes('requestDevice') || e.message.includes('disallowed')) {
+                    showToast("Verifique se o cabo USB está conectado e a depuração ativa no aparelho.", "error");
+                } else {
+                    showToast("Falha técnica de comunicação USB: " + e.message, "error"); 
                 }
-                return output;
-            } catch(e) { return null; }
+            }
         }
     </script>
 </body>
