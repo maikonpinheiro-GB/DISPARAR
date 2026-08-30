@@ -100,7 +100,7 @@
                 <span id="usb-status-text" class="text-xs font-semibold text-wa-dark-green">Dispositivo Conectado</span>
             </div>
             <button id="btn-conectar" onclick="conectarUSB()" class="wa-btn font-semibold px-8 py-2.5 text-sm flex items-center gap-2 text-white bg-wa-dark-green shadow-none hover:shadow-md">
-                Iniciar
+                <i class="fa-solid fa-plug"></i> <span id="txt-btn-conectar">Iniciar</span>
             </button>
         </div>
     </header>
@@ -112,18 +112,14 @@
             
             <!-- BLOCO 1: ENTRADA DE DADOS -->
             <div class="wa-card p-6 md:p-8">
-                <div class="flex items-center gap-3 mb-4">
+                <div class="flex items-center justify-between mb-4">
                     <h2 class="text-wa-text font-bold text-lg tracking-tight">Cole os Dados</h2>
+                    <button onclick="limparFila()" class="text-wa-muted hover:text-red-500 transition-colors text-sm font-semibold flex items-center gap-1 bg-gray-50 px-3 py-1.5 rounded-full hover:bg-red-50"><i class="fa-solid fa-trash-can"></i> Limpar</button>
                 </div>
                 <textarea id="paste-area" rows="4" class="w-full wa-input p-4 text-sm text-wa-text placeholder-wa-muted resize-none font-medium leading-relaxed" placeholder="DENTRO DA VDI COPIE CÓDIGO, NOME E TELEFONE DO REVENDEDOR E COLE AQUI DENTRO"></textarea>
-                <div class="grid grid-cols-3 gap-3 mt-4">
-                    <button onclick="limparFila()" class="col-span-1 bg-red-50 text-red-600 border border-red-100 py-3.5 rounded-full text-sm font-semibold flex items-center justify-center gap-2 hover:bg-red-100 transition-colors">
-                        <i class="fa-solid fa-trash-can"></i> Limpar
-                    </button>
-                    <button onclick="processarEntradas()" class="col-span-2 wa-btn text-white py-3.5 rounded-full text-sm font-semibold flex items-center justify-center gap-2 hover:bg-wa-dark-green bg-wa-dark-green shadow-none hover:shadow-md">
-                        Processar
-                    </button>
-                </div>
+                <button onclick="processarEntradas()" class="w-full mt-4 wa-btn text-white py-3.5 rounded-full text-sm font-semibold flex items-center justify-center gap-2 hover:bg-wa-dark-green bg-wa-dark-green shadow-none hover:shadow-md">
+                    Processar
+                </button>
             </div>
 
             <!-- BLOCO 2: CONTEÚDO -->
@@ -137,7 +133,7 @@
                 </p>
 
                 <div id="pipeline-container" class="flex flex-col gap-4 mb-4 overflow-y-auto flex-1 pr-2">
-                    <!-- Cards (Inicia Vazio) -->
+                    <!-- Cards de Ações Vêm Aqui -->
                 </div>
                 
                 <div class="grid grid-cols-2 gap-3 mt-auto pt-4 border-t border-wa-border">
@@ -172,8 +168,8 @@
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-wa-muted mb-2">Motor</label>
-                        <div class="w-full bg-gray-50 border border-gray-100 text-gray-500 font-semibold text-sm rounded-xl p-3 flex items-center gap-2">
-                            Inteligente
+                        <div class="w-full bg-gray-50 border border-gray-100 text-wa-dark-green font-semibold text-sm rounded-xl p-3 flex items-center gap-2">
+                            <i class="fa-solid fa-shield-halved"></i> Assíncrono
                         </div>
                     </div>
                 </div>
@@ -297,7 +293,7 @@
     <div id="toast-container" class="fixed bottom-8 right-8 z-[200] flex flex-col gap-3 pointer-events-none"></div>
 
     <script>
-        // --- ESTADO GLOBAL ---
+        // --- 1. ESTADO GLOBAL ---
         let contatosBase = [];
         let contatosTemp = [];
         let currentIndex = 0;
@@ -307,7 +303,7 @@
         let statsData = { sucesso: 0, invalidos: 0 };
         let pipelineActions = [];
 
-        // ESTADO WEBUSB
+        // ESTADO WEBUSB (REESCRITO E BLINDADO)
         let usbDevice = null;
         let epIn = null, epOut = null;
         let isAdbReady = false;
@@ -327,7 +323,7 @@
             }
         });
 
-        // --- TOASTS ---
+        // --- 2. SISTEMA DE TOASTS E UI ---
         function showToast(msg, type = 'info') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
@@ -344,17 +340,16 @@
             setTimeout(() => { toast.classList.add('translate-y-10', 'opacity-0'); setTimeout(() => toast.remove(), 300); }, 5000);
         }
 
-        // --- PIPELINE UI ---
         function renderPipelineUI() {
             const container = document.getElementById('pipeline-container');
             container.innerHTML = '';
             pipelineActions.forEach((action, index) => {
                 const div = document.createElement('div');
-                div.className = `bg-white border border-gray-200 rounded-2xl p-4 shrink-0`;
+                div.className = `bg-white border border-gray-200 rounded-2xl p-4 shrink-0 shadow-sm`;
                 
                 let innerHtml = `
                     <div class="flex justify-between items-center mb-3">
-                        <span class="text-[10px] font-bold uppercase tracking-wider text-wa-muted">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-wa-muted bg-gray-100 px-2 py-1 rounded">
                             Bloco ${index + 1}: ${action.type === 'TEXT' ? 'Mensagem' : 'Áudio'}
                         </span>
                         <button onclick="removerPipelineAction(${index})" class="text-gray-400 hover:text-red-500 transition-colors w-6 h-6 flex items-center justify-center rounded-full hover:bg-red-50"><i class="fa-solid fa-trash text-xs"></i></button>
@@ -362,13 +357,13 @@
                 `;
 
                 if (action.type === 'TEXT') {
-                    innerHtml += `<textarea rows="3" class="w-full wa-input p-3 text-sm text-wa-text font-medium placeholder-gray-400 resize-none" placeholder="use :re para puxar o nome e personalizar a mensagem" onchange="updatePipelineAction(${index}, 'TEXT', this.value)">${action.content}</textarea>`;
+                    innerHtml += `<textarea rows="3" class="w-full wa-input p-3 text-sm text-wa-text font-medium placeholder-gray-400 resize-none" placeholder="use :re para puxar o nome e personalizar a mensagem..." onchange="updatePipelineAction(${index}, 'TEXT', this.value)">${action.content}</textarea>`;
                 } else if (action.type === 'AUDIO') {
                     innerHtml += `
                         <div class="flex items-center gap-4 bg-gray-50 p-3 rounded-xl border border-gray-100">
                             <i class="fa-solid fa-microphone-lines text-2xl text-blue-500 w-8 text-center"></i>
                             <div class="flex-1">
-                                <label class="block text-[10px] font-semibold text-wa-muted uppercase tracking-wider mb-1">Anexar Áudio</label>
+                                <label class="block text-[10px] font-semibold text-wa-muted uppercase tracking-wider mb-1">Anexar Áudio (MP3/OGG)</label>
                                 <input type="file" accept="audio/*" id="audio-file-${action.id}" class="w-full text-xs font-medium text-wa-text file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-white file:text-wa-text file:border file:border-gray-200 hover:file:bg-gray-50 cursor-pointer transition-colors">
                             </div>
                         </div>
@@ -390,9 +385,10 @@
             document.getElementById('stage-name').innerText = "...";
             document.getElementById('stage-phone').innerText = "...";
             setActionUI('fa-robot', 'Aguardando Ação...', false, 'text-wa-green', 'bg-green-50');
-            showToast("Lista e memória zeradas com sucesso!", "success");
+            showToast("Lista limpa com sucesso!", "success");
         }
 
+        // --- 3. PROCESSAMENTO DE DADOS (CÓDIGO/NÚMERO) ---
         function processarEntradas() {
             const rawText = document.getElementById('paste-area').value;
             if(!rawText.trim()) return showToast("Cole os dados primeiro.", "warning");
@@ -407,6 +403,7 @@
                     else nameParts.push(word);
                 }
                 let code = "", phone = "";
+                // O primeiro bloco numerico eh o codigo, o ultimo eh o telefone (se tiver tamanho)
                 if (numbersBlock.length >= 2) { code = numbersBlock[0]; phone = numbersBlock[numbersBlock.length - 1]; }
                 else if (numbersBlock.length === 1) { let n = numbersBlock[0].replace(/\D/g, ''); if (n.length >= 10) phone = n; else code = numbersBlock[0]; }
                 
@@ -417,11 +414,11 @@
                 total++; contatosTemp.push({ name, code: code || "N/A", phone: phone || "N/A", statusEnvio: 'Pendente' });
             });
 
-            if (total === 0) return showToast("Nenhum dado formatado encontrado.", "error");
+            if (total === 0) return showToast("Nenhum dado legível encontrado.", "error");
             const tbody = document.getElementById('preview-table-body'); tbody.innerHTML = ''; document.getElementById('preview-count').innerText = `${total} Registros`;
             contatosTemp.forEach(c => {
                 let tr = document.createElement('tr');
-                tr.innerHTML = `<td class="py-3 px-6 text-xs">${c.name}</td><td class="py-3 px-6 font-mono text-xs text-center text-wa-muted">${c.code}</td><td class="py-3 px-6 font-mono text-xs text-right ${c.phone !== 'N/A' ? 'text-wa-text' : 'text-amber-500'}">${c.phone !== 'N/A' ? c.phone : 'Busca por Cód.'}</td>`;
+                tr.innerHTML = `<td class="py-3 px-6 text-xs font-semibold text-wa-text">${c.name}</td><td class="py-3 px-6 font-mono text-xs text-center text-wa-muted"><span class="bg-gray-100 px-2 py-1 rounded">${c.code}</span></td><td class="py-3 px-6 font-mono font-bold text-xs text-right ${c.phone !== 'N/A' ? 'text-wa-dark-green' : 'text-amber-500'}">${c.phone !== 'N/A' ? c.phone : 'Busca por Código'}</td>`;
                 tbody.appendChild(tr);
             });
             document.getElementById('modal-preview').classList.remove('hidden'); document.getElementById('modal-preview').classList.add('flex');
@@ -434,7 +431,7 @@
                 if (!isDup) { contatosBase.push(novo); add++; } else dup++;
             });
             atualizarMetricas(); document.getElementById('paste-area').value = ''; fecharModal();
-            if (add > 0) showToast(`${add} adicionados à fila.`, 'success'); else showToast(`Sem contatos novos.`, 'warning');
+            if (add > 0) showToast(`${add} injetados na fila. (${dup} repetidos barrados)`, 'success'); else showToast(`Sem contatos novos.`, 'warning');
         }
         function fecharModal() { document.getElementById('modal-preview').classList.add('hidden'); document.getElementById('modal-preview').classList.remove('flex'); }
 
@@ -464,24 +461,7 @@
             document.getElementById('action-text').innerText = text;
         }
 
-        function atualizarEstadoUSBUI(conectado) {
-            const box = document.getElementById('usb-status'), dot = document.getElementById('usb-status-dot'), txt = document.getElementById('usb-status-text'), btn = document.getElementById('btn-conectar');
-            if (conectado) {
-                box.classList.remove('hidden'); box.classList.add('flex');
-                dot.className = "w-2.5 h-2.5 rounded-full bg-wa-green animate-pulse";
-                txt.innerText = "Conectado"; txt.className = "text-xs font-semibold text-wa-dark-green";
-                btn.style.display = 'none';
-                if (contatosBase.length > 0 && !isCampaignActive) { if (currentIndex > 0) document.getElementById('btn-resume').style.display = 'flex'; else document.getElementById('btn-start').disabled = false; }
-            } else {
-                box.className = "hidden items-center gap-2 px-4 py-2 bg-red-50 rounded-full flex";
-                dot.className = "w-2.5 h-2.5 rounded-full bg-red-500";
-                txt.innerText = "Desconectado"; txt.className = "text-xs font-semibold text-red-600";
-                btn.style.display = 'flex'; btn.innerHTML = 'Reconectar Cabo';
-                document.getElementById('btn-resume').style.display = 'none'; document.getElementById('btn-start').disabled = true;
-            }
-        }
-
-        // --- EMERGÊNCIA ---
+        // --- 4. CONTROLES DO MOTOR ---
         function pararCampanha(emergencia = false) {
             isCampaignActive = false; skipCurrent = true;
             document.getElementById('btn-controls').style.display = 'none'; document.getElementById('btn-start').style.display = 'none';
@@ -497,35 +477,35 @@
             }
         }
 
-        function pularCliente() { if(!isCampaignActive) return; skipCurrent = true; showToast("Pulando...", "warning"); }
+        function pularCliente() { if(!isCampaignActive) return; skipCurrent = true; showToast("Pulando contato...", "warning"); }
         function retomarCampanha() {
-            if (!isAdbReady) return showToast("Verifique se o USB está conectado no seu celular e depuração ativa.", "error");
+            if (!isAdbReady) return showToast("Aguardando conexão USB estável.", "error");
             document.getElementById('btn-resume').style.display = 'none'; document.getElementById('btn-start').style.display = 'none'; document.getElementById('btn-controls').style.display = 'flex';
             document.getElementById('stage-status').className = "px-4 py-1.5 rounded-full bg-gray-100 text-[10px] font-bold text-wa-muted uppercase";
             isCampaignActive = true; skipCurrent = false; processarProximo();
         }
 
         async function iniciarCampanha() {
-            if (!isAdbReady) return showToast("Verifique a conexão USB do celular.", "error"); 
-            if (pipelineActions.length === 0) return showToast("Adicione conteúdo primeiro.", "error");
+            if (!isAdbReady) return showToast("Aguardando conexão USB estável.", "error"); 
+            if (pipelineActions.length === 0) return showToast("Adicione conteúdo de texto ou áudio primeiro.", "error");
             isCampaignActive = true; skipCurrent = false;
             document.getElementById('btn-start').style.display = 'none'; document.getElementById('btn-controls').style.display = 'flex';
             processarProximo();
         }
 
-        // --- NÚCLEO ADB ASSÍNCRONO ABSOLUTO ---
+        // --- 5. NÚCLEO ADB (RÁPIDO, SILENCIOSO E SEGURO) ---
         async function adbReaderLoop() {
             if (isReaderRunning) return; isReaderRunning = true;
             while (isAdbReady && usbDevice && epIn) {
                 try {
                     let r = await readPacket(); 
                     if (!r || r.error) continue;
-                    if (r.cmd === 0x57525445) { 
+                    if (r.cmd === 0x57525445) { // WRTE
                         let lId = r.arg1;
                         if (adbStreams[lId]) adbStreams[lId].data += new TextDecoder().decode(r.data);
-                        await sendPacket(0x59414B4F, lId, r.arg0); 
+                        await sendPacket(0x59414B4F, lId, r.arg0); // OKAY
                     }
-                    if (r.cmd === 0x45534C43) {
+                    if (r.cmd === 0x45534C43) { // CLSE
                         let lId = r.arg1;
                         if (adbStreams[lId] && !adbStreams[lId].closed) { adbStreams[lId].closed = true; adbStreams[lId].resolve(adbStreams[lId].data); }
                         await sendPacket(0x45534C43, lId, r.arg0); 
@@ -535,13 +515,13 @@
             isReaderRunning = false;
         }
 
-        async function runAdb(command, timeoutMs = 3000) {
+        async function runAdb(command, timeoutMs = 3500) {
             if (!isAdbReady || !usbDevice) return "";
             return new Promise(async (resolve) => {
                 const myId = localIdCounter++;
                 adbStreams[myId] = { data: "", closed: false, resolve: resolve };
                 await sendPacket(0x4E45504F, myId, 0, new TextEncoder().encode("shell:" + command + "\0"));
-                // Timeout de Segurança: Libera o código caso o celular não responda
+                // Timeout absoluto: O navegador NUNCA vai travar se o celular bugar.
                 setTimeout(() => { if (!adbStreams[myId].closed) { adbStreams[myId].closed = true; resolve(adbStreams[myId].data); } }, timeoutMs);
             });
         }
@@ -550,6 +530,7 @@
             let waited = 0; while (waited < ms) { if (skipCurrent || !isCampaignActive) return; await sleep(100); waited += 100; }
         }
 
+        // --- 6. CÉREBRO DE EXECUÇÃO (ESTEIRA) ---
         async function processarProximo() {
             if (!isCampaignActive || isProcessingCore) return;
             isProcessingCore = true; skipCurrent = false; 
@@ -557,11 +538,11 @@
             while (currentIndex < contatosBase.length && contatosBase[currentIndex].statusEnvio !== 'Pendente') currentIndex++;
             if (currentIndex >= contatosBase.length) {
                 isCampaignActive = false; isProcessingCore = false;
-                document.getElementById('stage-status').innerText = "CONCLUÍDO";
+                document.getElementById('stage-status').innerText = "OPERAÇÃO CONCLUÍDA";
                 document.getElementById('stage-name').innerText = "Base Finalizada"; document.getElementById('stage-phone').innerText = "";
                 document.getElementById('btn-controls').style.display = 'none'; document.getElementById('btn-start').style.display = 'flex';
                 setActionUI('fa-check', 'Finalizado', false, 'text-wa-green', 'bg-green-50');
-                showToast("Envios finalizados.", "success"); atualizarMetricas(); return;
+                showToast("Envios finalizados com sucesso!", "success"); atualizarMetricas(); return;
             }
 
             let contato = contatosBase[currentIndex];
@@ -573,19 +554,20 @@
                 const appPackage = document.getElementById('cfg-app').value; 
                 await runAdb("input keyevent 224"); await runAdb("input swipe 500 1500 500 200"); await runAdb("input keyevent 3"); 
                 if (skipCurrent || !isCampaignActive) { abortarTurno(contato); return; }
-                await safeSleep(500);
+                await safeSleep(800); // Dá um respiro pro celular limpar a RAM
 
                 if (contato.phone !== "N/A") {
-                    setActionUI('fa-magnifying-glass', 'Abrindo Conversa...', true, 'text-blue-500', 'bg-blue-50');
-                    // Abertura primária sem texto só para focar/validar o chat
+                    setActionUI('fa-magnifying-glass', 'Carregando Chat...', true, 'text-blue-500', 'bg-blue-50');
+                    // Abre a conversa vazia primeiro
                     await runAdb(`am start -a android.intent.action.VIEW -d 'whatsapp://send?phone=55${contato.phone}' -p ${appPackage}`);
                     await safeSleep(3500); if (skipCurrent || !isCampaignActive) { abortarTurno(contato); return; }
 
+                    // Checa se o número existe na base do WhatsApp
                     await runAdb("uiautomator dump /data/local/tmp/uidump.xml", 4000);
                     const screenDump = await runAdb("cat /data/local/tmp/uidump.xml", 2000);
                     
                     if (screenDump && (screenDump.includes("O número de telefone") || screenDump.includes("isn't on WhatsApp") || screenDump.includes("registrado no WhatsApp"))) {
-                        setActionUI('fa-ban', 'Inválido', false, 'text-red-500', 'bg-red-50');
+                        setActionUI('fa-ban', 'Número Inválido', false, 'text-red-500', 'bg-red-50');
                         await runAdb("input keyevent 66"); await runAdb("input keyevent 3"); 
                         contato.statusEnvio = 'Inválido'; statsData.invalidos++; currentIndex++; atualizarMetricas();
                         isProcessingCore = false; if(isCampaignActive && !skipCurrent) setTimeout(processarProximo, 500); return; 
@@ -598,32 +580,39 @@
                     const cleanCode = contato.code.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
                     await runAdb(`input text ${cleanCode}`);
                     await safeSleep(2000); if(skipCurrent) { abortarTurno(contato); return; }
-                    await runAdb("input keyevent 66"); await safeSleep(1500);
+                    await runAdb("input keyevent 66"); await safeSleep(1500); // Abre a conversa encontrada
                 }
 
                 if (skipCurrent || !isCampaignActive) { abortarTurno(contato); return; }
 
+                // O CHAT ESTÁ ABERTO AQUI. VAMOS INJETAR O CONTEÚDO SEQUENCIALMENTE:
                 for (let i = 0; i < pipelineActions.length; i++) {
                     if(skipCurrent || !isCampaignActive) break;
                     let acao = pipelineActions[i];
                     
                     if (acao.type === 'TEXT') {
-                        setActionUI('fa-font', `Texto...`, true, 'text-wa-dark-green', 'bg-green-50');
+                        setActionUI('fa-font', `Injetando Texto...`, true, 'text-wa-dark-green', 'bg-green-50');
                         const msg = parseMensagem(acao.content, contato.name);
                         
                         if(contato.phone === "N/A") {
+                            // Envio por Código (Digitação segura)
                             let cleanMsg = msg.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\n/g, '%s').replace(/\s/g, '%s').replace(/[&<>"']/g, ''); 
-                            await runAdb(`input text ${cleanMsg}`); await safeSleep(500);
-                            await runAdb("input keyevent 66"); await safeSleep(300); await runAdb("input keyevent 66");
+                            await runAdb(`input text ${cleanMsg}`); 
+                            await safeSleep(1000); // Tempo pro texto cair na caixa do celular
+                            await runAdb("input keyevent 66"); // Envia
+                            await safeSleep(500);
                         } else {
-                            // Envio direto garantido pelo Intent, em vez de input text que quebra com linhas
+                            // Envio por Telefone (Deep Link Rápido)
                             const encodedMsg = encodeURIComponent(msg).replace(/'/g, "%27").replace(/"/g, "%22");
                             await runAdb(`am start -a android.intent.action.VIEW -d 'whatsapp://send?phone=55${contato.phone}&text=${encodedMsg}' -p ${appPackage}`);
                             await safeSleep(1500); if(skipCurrent) break;
-                            await runAdb("input keyevent 66"); await safeSleep(300); await runAdb("input keyevent 66"); // Dois enters garantem envio
+                            await runAdb("input keyevent 66"); // Dispara o texto preenchido
+                            await safeSleep(300);
+                            await runAdb("input keyevent 66"); // Dispara o enter duplo pra garantir
+                            await safeSleep(500);
                         }
                     } else if (acao.type === 'AUDIO') {
-                        setActionUI('fa-microphone', `Áudio...`, true, 'text-blue-500', 'bg-blue-50');
+                        setActionUI('fa-microphone', `Gravando Áudio (Cabo P2)...`, true, 'text-blue-500', 'bg-blue-50');
                         const fileEl = document.getElementById(`audio-file-${acao.id}`);
                         if(fileEl && fileEl.files && fileEl.files.length > 0) {
                             await new Promise((resolve) => {
@@ -631,8 +620,11 @@
                                 audio.onloadedmetadata = async () => {
                                     if(skipCurrent) { resolve(); return; }
                                     const durMs = Math.ceil(audio.duration * 1000);
-                                    runAdb(`input swipe 950 1450 950 1450 ${durMs + 1000}`, durMs + 5000); 
-                                    await safeSleep(300); audio.play(); await safeSleep(durMs + 1200);
+                                    // Segura o dedo no microfone (coordenadas universais inferiores)
+                                    runAdb(`input swipe 950 1450 950 1450 ${durMs + 1500}`, durMs + 5000); 
+                                    await safeSleep(400); 
+                                    audio.play(); // Toca o audio no PC
+                                    await safeSleep(durMs + 1800); // Espera o áudio acabar + margem pro app soltar
                                     URL.revokeObjectURL(audioUrl); resolve();
                                 };
                             });
@@ -641,11 +633,11 @@
                 }
 
                 if (skipCurrent || !isCampaignActive) { abortarTurno(contato); return; }
-                await runAdb("input keyevent 3");
+                await runAdb("input keyevent 3"); // Botão home para sair da conversa
                 contato.statusEnvio = 'Enviado'; statsData.sucesso++; currentIndex++; atualizarMetricas();
 
                 const delaySegundos = rnd(parseInt(document.getElementById('cfg-delay-min').value) || 10, parseInt(document.getElementById('cfg-delay-max').value) || 25);
-                setActionUI('fa-hourglass-half', `Aguardando ${delaySegundos}s...`, false, 'text-gray-400', 'bg-gray-50');
+                setActionUI('fa-hourglass-half', `Resfriando: ${delaySegundos}s...`, false, 'text-gray-400', 'bg-gray-50');
                 await safeSleep(delaySegundos * 1000); 
                 
                 isProcessingCore = false; if(isCampaignActive && !skipCurrent) processarProximo();
@@ -664,19 +656,31 @@
         }
 
         function exportarRelatorio() {
-            if (contatosBase.length === 0) return showToast("Sem relatórios ainda", "warning"); 
+            if (contatosBase.length === 0) return showToast("Fila vazia", "warning"); 
             let csv = "Código,Nome,Telefone,Status\n"; contatosBase.forEach(c => csv += `${c.code},${c.name},${c.phone},${c.statusEnvio}\n`); 
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "Relatorio_DisparaAI.csv"; link.click();
+            const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "Relatorio.csv"; link.click();
         }
 
-        // --- USB CORE (BLINDADO) ---
-        let adbKeyPair = null;
-        async function getAdbKeyPair() { 
-            if(adbKeyPair) return adbKeyPair;
-            adbKeyPair = await crypto.subtle.generateKey({ name: "RSASSA-PKCS1-v1_5", modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" }, true, ["sign", "verify"]);
-            return adbKeyPair; 
+        // --- 7. CONEXÃO USB WEB-ADB (BLINDADA CONTRA QUEDAS) ---
+        function atualizarEstadoUSBUI(conectado, txtBtn = "Iniciar") {
+            const box = document.getElementById('usb-status'), dot = document.getElementById('usb-status-dot'), txt = document.getElementById('usb-status-text'), btn = document.getElementById('btn-conectar'), spanBtn = document.getElementById('txt-btn-conectar');
+            if (conectado) {
+                box.classList.remove('hidden'); box.classList.add('flex');
+                dot.className = "w-2.5 h-2.5 rounded-full bg-wa-green animate-pulse";
+                txt.innerText = "Conectado e Seguro"; txt.className = "text-xs font-semibold text-wa-dark-green";
+                btn.style.display = 'none';
+                if (contatosBase.length > 0 && !isCampaignActive) { if (currentIndex > 0) document.getElementById('btn-resume').style.display = 'flex'; else document.getElementById('btn-start').disabled = false; }
+            } else {
+                box.className = "hidden items-center gap-2 px-4 py-2 bg-red-50 rounded-full flex";
+                dot.className = "w-2.5 h-2.5 rounded-full bg-red-500";
+                txt.innerText = "Desconectado"; txt.className = "text-xs font-semibold text-red-600";
+                btn.style.display = 'flex'; spanBtn.innerText = txtBtn; btn.disabled = false;
+                document.getElementById('btn-resume').style.display = 'none'; document.getElementById('btn-start').disabled = true;
+            }
         }
+
+        async function getAdbKeyPair() { return await crypto.subtle.generateKey({ name: "RSASSA-PKCS1-v1_5", modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" }, true, ["sign", "verify"]); }
         async function signAdbToken(keyPair, token) { return new Uint8Array(await crypto.subtle.sign("RSASSA-PKCS1-v1_5", keyPair.privateKey, token)); }
         async function getAdbPublicKeyPayload(keyPair) {
             const exported = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
@@ -688,9 +692,7 @@
             view.setUint32(0, 64, true); view.setUint32(4, Number((r32 - inv) % r32), true);
             let tempN = n; for (let i = 0; i < 256; i++) { bytes[8 + i] = Number(tempN & 0xffn); tempN >>= 8n; }
             let tempRR = ((1n << 2048n) * (1n << 2048n)) % n; for (let i = 0; i < 256; i++) { bytes[264 + i] = Number(tempRR & 0xffn); tempRR >>= 8n; }
-            
-            const randomId = Math.floor(Math.random() * 900) + 100;
-            view.setUint32(520, 65537, true); const nameBytes = new TextEncoder().encode(`FVC_DISPARAAI_${randomId}\0`);
+            view.setUint32(520, 65537, true); const nameBytes = new TextEncoder().encode("DisparaAI_Pro\0");
             const fullPayload = new Uint8Array(buffer.byteLength + nameBytes.length); fullPayload.set(bytes, 0); fullPayload.set(nameBytes, buffer.byteLength); return fullPayload;
         }
         
@@ -713,11 +715,11 @@
 
         async function conectarUSB() {
             const btn = document.getElementById('btn-conectar');
-            const originalText = btn.innerHTML;
+            const spanBtn = document.getElementById('txt-btn-conectar');
             
             try {
                 btn.disabled = true;
-                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Conectando...';
+                spanBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Conectando...';
 
                 if(usbDevice) { try { await usbDevice.close(); } catch(e){} usbDevice = null; }
                 
@@ -727,19 +729,19 @@
                 
                 let intfNum = -1;
                 for (const conf of usbDevice.configurations) { for (const intf of conf.interfaces) { for (const alt of intf.alternates) { if (alt.interfaceClass === 255 && alt.interfaceSubclass === 66 && alt.interfaceProtocol === 1) { intfNum = intf.interfaceNumber; epIn = alt.endpoints.find(e => e.direction === 'in').endpointNumber; epOut = alt.endpoints.find(e => e.direction === 'out').endpointNumber; break; } } } }
-                if(intfNum === -1) throw new Error("Interface incompatível.");
+                if(intfNum === -1) throw new Error("Interface ADB não encontrada. Ative a depuração USB.");
                 
                 await usbDevice.claimInterface(intfNum);
                 
-                // Flush da porta USB para limpar conexões pendentes do Windows
+                // Flush de segurança
                 try { await usbDevice.transferOut(epOut, new Uint8Array(0)); } catch(e){}
 
-                await sendPacket(0x4E584E43, 0x01000000, 4096, new TextEncoder().encode("host::DisparaAI_Pro\0"));
+                await sendPacket(0x4E584E43, 0x01000000, 4096, new TextEncoder().encode("host::DisparaAI\0"));
                 
                 let keyPair = await getAdbKeyPair();
                 let resp = await readPacket();
                 
-                if(!resp) throw new Error("Sem resposta do aparelho.");
+                if(!resp) throw new Error("Celular não respondeu.");
 
                 if (resp.cmd === 0x4E584E43) { 
                     isAdbReady = true; adbReaderLoop(); 
@@ -752,30 +754,31 @@
                     } else if (resp2 && resp2.cmd === 0x48545541) { 
                         await sendPacket(0x48545541, 3, 0, await getAdbPublicKeyPayload(keyPair)); 
                         
-                        showToast("⚠️ Olhe para o celular e clique em PERMITIR.", "warning"); 
-                        btn.innerHTML = '<i class="fa-solid fa-mobile-screen"></i> Autorize no Celular...';
+                        showToast("⚠️ Olhe para o seu celular e clique em PERMITIR.", "warning"); 
+                        spanBtn.innerHTML = 'Aguardando celular...';
                         
-                        // Fica pendente até o usuário bater o dedo na tela
-                        let waitResp = await readPacket();
-                        if (waitResp && waitResp.cmd === 0x4E584E43) { 
-                            isAdbReady = true; adbReaderLoop(); 
-                        } else {
-                            throw new Error("Autorização recusada.");
+                        // Espera paciente infinita para o usuário apertar na tela do Android
+                        while(!isAdbReady) {
+                            let waitResp = await readPacket();
+                            if (waitResp && waitResp.cmd === 0x4E584E43) { 
+                                isAdbReady = true; adbReaderLoop(); break;
+                            }
+                            if (waitResp && waitResp.error) {
+                                throw new Error("Conexão interrompida pelo Android.");
+                            }
+                            await sleep(500);
                         }
                     } 
                 }
                 
                 if (isAdbReady) {
-                    btn.disabled = false;
-                    btn.innerHTML = originalText;
                     atualizarEstadoUSBUI(true); 
                     showToast("Conexão estabelecida e blindada!", "success");
                 }
             } catch (e) { 
-                btn.disabled = false;
-                btn.innerHTML = originalText;
                 usbDevice = null;
-                showToast("Conexão interrompida. Tente retirar e colocar o cabo novamente.", "error"); 
+                atualizarEstadoUSBUI(false, "Reconectar");
+                showToast("Erro: " + e.message, "error"); 
             }
         }
     </script>
