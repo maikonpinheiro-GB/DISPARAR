@@ -527,14 +527,8 @@
                 const myId = localIdCounter++;
                 adbStreams[myId] = { data: "", closed: false, resolve: resolve };
                 
-                // Embrulhando o comando em aspas simples para proteger contra espaços e %s caso a string tenha coisas sensíveis
-                let safeCommand = command;
-                if(command.startsWith("am start -a android.intent.action.VIEW")) {
-                     // Proteção extra para Intents longos com múltiplos caracteres
-                     safeCommand = `'${command}'`;
-                }
-
-                await sendPacket(0x4E45504F, myId, 0, new TextEncoder().encode("shell:" + safeCommand + "\0"));
+                // Enviando comando direto para o shell do Android sem envelopamento que quebra o binário "am"
+                await sendPacket(0x4E45504F, myId, 0, new TextEncoder().encode("shell:" + command + "\0"));
                 setTimeout(() => { if (!adbStreams[myId].closed) { adbStreams[myId].closed = true; resolve(adbStreams[myId].data); } }, timeoutMs);
             });
         }
@@ -570,7 +564,8 @@
 
                 if (contato.phone !== "N/A") {
                     setActionUI('fa-magnifying-glass', 'Buscando...', true, 'text-blue-500', 'bg-blue-50');
-                    await runAdb(`am start -a android.intent.action.VIEW -d "whatsapp://send?phone=55${contato.phone}" -p ${appPackage}`);
+                    // Usando aspas simples apenas no URI do WhatsApp para proteger o ADB Shell
+                    await runAdb(`am start -a android.intent.action.VIEW -d 'whatsapp://send?phone=55${contato.phone}' -p ${appPackage}`);
                     await safeSleep(3500); if (skipCurrent || !isCampaignActive) { abortarTurno(contato); return; }
 
                     await runAdb("uiautomator dump /data/local/tmp/uidump.xml", 4000);
@@ -614,7 +609,8 @@
                             // Envio Seguro por Intent (Aceita Multi-Line %0A e Caracteres Especiais)
                             const encodedMsg = encodeURIComponent(msg).replace(/'/g, "%27").replace(/"/g, "%22");
                             const sendUrl = `whatsapp://send?phone=55${contato.phone}&text=${encodedMsg}`;
-                            await runAdb(`am start -a android.intent.action.VIEW -d "${sendUrl}" -p ${appPackage}`);
+                            // Usando aspas simples no link para o Shell interpretar todos os parâmetros (&text) corretamente
+                            await runAdb(`am start -a android.intent.action.VIEW -d '${sendUrl}' -p ${appPackage}`);
                             await safeSleep(1500); if(skipCurrent) break;
                             await runAdb("input keyevent 66"); await safeSleep(200); await runAdb("input keyevent 66");
                         }
