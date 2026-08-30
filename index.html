@@ -116,9 +116,14 @@
                     <h2 class="text-wa-text font-bold text-lg tracking-tight">Cole os Dados</h2>
                 </div>
                 <textarea id="paste-area" rows="4" class="w-full wa-input p-4 text-sm text-wa-text placeholder-wa-muted resize-none font-medium leading-relaxed" placeholder="DENTRO DA VDI COPIE CÓDIGO, NOME E TELEFONE DO REVENDEDOR E COLE AQUI DENTRO"></textarea>
-                <button onclick="processarEntradas()" class="w-full mt-4 wa-btn py-3.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 bg-wa-dark-green hover:bg-wa-green">
-                    Processar
-                </button>
+                <div class="grid grid-cols-3 gap-3 mt-4">
+                    <button onclick="limparFila()" class="col-span-1 bg-red-50 text-red-600 border border-red-100 py-3.5 rounded-full text-sm font-semibold flex items-center justify-center gap-2 hover:bg-red-100 transition-colors">
+                        <i class="fa-solid fa-trash-can"></i> Limpar
+                    </button>
+                    <button onclick="processarEntradas()" class="col-span-2 wa-btn text-white py-3.5 rounded-full text-sm font-semibold flex items-center justify-center gap-2 hover:bg-wa-dark-green bg-wa-dark-green shadow-none hover:shadow-md">
+                        Processar
+                    </button>
+                </div>
             </div>
 
             <!-- BLOCO 2: CONTEÚDO -->
@@ -423,6 +428,31 @@
         }
         function fecharModal() { document.getElementById('modal-preview').classList.add('hidden'); document.getElementById('modal-preview').classList.remove('flex'); }
 
+        function limparFila() {
+            if(isCampaignActive) return showToast("Pause a operação antes de limpar a fila.", "warning");
+            
+            contatosBase = [];
+            currentIndex = 0;
+            statsData = { sucesso: 0, invalidos: 0 };
+            document.getElementById('paste-area').value = '';
+            atualizarMetricas();
+            
+            // Restaura o painel central para o estado inicial
+            document.getElementById('stage-status').innerText = "Aguardando Início";
+            document.getElementById('stage-status').className = "px-5 py-2 bg-gray-100 text-wa-muted text-xs font-bold rounded-full";
+            document.getElementById('stage-name').innerText = "...";
+            document.getElementById('stage-phone').innerText = "...";
+            setActionUI('fa-robot', 'Aguardando Ação...', false, 'text-wa-green', 'bg-green-50');
+            
+            // Reseta os botões
+            document.getElementById('btn-start').style.display = 'flex';
+            document.getElementById('btn-start').disabled = true;
+            document.getElementById('btn-controls').style.display = 'none';
+            document.getElementById('btn-resume').style.display = 'none';
+            
+            showToast("Base apagada! Você já pode colar os dados novamente.", "success");
+        }
+
         function parseMensagem(template, nome) {
             let txt = template.replace(/:re:?/gi, nome);
             const regex = /\{([^{}]+)\}/g; let match;
@@ -695,15 +725,42 @@
         }
 
         async function conectarUSB() {
+            const btn = document.getElementById('btn-conectar');
+            const originalText = btn.innerHTML;
+            
             try {
-                // Força reset para evitar travamento em múltiplos cliques
-                if(usbDevice) { usbDevice = null; }
+                if (!navigator.usb) {
+                    return showToast("Seu navegador não suporta conexão USB. Use Chrome, Edge ou Opera no PC.", "error");
+                }
+
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Conectando...';
+                btn.disabled = true;
+
+                // Força reset profundo para evitar travamento em múltiplos cliques ou conexões órfãs
+                if(usbDevice) { 
+                    try { await usbDevice.close(); } catch(e) {}
+                    usbDevice = null; 
+                }
 
                 usbDevice = await navigator.usb.requestDevice({ filters: [{ classCode: 255, subclassCode: 66, protocolCode: 1 }] }); 
                 await usbDevice.open();
                 if (usbDevice.configuration === null) await usbDevice.selectConfiguration(1);
+                
                 let intfNum = -1;
-                for (const conf of usbDevice.configurations) { for (const intf of conf.interfaces) { for (const alt of intf.alternates) { if (alt.interfaceClass === 255 && alt.interfaceSubclass === 66 && alt.interfaceProtocol === 1) { intfNum = intf.interfaceNumber; epIn = alt.endpoints.find(e => e.direction === 'in').endpointNumber; epOut = alt.endpoints.find(e => e.direction === 'out').endpointNumber; break; } } } }
+                for (const conf of usbDevice.configurations) { 
+                    for (const intf of conf.interfaces) { 
+                        for (const alt of intf.alternates) { 
+                            if (alt.interfaceClass === 255 && alt.interfaceSubclass === 66 && alt.interfaceProtocol === 1) { 
+                                intfNum = intf.interfaceNumber; 
+                                epIn = alt.endpoints.find(e => e.direction === 'in').endpointNumber; 
+                                epOut = alt.endpoints.find(e => e.direction === 'out').endpointNumber; 
+                                break; 
+                            } 
+                        } 
+                    } 
+                }
+                
+                // Tenta reivindicar a interface (onde a maioria dos erros de "ocupado" acontece)
                 await usbDevice.claimInterface(intfNum);
                 await sendPacket(0x4E584E43, 0x01000000, 4096, new TextEncoder().encode("host::DisparaAI\0"));
                 
@@ -720,16 +777,36 @@
                         isAdbReady = true; adbReaderLoop(); 
                     } else if (resp2 && resp2.cmd === 0x48545541) { 
                         await sendPacket(0x48545541, 3, 0, await getAdbPublicKeyPayload(keyPair)); 
-                        showToast("Autorize a conexão na tela do seu celular e clique em Iniciar novamente.", "warning");
-                        usbDevice = null; return;
+                        showToast("ATENÇÃO: Olhe a tela do celular, marque 'Sempre permitir' e clique em Iniciar aqui novamente.", "warning");
+                        usbDevice = null; 
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                        return;
                     } 
                 }
                 
                 if (isAdbReady) {
-                    atualizarEstadoUSBUI(true); showToast("Conectado com sucesso!", "success");
+                    atualizarEstadoUSBUI(true); 
+                    showToast("Conectado com sucesso!", "success");
+                } else {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
                 }
             } catch (e) { 
-                showToast("Verifique se o USB está conectado no seu celular, lembrando que tem que ter ativado a depuração.", "error"); 
+                console.error("Erro detalhado USB:", e);
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                
+                // Tratamento de erros específicos para guiar o usuário
+                if (e.name === 'NotFoundError') {
+                    showToast("Operação cancelada. Você não selecionou o celular.", "warning");
+                } else if (e.message && e.message.toLowerCase().includes('claim')) {
+                    showToast("PORTA OCUPADA! Feche outros programas (scrcpy, Android Studio) e desconecte/reconecte o cabo.", "error");
+                } else if (e.message && e.message.toLowerCase().includes('access denied')) {
+                    showToast("ACESSO NEGADO. O Windows ou o driver do celular está bloqueando a porta.", "error");
+                } else {
+                    showToast("Erro: " + e.message, "error"); 
+                }
             }
         }
     </script>
