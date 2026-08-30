@@ -288,7 +288,7 @@
             function addMsgVariant(value = '') {
                 const div = document.createElement('div');
                 div.className = 'msg-variant';
-                div.innerHTML = `<textarea class="dr-msg-input" placeholder="Digite sua mensagem aqui... Use :re: para puxar o NOME.">${value}</textarea><button class="btn-remove-msg"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>`;
+                div.innerHTML = '<textarea class="dr-msg-input" placeholder="Digite sua mensagem aqui... Use :re: para puxar o NOME.">' + value + '</textarea><button class="btn-remove-msg"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>';
                 bindRemoveMsg(div.querySelector('.btn-remove-msg'));
                 msgList.appendChild(div);
             }
@@ -364,16 +364,22 @@
             async function typeLikeHuman(targetElement, text, mode) {
                 if (!targetElement) return;
                 targetElement.focus();
+                
+                // Força o clique biomecânico para ativar o cursor real do WhatsApp (Trava Biológica)
+                targetElement.dispatchEvent(new MouseEvent('mousedown', {bubbles:true}));
+                targetElement.dispatchEvent(new MouseEvent('mouseup', {bubbles:true}));
+                targetElement.dispatchEvent(new MouseEvent('click', {bubbles:true}));
+
                 try { document.execCommand('selectAll', false, null); document.execCommand('delete', false, null); } catch (e) { targetElement.textContent = ''; }
                 await wait(300);
 
                 const cnf = DELAY_CONFIG[mode];
-                const chars = Array.from(text.replace(/\r\n/g, '\n').replace(/\r/g, '\n'));
+                const chars = Array.from(text.replace(/\\r\\n/g, '\\n').replace(/\\r/g, '\\n'));
                 
                 for (const char of chars) {
                     if (!app.active) break;
-                    if (char === '\n') {
-                        const dt = new DataTransfer(); dt.setData('text/plain', '\n');
+                    if (char === '\\n') {
+                        const dt = new DataTransfer(); dt.setData('text/plain', '\\n');
                         const pasteEvt = new ClipboardEvent('paste', { bubbles: true });
                         Object.defineProperty(pasteEvt, 'clipboardData', { value: dt });
                         targetElement.dispatchEvent(pasteEvt);
@@ -382,7 +388,7 @@
                         document.execCommand('insertText', false, char);
                     }
                     targetElement.dispatchEvent(new Event('input', { bubbles: true }));
-                    if (char !== '\n') await randomWait(cnf.type_min, cnf.type_max);
+                    if (char !== '\\n') await randomWait(cnf.type_min, cnf.type_max);
                     if (mode !== 'turbo' && Math.random() < 0.03) await randomWait(cnf.type_max * 2, cnf.type_max * 4);
                 }
                 
@@ -401,27 +407,45 @@
                 await wait(1000);
             }
 
-            // SELETORES RESILIENTES ATUALIZADOS
-            function findSearchInput() { return document.querySelector('div[contenteditable="true"][data-tab="3"]') || document.querySelector('div[title*="pesquisa" i]') || document.querySelector('#side div[contenteditable="true"]'); }
+            // SELETORES RESILIENTES BLINDADOS
             function findChatInput() { return document.querySelector('footer div[contenteditable="true"]') || document.querySelector('div[contenteditable="true"][data-tab="10"]') || document.querySelector('#main footer div[contenteditable="true"]'); }
-            function findSendButton() { return document.querySelector('span[data-icon="send"]') || document.querySelector('button[aria-label="Enviar"]') || document.querySelector('button[aria-label="Send"]') || document.querySelector('[data-testid="send"]'); }
+            
+            function findSendButton() { 
+                // Se estiver dentro da janela de mídia, força pegar o botão da mídia
+                let modal = document.querySelector('div[role="dialog"]') || document.querySelector('div[data-testid="drawer-left"]') || document.querySelector('div[data-testid="media-preview"]');
+                if (modal) {
+                    let btn = modal.querySelector('span[data-icon="send"]') || modal.querySelector('button[aria-label="Enviar"]') || modal.querySelector('[data-testid="send"]');
+                    if (btn) return btn;
+                }
+                // Botão de envio padrão do chat
+                return document.querySelector('span[data-icon="send"]') || document.querySelector('button[aria-label="Enviar"]') || document.querySelector('button[aria-label="Send"]') || document.querySelector('[data-testid="send"]'); 
+            }
             
             function isMediaPreviewOpen() {
-                return !!document.querySelector('div[role="dialog"]') || !!document.querySelector('div[data-testid="drawer-left"]') || !!document.querySelector('div[data-testid="media-preview"]');
+                return !!document.querySelector('div[role="dialog"]') || !!document.querySelector('div[data-testid="drawer-left"]') || !!document.querySelector('div[data-testid="media-preview"]') || !!document.querySelector('[class*="media-preview"]');
             }
 
-            // CAÇADOR DE LEGENDAS BLINDADO E UNIVERSAL
+            // CAÇADOR DE LEGENDAS MODO DEUS (Para vídeos e fotos)
             function findCaptionField() {
-                let el = document.querySelector('div[aria-placeholder*="legenda" i], div[aria-placeholder*="caption" i], div[aria-label*="legenda" i], div[aria-label*="caption" i]');
+                let el = document.querySelector('div[aria-placeholder*="legenda" i]') || 
+                         document.querySelector('div[aria-placeholder*="caption" i]') || 
+                         document.querySelector('div[aria-label*="legenda" i]') || 
+                         document.querySelector('div[aria-label*="caption" i]');
                 if (el) return el;
                 
-                let modals = document.querySelectorAll('div[role="dialog"], div[data-testid="drawer-left"], div[data-testid="media-preview"]');
+                let modals = document.querySelectorAll('div[role="dialog"], div[data-testid="drawer-left"], div[data-testid="media-preview"], [class*="media-preview"]');
                 for (let modal of modals) {
                     let editables = modal.querySelectorAll('div[contenteditable="true"]');
                     for (let editable of editables) {
                         if (editable.offsetWidth > 0 && editable.offsetHeight > 0) return editable;
                     }
                 }
+                
+                let active = document.activeElement;
+                if (active && active.getAttribute('contenteditable') === 'true' && !active.closest('#main footer')) {
+                    return active;
+                }
+                
                 return null;
             }
 
@@ -439,7 +463,7 @@
                 try {
                     writeLog("Contatando: " + next.phone);
                     
-                    // SPA: Navegação por clique fantasma para evitar refresh
+                    // SPA: Navegação por clique fantasma para evitar refresh e perda de estado
                     let a = document.getElementById('wa-magic-link');
                     if(!a) { a = document.createElement('a'); a.id = 'wa-magic-link'; document.body.appendChild(a); }
                     a.href = "https://web.whatsapp.com/send?phone=55" + next.phone;
@@ -447,7 +471,7 @@
                     
                     await wait(getDelay('search_wait') + 1500);
 
-                    // Verifica número inválido
+                    // Verifica número inválido bloqueado pelo WA
                     let errorModal = document.querySelector('[data-animate-modal-popup="true"]');
                     if(errorModal && errorModal.innerText.toLowerCase().includes('inválid')) {
                         let okBtn = errorModal.querySelector('button');
@@ -461,7 +485,7 @@
                     const textareas = Array.from(shadow.querySelectorAll('.dr-msg-input')).map(t => t.value).filter(v => v.trim() !== '');
                     let msgFinal = textareas.length > 0 ? textareas[Math.floor(Math.random() * textareas.length)] : '';
                     
-                    // Regex ATUALIZADA para aceitar tanto :re: quanto :re
+                    // Variável Perfeita: aceita :re ou :re: e puxa o nome limpo do contato
                     msgFinal = msgFinal.replace(/:re:?/gi, next.name);
 
                     let captionPasted = false;
@@ -473,44 +497,70 @@
                             
                             await simulateMediaPaste(chatInput, file);
                             
-                            // Aguarda modal abrir
+                            // Aguarda modal de mídia abrir garantido
+                            let modalAberto = false;
                             for (let cycle = 0; cycle < 50; cycle++) {
                                 if (!app.active) break;
-                                if (isMediaPreviewOpen() || findCaptionField()) break;
+                                if (isMediaPreviewOpen() || findCaptionField()) {
+                                    modalAberto = true;
+                                    break;
+                                }
                                 await wait(200);
                             }
 
-                            // Só escreve legenda na última mídia
-                            if (isLast && msgFinal.trim().length > 0) {
-                                let caption = null;
-                                for(let c=0; c<15; c++){ 
-                                    caption = findCaptionField(); 
-                                    if(caption) break; 
-                                    await wait(300); 
-                                }
-                                if(caption) {
-                                    writeLog("Inserindo legenda da mídia...");
-                                    // Força foco clicando no campo antes de digitar
-                                    caption.click();
-                                    await wait(200);
-                                    await typeLikeHuman(caption, msgFinal, app.currentSpeedMode);
-                                    captionPasted = true;
-                                    await wait(500);
-                                }
-                            }
+                            if (modalAberto) {
+                                await wait(1500); // Tempo paciência para renderizar foto/vídeo na tela
 
-                            let sendBtn = findSendButton();
-                            if(sendBtn) sendBtn.click();
-                            else dispatchKey(document.activeElement, 'Enter');
-                            
-                            await wait(2000);
+                                // Só escreve legenda na última mídia do carrossel
+                                if (isLast && msgFinal.trim().length > 0) {
+                                    let caption = null;
+                                    for(let c=0; c<20; c++){ 
+                                        caption = findCaptionField(); 
+                                        if(caption && caption.offsetWidth > 0) break; 
+                                        await wait(300); 
+                                    }
+
+                                    if(caption) {
+                                        writeLog("Inserindo legenda...");
+                                        caption.focus();
+                                        caption.click(); // Trava o cursor na tela
+                                        await wait(500);
+
+                                        try {
+                                            await typeLikeHuman(caption, msgFinal, app.currentSpeedMode);
+                                        } catch (err) {
+                                            const dtText = new DataTransfer();
+                                            dtText.setData('text/plain', msgFinal);
+                                            const pasteText = new ClipboardEvent('paste', { bubbles: true, cancelable: true });
+                                            Object.defineProperty(pasteText, 'clipboardData', { value: dtText });
+                                            caption.dispatchEvent(pasteText);
+                                        }
+
+                                        captionPasted = true;
+                                        await wait(1000);
+                                    } else {
+                                        writeLog("Campo de legenda bloqueado (ex: PDF)", "warning");
+                                    }
+                                }
+
+                                let sendBtn = findSendButton();
+                                if(sendBtn) sendBtn.click();
+                                else dispatchKey(document.activeElement, 'Enter');
+                                
+                                // Espera o modal fechar para não atropelar a próxima mídia
+                                for (let cycle = 0; cycle < 50; cycle++) {
+                                    if (!isMediaPreviewOpen()) break;
+                                    await wait(200);
+                                }
+                                await wait(1500);
+                            }
                         }
                     }
 
-                    // FALLBACK BLINDADO: Se falhou a legenda (ex: PDF ou Vídeo bloqueado), atira a mensagem avulsa embaixo
+                    // FALLBACK: Se falhou a legenda porque era documento ou falhou (atira embaixo)
                     if (msgFinal.trim().length > 0 && !captionPasted) {
-                        writeLog("Injetando texto (Chat)...");
-                        await wait(1500); // Aguarda animações do WA
+                        writeLog("Injetando texto...");
+                        await wait(1500); 
                         let freshChatInput = findChatInput();
                         if (freshChatInput) {
                             freshChatInput.focus();
@@ -544,16 +594,16 @@
 
             shadow.getElementById('dr-save').onclick = () => {
                 const text = shadow.getElementById('dr-import').value;
-                app.contacts = text.split('\n').filter(l => l.trim()).map(line => {
-                    // REGRA DE SEPARAÇÃO CORRIGIDA (Quebra no Espaço sem bugar aspas)
-                    const parts = line.split(/\s+/);
+                app.contacts = text.split('\\n').filter(l => l.trim()).map(line => {
+                    // REGRA DE SEPARAÇÃO BLINDADA (Isola o nome perfeitamente)
+                    const parts = line.split(/[\\s\\t]+/);
                     let phone = ''; let nameParts = [];
                     parts.forEach(p => { 
-                        const cl = p.replace(/\D/g, ''); 
+                        const cl = p.replace(/\\D/g, ''); 
                         if(cl.length >= 10 && !phone) phone = cl; 
                         else nameParts.push(p); 
                     });
-                    return { phone, name: nameParts.join(' ') || 'Cliente', status: 'PENDENTE' };
+                    return { phone, name: nameParts.join(' ').trim() || 'Cliente', status: 'PENDENTE' };
                 }).filter(c => c.phone);
                 writeLog(app.contacts.length + " contatos carregados."); syncStats();
                 shadow.querySelector('[data-tab="disparo"]').click();
@@ -562,7 +612,15 @@
             shadow.getElementById('dr-img-input').onchange = (e) => {
                 app.selectedMedias = Array.from(e.target.files);
                 shadow.getElementById('file-name').innerText = app.selectedMedias.length > 0 ? app.selectedMedias.length + " arquivo(s)" : "Nenhum";
+                if(app.selectedMedias.length > 0) shadow.getElementById('btn-clear-img').style.display = 'inline';
             };
+            
+            shadow.getElementById('btn-clear-img').onclick = () => {
+                app.selectedMedias = [];
+                shadow.getElementById('dr-img-input').value = "";
+                shadow.getElementById('file-name').innerText = "Nenhum";
+                shadow.getElementById('btn-clear-img').style.display = 'none';
+            }
 
             shadow.getElementById('dr-start').onclick = () => {
                 if (app.contacts.length === 0) return alert("Adicione contatos na aba 'Lista'!");
@@ -580,6 +638,7 @@
                 app.contacts = []; app.selectedMedias = [];
                 shadow.getElementById('dr-import').value = ""; shadow.getElementById('dr-img-input').value = "";
                 shadow.getElementById('file-name').innerText = "Nenhum";
+                shadow.getElementById('btn-clear-img').style.display = 'none';
                 syncStats(); writeLog("Memória Limpa.");
             };
         };
