@@ -1,651 +1,1673 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instalador | DisparaAI Web Pro</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <title>Omni VD - Omnichannel Platform</title>
+    
+    <!-- Fontes e Ícones -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    
+    <!-- SheetJS para ler Excel (.xlsx) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <!-- Configuração do Tailwind (Paleta Omni VD) -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        omni: {
+                            base: '#0B1120',      // Fundo escuro profundo (Navy)
+                            panel: '#151E32',     // Cards e painéis
+                            border: '#23314B',    // Bordas sutis
+                            primary: '#38BDF8',   // Azul/Ciano claro
+                            purple: '#A855F7',    // Roxo (Logo)
+                            green: '#22C55E',     // Verde (Logo)
+                            orange: '#F97316',    // Laranja (Logo)
+                            red: '#EF4444',       // Alertas
+                            text: '#F1F5F9',      // Texto principal
+                            muted: '#94A3B8'      // Texto secundário
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
         body {
-            margin: 0; padding: 0; font-family: 'Inter', sans-serif;
-            background-color: #131314; color: #e3e3e3;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            min-height: 100vh; text-align: center;
+            background-color: #0B1120;
+            color: #F1F5F9;
+            overflow: hidden; /* Evita rolagem na página inteira, mantendo layout fixo tipo App */
         }
-        .container {
-            max-width: 600px; background: #1e1f20; padding: 40px;
-            border-radius: 24px; border: 1px solid #444746;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+
+        /* Efeito Glassmorphism Premium */
+        .glass {
+            background: rgba(21, 30, 50, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(35, 49, 75, 0.8);
         }
-        h1 { font-size: 32px; background: linear-gradient(90deg, #8ab4f8, #c58af9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; margin-top: 0; }
-        p { font-size: 16px; color: #c4c7c5; line-height: 1.6; margin-bottom: 30px; }
-        .step { background: #131314; border: 1px solid #444746; border-radius: 12px; padding: 20px; text-align: left; margin-bottom: 30px; }
-        .step span { display: inline-block; background: #8ab4f8; color: #131314; width: 24px; height: 24px; text-align: center; border-radius: 50%; font-weight: bold; line-height: 24px; margin-right: 10px; }
-        .bookmark-btn {
-            display: inline-block; background: #8ab4f8; color: #131314;
-            text-decoration: none; padding: 15px 40px; font-size: 18px;
-            font-weight: 800; border-radius: 99px; transition: all 0.2s;
-            cursor: grab; box-shadow: 0 4px 15px rgba(138, 180, 248, 0.3);
+
+        /* Scrollbars Customizadas (Dark Mode) */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        
+        .hide-scroll::-webkit-scrollbar { display: none; }
+
+        /* Scroll Horizontal do Kanban */
+        .kanban-board {
+            display: flex;
+            gap: 1.5rem;
+            overflow-x: auto;
+            overflow-y: hidden;
+            height: calc(100vh - 140px); /* Subtrai Header e Tabs */
+            padding-bottom: 1rem;
         }
-        .bookmark-btn:hover { background: #aecbfa; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(138, 180, 248, 0.4); }
+
+        .kanban-column {
+            min-width: 320px;
+            width: 320px;
+            display: flex;
+            flex-direction: column;
+            background: rgba(21, 30, 50, 0.4);
+            border-radius: 1rem;
+            border: 1px solid #23314B;
+        }
+
+        .kanban-cards {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        /* Badges de Nível */
+        .bg-cobre { background: #B87333; color: white; }
+        .bg-bronze { background: #CD7F32; color: white; }
+        .bg-prata { background: #C0C0C0; color: #1E293B; }
+        .bg-ouro { background: #FFD700; color: #1E293B; }
+        .bg-platina { background: #E5E4E2; color: #1E293B; }
+        .bg-rubi { background: #E0115F; color: white; }
+        .bg-esmeralda { background: #50C878; color: white; }
+        .bg-diamante { background: linear-gradient(135deg, #B9F2FF, #38BDF8); color: #1E293B; }
+        .bg-indefinido { background: #475569; color: white; }
+
+        /* Temperatura */
+        .t-quente { color: #EF4444; }
+        .t-morna { color: #F97316; }
+        .t-fria { color: #38BDF8; }
+
+        /* Animação do Logo */
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: conic-gradient(#22C55E 0deg 90deg, #F97316 90deg 180deg, #EF4444 180deg 270deg, #A855F7 270deg 360deg);
+            padding: 4px;
+            box-shadow: 0 0 15px rgba(34, 197, 94, 0.2);
+            transition: all 0.4s ease;
+        }
+        .logo-inner {
+            width: 100%;
+            height: 100%;
+            background: #0B1120;
+            border-radius: 50%;
+        }
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            opacity: 0;
+            max-width: 0;
+            overflow: hidden;
+            white-space: nowrap;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .logo-container:hover .logo-text, .logo-expanded .logo-text {
+            opacity: 1;
+            max-width: 200px;
+            margin-left: 0.5rem;
+        }
+        .logo-container:hover .logo-icon, .logo-expanded .logo-icon {
+            transform: rotate(90deg);
+        }
+
+        /* Utilitários ADB / Disparador */
+        .input-clean {
+            border: 1px solid #23314B;
+            transition: all 0.2s ease;
+        }
+        .input-clean:focus {
+            border-color: #38BDF8;
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+            outline: none;
+        }
+        .discador-timer-bar { transition: width 1s linear; }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h1>DisparaAI Web Pro</h1>
-        <p>Motor de injeção direta no DOM do WhatsApp Web. Versão aprimorada com suporte inteligente a mídias, vídeos, fotos e PDF.</p>
+<body class="flex flex-col h-screen">
 
-        <div class="step">
-            <div style="font-weight: 600; margin-bottom: 10px; color: #fff;"><span>1</span> Como instalar:</div>
-            <div style="font-size: 14px; color: #c4c7c5;">
-                Aperte <b>CTRL + SHIFT + B</b> para exibir sua barra de favoritos no Chrome. Depois, <b>CLIQUE E ARRASTE</b> o botão azul abaixo para dentro da sua barra de favoritos.
+    <!-- HEADER GLOBAL -->
+    <header class="glass h-16 flex-shrink-0 flex items-center justify-between px-6 z-50 shadow-md border-b border-omni-border">
+        <!-- Logo Interativa -->
+        <div class="logo-container" id="main-logo" onclick="this.classList.toggle('logo-expanded')">
+            <div class="logo-icon"><div class="logo-inner"></div></div>
+            <div class="logo-text">
+                <span class="text-white">omni</span> <span class="text-transparent bg-clip-text bg-gradient-to-r from-omni-purple via-omni-orange to-omni-green">VD</span>
             </div>
         </div>
 
-        <a id="btn-magico" class="bookmark-btn" href="#">⚡ DisparaAI Pro</a>
+        <!-- Barra de Pesquisa Global -->
+        <div class="flex-1 max-w-2xl mx-8 relative group">
+            <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-omni-muted group-focus-within:text-omni-primary transition-colors text-lg"></i>
+            <input type="text" id="global-search" oninput="App.filtrar()" placeholder="Buscar por Nome, Código, CPF, Telefone ou E-mail..." 
+                   class="w-full bg-omni-base border border-omni-border rounded-full py-3 pl-12 pr-12 text-sm text-white font-medium outline-none focus:border-omni-primary focus:ring-1 focus:ring-omni-primary transition-all placeholder:text-omni-muted shadow-inner">
+            <!-- Botão de Limpar -->
+            <button id="btn-clear-search" onclick="App.limparBusca()" class="absolute right-4 top-1/2 -translate-y-1/2 text-omni-muted hover:text-white transition-colors hidden h-8 w-8 flex items-center justify-center rounded-full hover:bg-omni-border">
+                <i class="fa-solid fa-circle-xmark text-lg"></i>
+            </button>
+        </div>
 
-        <div class="step" style="margin-top: 30px; margin-bottom: 0;">
-            <div style="font-weight: 600; margin-bottom: 10px; color: #fff;"><span>2</span> Como usar:</div>
-            <div style="font-size: 14px; color: #c4c7c5;">
-                Abra o site <b>web.whatsapp.com</b> e espere carregar. Clique no botão "⚡ DisparaAI Pro" que você salvou nos favoritos. O painel abrirá instantaneamente sem recarregar a página.
+        <!-- Controles Direita (Incluindo ADB Connect unificado) -->
+        <div class="flex items-center gap-4">
+            <!-- Central de Notificações -->
+            <button class="relative p-2 text-omni-muted hover:text-white transition-colors" title="Lembretes e Follow-ups" onclick="App.mudarAbaPorId('tab-retornos')">
+                <i class="fa-solid fa-bell text-xl"></i>
+                <span id="badge-notificacoes" class="absolute top-1 right-1 w-4 h-4 bg-omni-red rounded-full text-[9px] font-bold flex items-center justify-center border-2 border-omni-panel hidden">0</span>
+            </button>
+            
+            <div class="h-6 w-px bg-omni-border mx-1"></div>
+            
+            <!-- Toggle Base Ativa / Bloqueadas -->
+            <div class="bg-omni-base p-1 rounded-lg flex items-center border border-omni-border">
+                <button id="btn-base-ativa" onclick="App.setModoBloqueadas(false)" class="px-4 py-1.5 rounded-md bg-omni-primary text-omni-base text-xs font-bold transition-all shadow-sm">Ativas</button>
+                <button id="btn-base-bloqueadas" onclick="App.setModoBloqueadas(true)" class="px-4 py-1.5 rounded-md text-omni-muted hover:text-white text-xs font-bold transition-all">Bloqueadas</button>
+            </div>
+
+            <div class="h-6 w-px bg-omni-border mx-1"></div>
+
+            <!-- Botão Conectar ADB Unificado -->
+            <div class="flex items-center gap-2">
+                <div id="usb-status" class="hidden items-center gap-2 px-3 py-1.5 rounded-lg bg-omni-green/10 border border-omni-green/30 text-omni-green transition-all">
+                    <div class="w-2 h-2 rounded-full bg-omni-green animate-pulse shadow-[0_0_8px_#22C55E]"></div>
+                    <span class="text-[10px] font-bold uppercase tracking-wider">Conectado</span>
+                </div>
+                <button id="btn-conectar" onclick="conectarUSB()" class="bg-omni-primary hover:bg-white text-omni-base px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 shadow-[0_0_15px_rgba(56,189,248,0.3)]">
+                    <i class="fa-brands fa-usb text-sm"></i> Conectar Cabo
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- NAVEGAÇÃO DAS ABAS -->
+    <nav class="bg-omni-base border-b border-omni-border flex-shrink-0 px-6 flex gap-2">
+        <button class="tab-btn px-4 py-3 text-sm font-semibold border-b-2 border-omni-primary text-omni-primary transition-colors flex items-center gap-2" data-target="tab-funil" onclick="App.mudarAba(this)">
+            <i class="fa-solid fa-filter"></i> Funil (CRM)
+        </button>
+        <button class="tab-btn px-4 py-3 text-sm font-semibold border-b-2 border-transparent text-omni-muted hover:text-white transition-colors flex items-center gap-2" data-target="tab-wa-chat" onclick="App.mudarAba(this)">
+            <i class="fa-brands fa-whatsapp"></i> WhatsApp
+        </button>
+        <button class="tab-btn px-4 py-3 text-sm font-semibold border-b-2 border-transparent text-omni-muted hover:text-white transition-colors flex items-center gap-2" data-target="tab-wa-disp" onclick="App.mudarAba(this)">
+            <i class="fa-solid fa-paper-plane"></i> WA Disparador
+        </button>
+        <button class="tab-btn px-4 py-3 text-sm font-semibold border-b-2 border-transparent text-omni-muted hover:text-white transition-colors flex items-center gap-2" data-target="tab-discador" onclick="App.mudarAba(this)">
+            <i class="fa-solid fa-headset"></i> Discador
+        </button>
+        <button class="tab-btn px-4 py-3 text-sm font-semibold border-b-2 border-transparent text-omni-muted hover:text-white transition-colors flex items-center gap-2" data-target="tab-retornos" onclick="App.mudarAba(this)">
+            <i class="fa-regular fa-calendar-check"></i> Retornos
+        </button>
+        <button class="tab-btn px-4 py-3 text-sm font-semibold border-b-2 border-transparent text-omni-muted hover:text-white transition-colors flex items-center gap-2" data-target="tab-dados" onclick="App.mudarAba(this)">
+            <i class="fa-solid fa-database"></i> Dados
+        </button>
+    </nav>
+
+    <!-- ÁREA PRINCIPAL DAS ABAS -->
+    <main class="flex-1 relative overflow-hidden bg-omni-base min-h-0">
+        
+        <!-- ABA 1: FUNIL (CRM) -->
+        <section id="tab-funil" class="tab-content absolute inset-0 p-6 flex flex-col hidden">
+            <div class="kanban-board" id="kanban-container">
+                <!-- Colunas injetadas via JS -->
+            </div>
+        </section>
+
+        <!-- ABA 2: WHATSAPP (1 a 1 Oficial Nativamente Embutido) -->
+        <section id="tab-wa-chat" class="tab-content absolute inset-0 flex flex-col p-0 hidden">
+            <div class="bg-omni-panel h-14 border-b border-omni-border flex justify-between items-center px-6 shadow-sm z-20">
+                <span class="text-white text-sm font-bold flex items-center gap-2"><i class="fa-brands fa-whatsapp text-omni-green text-xl"></i> WhatsApp Web Native</span>
+                <a href="https://web.whatsapp.com/" target="_blank" class="text-xs bg-omni-primary/10 border border-omni-primary/30 text-omni-primary font-bold px-4 py-2 rounded-lg hover:bg-omni-primary hover:text-omni-base transition shadow-sm flex items-center gap-2">
+                    <i class="fa-solid fa-up-right-from-square"></i> Forçar Abertura
+                </a>
+            </div>
+            <div class="flex-1 relative w-full h-full bg-[#111B21] flex items-center justify-center overflow-hidden">
+                <div class="absolute z-0 flex flex-col items-center justify-center p-8 text-center max-w-lg">
+                    <i class="fa-brands fa-whatsapp text-6xl text-omni-border mb-4"></i>
+                    <h3 class="text-white font-bold text-lg mb-2">Conectando ao WhatsApp Web...</h3>
+                    <p class="text-omni-muted text-sm leading-relaxed">O navegador pode bloquear a exibição direta nesta tela por motivos de segurança da Meta (X-Frame-Options). Caso a tela fique em branco ou cinza, clique no botão "Forçar Abertura" acima.</p>
+                </div>
+                <iframe src="https://web.whatsapp.com/" class="absolute inset-0 w-full h-full z-10 border-0 bg-transparent" allow="camera; microphone; display-capture; autoplay; clipboard-read; clipboard-write"></iframe>
+            </div>
+        </section>
+
+        <!-- ABA 3: WHATSAPP DISPARADOR (Massa via ADB Integrado) -->
+        <section id="tab-wa-disp" class="tab-content absolute inset-0 p-6 overflow-y-auto hide-scroll hidden">
+            <div class="max-w-[1600px] mx-auto grid grid-cols-1 xl:grid-cols-12 gap-6 h-full pb-20">
+                <div class="xl:col-span-5 flex flex-col gap-6">
+                    <!-- Importação WA -->
+                    <div class="bg-omni-panel border border-omni-border rounded-xl p-5 shadow-md">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-white font-bold text-xs uppercase tracking-widest flex items-center gap-2">
+                                <i class="fa-solid fa-database text-omni-primary"></i> Base de Fila WA
+                            </h2>
+                            <button onclick="limparBaseAdb()" class="text-[10px] text-omni-red hover:text-red-400 font-bold px-2 py-1 rounded hover:bg-omni-red/10 transition-colors uppercase">
+                                <i class="fa-solid fa-trash-can mr-1"></i> Limpar Fila
+                            </button>
+                        </div>
+                        <p class="text-[10px] text-omni-muted mb-3 font-medium">Cole números misturados com nomes. A IA extrai automaticamente.</p>
+                        <textarea id="paste-area-adb" rows="3" class="w-full bg-omni-base input-clean rounded-lg p-3 text-xs text-white placeholder-omni-muted/50 resize-none outline-none focus:border-omni-primary transition-all shadow-inner" placeholder="Ex: Maria 41 99999-8888"></textarea>
+                        <button onclick="processarEntradasAdb()" class="w-full mt-3 bg-omni-base border border-omni-border hover:bg-omni-primary/10 hover:border-omni-primary/50 text-white py-2.5 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all">
+                            <i class="fa-solid fa-filter text-omni-primary"></i> Analisar e Injetar na Fila
+                        </button>
+                    </div>
+
+                    <!-- Mensagens (Spintax) -->
+                    <div class="bg-omni-panel border border-omni-border rounded-xl p-5 shadow-md flex-1 flex flex-col">
+                        <div class="flex justify-between items-center mb-3">
+                            <h2 class="text-white font-bold text-xs uppercase tracking-widest flex items-center gap-2">
+                                <i class="fa-solid fa-message text-omni-primary"></i> Variações de Texto
+                            </h2>
+                        </div>
+                        <div class="bg-omni-primary/5 border border-omni-primary/20 p-2.5 rounded-lg mb-3">
+                            <p class="text-[10px] text-omni-primary leading-relaxed font-medium">
+                                <b>Macros:</b> Use <code class="bg-omni-base px-1 py-0.5 rounded text-white font-bold border border-omni-border">:re:</code> para inserir o Nome. <br>
+                                Gire palavras usando <code class="bg-omni-base px-1 py-0.5 rounded text-white font-bold border border-omni-border">{Oi|Olá}</code>.
+                            </p>
+                        </div>
+                        <div id="variacoes-container" class="flex flex-col gap-3 mb-3 flex-1 overflow-y-auto max-h-[180px] hide-scroll pr-1"></div>
+                        <div class="flex gap-2 mt-auto pt-2 border-t border-omni-border/50">
+                            <button onclick="addVariacaoAdb()" class="flex-1 bg-omni-base hover:bg-omni-border border border-omni-border text-white py-2 rounded-lg text-[10px] font-bold transition-colors uppercase">
+                                <i class="fa-solid fa-plus text-omni-green mr-1"></i> Adicionar Variável
+                            </button>
+                            <button onclick="testarMacroAdb()" class="bg-omni-base hover:bg-omni-border border border-omni-border text-white px-4 py-2 rounded-lg transition-colors" title="Testar Visualização">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Configurações WA -->
+                    <div class="bg-omni-panel border border-omni-border rounded-xl p-4 shadow-md">
+                        <h2 class="text-white font-bold text-xs uppercase tracking-widest flex items-center gap-2 mb-3">
+                            <i class="fa-solid fa-sliders text-omni-primary"></i> Configuração WA
+                        </h2>
+                        <div class="grid grid-cols-2 gap-3 mb-3">
+                            <div>
+                                <label class="block text-[9px] font-bold text-omni-muted uppercase tracking-wider mb-1">App Alvo</label>
+                                <select id="cfg-app" onchange="salvarConfiguracoesAdb()" class="w-full bg-omni-base border border-omni-border text-white text-[11px] rounded p-2 outline-none focus:border-omni-primary">
+                                    <option value="com.whatsapp.w4b">WA Business</option>
+                                    <option value="com.whatsapp">WA Normal</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[9px] font-bold text-omni-muted uppercase tracking-wider mb-1">Método de Clique</label>
+                                <select id="cfg-click" onchange="toggleCoordenadas(); salvarConfiguracoesAdb();" class="w-full bg-omni-base border border-omni-border text-white text-[11px] rounded p-2 outline-none focus:border-omni-primary">
+                                    <option value="auto">Botão Enter (Auto)</option>
+                                    <option value="manual">Tap (Coordenadas)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="painel-coord" class="hidden bg-omni-base p-3 rounded-lg border border-omni-border mb-3">
+                            <label class="block text-[9px] font-bold text-omni-muted uppercase tracking-wider mb-2 flex items-center gap-1"><i class="fa-solid fa-crosshairs text-omni-red"></i> Eixo X e Y do Botão Enviar</label>
+                            <div class="flex gap-2">
+                                <input type="number" id="cfg-tap-x" onchange="salvarConfiguracoesAdb()" value="950" placeholder="Eixo X" class="w-full bg-omni-panel border border-omni-border rounded px-2 py-1.5 text-xs text-white text-center">
+                                <input type="number" id="cfg-tap-y" onchange="salvarConfiguracoesAdb()" value="1350" placeholder="Eixo Y" class="w-full bg-omni-panel border border-omni-border rounded px-2 py-1.5 text-xs text-white text-center">
+                                <button onclick="testarToqueAdb()" class="bg-omni-primary text-omni-base hover:bg-white px-3 rounded text-sm"><i class="fa-solid fa-bullseye"></i></button>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="bg-omni-base p-2 rounded-lg border border-omni-border text-center">
+                                <label class="block text-[9px] font-bold text-omni-muted uppercase tracking-wider mb-1">Pausa Mínima</label>
+                                <div class="flex items-center justify-center gap-1">
+                                    <input type="number" id="cfg-delay-min" onchange="atualizarMetricasAdb(); salvarConfiguracoesAdb();" value="8" class="w-10 bg-transparent text-sm text-white font-bold text-center outline-none">
+                                    <span class="text-[10px] text-omni-muted font-bold">s</span>
+                                </div>
+                            </div>
+                            <div class="bg-omni-base p-2 rounded-lg border border-omni-border text-center">
+                                <label class="block text-[9px] font-bold text-omni-muted uppercase tracking-wider mb-1">Pausa Máxima</label>
+                                <div class="flex items-center justify-center gap-1">
+                                    <input type="number" id="cfg-delay-max" onchange="atualizarMetricasAdb(); salvarConfiguracoesAdb();" value="21" class="w-10 bg-transparent text-sm text-white font-bold text-center outline-none">
+                                    <span class="text-[10px] text-omni-muted font-bold">s</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="xl:col-span-7 flex flex-col gap-6">
+                    <div class="bg-omni-panel border border-omni-border rounded-xl flex-1 flex flex-col items-center justify-center relative min-h-[400px] overflow-hidden p-8 shadow-md">
+                        <div class="absolute inset-0 bg-gradient-to-b from-transparent to-omni-base/50 pointer-events-none"></div>
+                        <div class="text-center relative z-10 w-full max-w-md flex flex-col items-center">
+                            <div class="flex justify-center mb-5">
+                                <span id="stage-status-adb" class="px-3 py-1 rounded-full bg-omni-base text-omni-muted border border-omni-border text-[9px] font-bold tracking-widest uppercase shadow-inner">Sistema Ocioso</span>
+                            </div>
+                            <h2 id="stage-name-adb" class="text-3xl font-black text-white mb-2 tracking-tight truncate w-full">Aguardando Base</h2>
+                            <p id="stage-phone-adb" class="text-lg font-mono text-omni-muted mb-8">---</p>
+                            <div id="action-feedback" class="hidden flex-col items-center justify-center mb-8 h-24">
+                                <div id="action-icon-box" class="w-16 h-16 rounded-full bg-omni-base border border-omni-border flex items-center justify-center mb-3 transition-all">
+                                    <i id="action-icon" class="fa-solid fa-robot text-2xl text-omni-primary"></i>
+                                </div>
+                                <p id="action-text" class="text-[10px] font-bold text-omni-primary uppercase tracking-wider">Protocolo Pronto</p>
+                            </div>
+                            <div class="flex gap-3 w-full mt-auto">
+                                <button id="btn-start-adb" onclick="iniciarCampanhaAdb()" class="w-full bg-omni-primary hover:bg-white text-omni-base font-black text-sm py-4 rounded-xl flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(56,189,248,0.2)] transition-all disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider">
+                                    <i class="fa-solid fa-paper-plane text-lg"></i> Iniciar Motor ADB
+                                </button>
+                                <button id="btn-stop-adb" onclick="pararCampanhaAdb()" class="hidden w-full bg-omni-red hover:bg-red-500 text-white font-black text-sm py-4 rounded-xl flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(239,68,68,0.3)] transition-all uppercase tracking-wider">
+                                    <i class="fa-solid fa-stop text-lg"></i> Interromper
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Mini Dash WA -->
+                    <div class="grid grid-cols-4 gap-4">
+                        <div class="bg-omni-panel border border-omni-border p-4 rounded-xl flex flex-col justify-center items-start shadow-sm">
+                            <p class="text-[9px] text-omni-muted uppercase font-bold tracking-widest mb-1 flex items-center gap-1.5"><i class="fa-solid fa-list-ul"></i> Pendentes</p>
+                            <p id="stat-pendentes-adb" class="text-xl font-black text-white mt-1">0</p>
+                        </div>
+                        <div class="bg-omni-panel border border-omni-border border-l-4 border-l-omni-green p-4 rounded-xl flex flex-col justify-center items-start shadow-sm">
+                            <p class="text-[9px] text-omni-muted uppercase font-bold tracking-widest mb-1 flex items-center gap-1.5"><i class="fa-solid fa-check-double text-omni-green"></i> Enviados</p>
+                            <p id="stat-feitos-adb" class="text-xl font-black text-white mt-1">0</p>
+                        </div>
+                        <div class="bg-omni-panel border border-omni-border p-4 rounded-xl flex flex-col justify-center items-start shadow-sm">
+                            <p class="text-[9px] text-omni-muted uppercase font-bold tracking-widest mb-1 flex items-center gap-1.5"><i class="fa-regular fa-clock"></i> ETA</p>
+                            <p id="stat-eta-adb" class="text-xl font-black text-white mt-1 tracking-tight">00h 00m</p>
+                        </div>
+                        <div class="bg-omni-panel border border-omni-border p-4 rounded-xl flex flex-col justify-center items-center shadow-sm cursor-pointer hover:bg-omni-border transition-colors group" onclick="exportarRelatorioAdb()">
+                            <div class="w-8 h-8 rounded-full bg-omni-base border border-omni-border text-omni-primary flex items-center justify-center mb-1 group-hover:-translate-y-1 transition-transform">
+                                <i class="fa-solid fa-download text-sm"></i>
+                            </div>
+                            <p class="text-[9px] font-bold text-white uppercase tracking-wider">Baixar CSV</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ABA 4: DISCADOR NATIVO -->
+        <section id="tab-discador" class="tab-content absolute inset-0 p-6 overflow-y-auto hidden">
+            <div class="max-w-7xl mx-auto h-full flex flex-col gap-6">
+                
+                <!-- Navegação Interna Discador -->
+                <div class="flex items-center gap-3 border-b border-omni-border pb-4">
+                    <button onclick="App.discador.switchTab('dashboard')" id="dTabBtn-dashboard" class="d-tab-btn bg-omni-primary text-omni-base border border-omni-primary px-5 py-2.5 rounded-lg text-sm font-semibold flex items-center gap-2 transition-colors shadow-sm">
+                        <i class="fa-solid fa-desktop"></i> Mesa de Operação
+                    </button>
+                    <button onclick="App.discador.switchTab('contacts')" id="dTabBtn-contacts" class="d-tab-btn bg-omni-base text-omni-text hover:bg-omni-border border border-omni-border px-5 py-2.5 rounded-lg text-sm font-semibold flex items-center gap-2 transition-colors">
+                        <i class="fa-solid fa-file-import"></i> Colar Dados <span id="badgeContacts-disc" class="bg-omni-panel text-omni-muted border border-omni-border text-[10px] px-2 py-0.5 rounded-full font-bold ml-1">0</span>
+                    </button>
+                    <button onclick="App.discador.switchTab('history')" id="dTabBtn-history" class="d-tab-btn bg-omni-base text-omni-text hover:bg-omni-border border border-omni-border px-5 py-2.5 rounded-lg text-sm font-semibold flex items-center gap-2 transition-colors">
+                        <i class="fa-solid fa-chart-pie"></i> Relatórios
+                    </button>
+                </div>
+
+                <!-- D-TAB: MESA DE OPERAÇÃO -->
+                <div id="d-tab-dashboard" class="d-tab-content flex flex-col gap-6">
+                    <!-- Indicadores -->
+                    <div class="grid grid-cols-5 gap-4">
+                        <div class="col-span-1 bg-omni-panel border border-omni-primary/30 p-4 rounded-xl flex flex-col justify-center">
+                            <span class="text-[10px] font-bold text-omni-muted uppercase tracking-wider mb-1">Pular se não atender em:</span>
+                            <div class="flex items-center gap-2">
+                                <input type="number" id="d-cfg-time" value="25" class="bg-omni-base border border-omni-border rounded-md w-16 px-2 py-1 text-center font-bold text-white outline-none focus:border-omni-primary">
+                                <span class="text-xs text-omni-muted font-medium">Segundos</span>
+                            </div>
+                        </div>
+                        <div class="bg-omni-panel border border-omni-border p-4 rounded-xl flex flex-col justify-between">
+                            <span class="text-[10px] font-bold text-omni-muted uppercase tracking-wider">Total na Fila</span>
+                            <div class="text-2xl font-black text-white mt-1" id="d-stat-total">0</div>
+                        </div>
+                        <div class="bg-omni-panel border border-omni-border p-4 rounded-xl flex flex-col justify-between">
+                            <span class="text-[10px] font-bold text-omni-orange uppercase tracking-wider">Aguardando</span>
+                            <div class="text-2xl font-black text-omni-orange mt-1" id="d-stat-pending">0</div>
+                        </div>
+                        <div class="bg-omni-panel border border-omni-border p-4 rounded-xl flex flex-col justify-between">
+                            <span class="text-[10px] font-bold text-omni-green uppercase tracking-wider">Vendas</span>
+                            <div class="text-2xl font-black text-omni-green mt-1" id="d-stat-sales">0</div>
+                        </div>
+                        <div class="bg-omni-panel border border-omni-border p-4 rounded-xl flex flex-col justify-between">
+                            <span class="text-[10px] font-bold text-omni-primary uppercase tracking-wider">Agendados</span>
+                            <div class="text-2xl font-black text-omni-primary mt-1" id="d-stat-returns">0</div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Mesa Central -->
+                        <div class="lg:col-span-2 bg-omni-panel border border-omni-border rounded-xl p-8 flex flex-col relative">
+                            <div class="flex-1 flex flex-col items-center justify-center text-center py-6 mb-4 bg-omni-base rounded-xl border border-omni-border relative">
+                                <span class="text-[11px] font-bold text-omni-muted uppercase tracking-widest block mb-2">Contato Atual</span>
+                                <h2 id="d-stage-name" class="text-3xl font-bold text-white mb-1">Aguardando...</h2>
+                                
+                                <div class="flex items-center justify-center gap-3 mt-2 mb-6">
+                                    <span id="d-stage-code" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-mono font-medium bg-omni-primary/10 text-omni-primary border border-omni-primary/20">CÓD: --</span>
+                                    <p id="d-stage-phone" class="text-2xl font-mono text-omni-muted tracking-wider">--</p>
+                                </div>
+
+                                <!-- Cronômetro -->
+                                <div id="d-timer-container" class="w-full max-w-sm mx-auto hidden flex-col items-center">
+                                    <p class="text-xs font-bold text-omni-muted mb-2 uppercase tracking-wide">Desligando e pulando em:</p>
+                                    <div class="text-5xl font-light text-white mb-3 tabular-nums" id="d-stage-timer">00</div>
+                                    <div class="w-full bg-omni-panel rounded-full h-1.5 overflow-hidden">
+                                        <div id="d-timer-bar" class="bg-omni-primary h-full w-full discador-timer-bar"></div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Botão Cliente Atendeu -->
+                                <button id="d-btn-atendeu" onclick="App.discador.marcarAtendido()" class="hidden mt-6 bg-omni-green hover:bg-green-500 text-white font-bold text-lg uppercase tracking-wide px-10 py-4 rounded-xl shadow-[0_0_15px_rgba(34,197,94,0.3)] transition-all flex items-center justify-center gap-3 w-full max-w-sm">
+                                    <i class="fa-solid fa-headset text-2xl"></i> Cliente Atendeu
+                                </button>
+                                
+                                <!-- Tabulação -->
+                                <div id="d-tela-tabulacao" class="hidden w-full max-w-lg mt-4 border-t border-omni-border pt-6">
+                                    <h3 class="text-xs font-bold text-omni-muted uppercase tracking-wider mb-4 flex items-center justify-center gap-2">
+                                        <span class="w-2 h-2 rounded-full bg-omni-green animate-pulse"></span> Em Atendimento: Registre o resultado
+                                    </h3>
+                                    
+                                    <div id="d-grid-tabulacao" class="grid grid-cols-2 gap-3">
+                                        <button onclick="App.discador.tabulaChamada('Venda Realizada')" class="bg-omni-green/10 hover:bg-omni-green/20 border border-omni-green/30 text-omni-green p-4 flex flex-col items-center gap-2 rounded-xl transition-colors">
+                                            <i class="fa-solid fa-bag-shopping text-xl"></i>
+                                            <span class="text-[11px] font-bold uppercase">Venda (+ Auto SMS)</span>
+                                        </button>
+                                        <button onclick="App.discador.abrirModalCalendario()" class="bg-omni-primary/10 hover:bg-omni-primary/20 border border-omni-primary/30 text-omni-primary p-4 flex flex-col items-center gap-2 rounded-xl transition-colors">
+                                            <i class="fa-solid fa-calendar-check text-xl"></i>
+                                            <span class="text-[11px] font-bold uppercase">Agendar (+ Auto SMS)</span>
+                                        </button>
+                                        <button onclick="App.discador.tabulaChamada('Desconhece Titular')" class="bg-omni-base hover:bg-omni-border border border-omni-border text-omni-text p-3 flex flex-col items-center gap-2 rounded-xl transition-colors">
+                                            <i class="fa-solid fa-user-slash text-omni-muted"></i>
+                                            <span class="text-[10px] font-bold uppercase">Desconhece Titular</span>
+                                        </button>
+                                        <button onclick="App.discador.tabulaChamada('Queda de Ligação')" class="bg-omni-red/10 hover:bg-omni-red/20 border border-omni-red/30 text-omni-red p-3 flex flex-col items-center gap-2 rounded-xl transition-colors">
+                                            <i class="fa-solid fa-phone-slash"></i>
+                                            <span class="text-[10px] font-bold uppercase text-center">Queda de Ligação<br>(Ligar Agora)</span>
+                                        </button>
+                                    </div>
+
+                                    <!-- Sucesso Pós Tabulação (Mantendo linha) -->
+                                    <div id="d-aguardo-desligamento" class="hidden flex-col items-center py-6 bg-omni-green/10 border border-omni-green/30 rounded-xl">
+                                        <i class="fa-solid fa-circle-check text-3xl text-omni-green mb-2"></i>
+                                        <p class="text-sm font-bold text-white mb-1">Registro Salvo! SMS despachado.</p>
+                                        <p class="text-xs text-omni-muted text-center mb-5 max-w-sm">Você ainda está na linha com o cliente. Fique à vontade para continuar a conversa.</p>
+                                        
+                                        <button onclick="App.discador.finalizarLigacaoPosTabulacao()" class="bg-omni-red hover:bg-red-500 text-white font-bold py-3 px-8 rounded-lg shadow-sm text-sm transition-colors">
+                                            <i class="fa-solid fa-phone-slash"></i> Encerrar Chamada e Avançar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Controles Mestres -->
+                            <div class="flex items-center gap-3 mt-4">
+                                <button id="d-btn-iniciar" onclick="App.discador.iniciarCampanha()" class="flex-1 bg-omni-primary hover:bg-white text-omni-base font-bold text-sm uppercase tracking-wider py-4 rounded-xl shadow-[0_0_15px_rgba(56,189,248,0.2)] transition-colors flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-play"></i> Iniciar Atendimento
+                                </button>
+                                <div id="d-active-controls" class="hidden flex-1 grid grid-cols-2 gap-3">
+                                    <button onclick="App.discador.desligarEPular()" class="bg-omni-base border border-omni-border text-white hover:bg-omni-border py-3 rounded-xl text-xs font-bold uppercase shadow-sm transition-colors">
+                                        <i class="fa-solid fa-forward-step"></i> Desligar/Pular
+                                    </button>
+                                    <button onclick="App.discador.refazerLigacao()" class="bg-omni-primary/10 border border-omni-primary/30 text-omni-primary hover:bg-omni-primary/20 py-3 rounded-xl text-xs font-bold uppercase shadow-sm transition-colors">
+                                        <i class="fa-solid fa-rotate-left"></i> Callback Agora
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Fila de Espera -->
+                        <div class="bg-omni-panel border border-omni-border rounded-xl p-6 flex flex-col h-[650px]">
+                            <h3 class="font-bold text-sm text-white border-b border-omni-border pb-4 mb-4 flex justify-between items-center">
+                                <span><i class="fa-solid fa-list-ol text-omni-muted mr-2"></i> Próximos na Fila</span>
+                            </h3>
+                            <div id="d-queue-list" class="flex-1 overflow-y-auto space-y-2 pr-2 hide-scroll">
+                                <div class="text-center text-omni-muted py-10 text-xs">Sua fila está vazia.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- D-TAB: COLAR DADOS -->
+                <div id="d-tab-contacts" class="d-tab-content hidden flex-col gap-6">
+                    <div class="bg-omni-panel border border-omni-border rounded-xl p-8">
+                        <h2 class="text-lg font-bold text-white mb-6 flex items-center gap-2"><i class="fa-solid fa-file-import text-omni-primary"></i> Colar Dados de Discagem</h2>
+                        <div class="relative mb-4">
+                            <textarea id="d-paste-area" rows="8" class="w-full bg-omni-base border border-omni-border rounded-lg p-4 text-sm text-white resize-none focus:border-omni-primary outline-none" placeholder="Copie o Código, o Nome e o Telefone e cole aqui dentro.&#10;A IA extrairá os telefones válidos para a fila de discagem."></textarea>
+                        </div>
+                        <div class="flex gap-3">
+                            <button onclick="App.discador.processarEntradas()" class="bg-omni-primary text-omni-base hover:bg-white py-3 px-8 rounded-lg font-bold text-sm shadow-sm transition-colors">Processar Base Colada</button>
+                            <button onclick="document.getElementById('d-fileInput').click()" class="bg-omni-base border border-omni-border text-white hover:bg-omni-border py-3 px-8 rounded-lg font-bold text-sm shadow-sm transition-colors">Importar Arquivo .xlsx</button>
+                            <input type="file" id="d-fileInput" accept=".xlsx, .xls, .csv" class="hidden" onchange="App.discador.handleFileImport(event)" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- D-TAB: RELATÓRIO -->
+                <div id="d-tab-history" class="d-tab-content hidden flex-col gap-6">
+                    <div class="bg-omni-panel border border-omni-border rounded-xl p-8 flex flex-col h-[700px]">
+                        <div class="flex justify-between items-center border-b border-omni-border pb-5 mb-5">
+                            <h3 class="text-lg font-bold text-white"><i class="fa-solid fa-chart-pie text-omni-primary mr-2"></i> Relatório de Ligações (Discador)</h3>
+                            <button onclick="App.discador.exportarRelatorioCSV()" class="bg-omni-base border border-omni-border text-white hover:bg-omni-border text-xs font-bold px-5 py-2.5 rounded-lg shadow-sm flex items-center gap-2 transition-colors">
+                                <i class="fa-solid fa-download"></i> Baixar CSV
+                            </button>
+                        </div>
+                        <div class="flex-1 overflow-y-auto border border-omni-border rounded-lg bg-omni-base hide-scroll">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-omni-panel text-[10px] uppercase text-omni-muted font-bold sticky top-0 border-b border-omni-border">
+                                    <tr>
+                                        <th class="py-3 px-4">Código</th>
+                                        <th class="py-3 px-4">Nome</th>
+                                        <th class="py-3 px-4">Telefone</th>
+                                        <th class="py-3 px-4">Ocorrido</th>
+                                        <th class="py-3 px-4">Data / Hora</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="d-history-list" class="divide-y divide-omni-border font-medium text-xs text-white">
+                                    <tr><td colspan="5" class="text-center py-8 text-omni-muted">Nenhum registro encontrado.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ABA 6: RETORNOS -->
+        <section id="tab-retornos" class="tab-content absolute inset-0 p-6 overflow-y-auto hidden">
+            <div class="max-w-5xl mx-auto flex flex-col gap-6">
+                <div class="glass p-6 rounded-2xl">
+                    <h2 class="text-xl font-bold text-white mb-4"><i class="fa-regular fa-calendar-check text-omni-primary mr-2"></i>Follow-ups Agendados</h2>
+                    <div id="lista-retornos" class="flex flex-col gap-3">
+                        <p class="text-omni-muted text-sm italic">Nenhum retorno agendado.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ABA 7: DADOS (Importação/Exportação) -->
+        <section id="tab-dados" class="tab-content absolute inset-0 p-6 overflow-y-auto hidden">
+            <div class="max-w-3xl mx-auto flex flex-col gap-6">
+                <div class="glass p-8 rounded-2xl flex flex-col gap-6">
+                    <h2 class="text-2xl font-bold text-white"><i class="fa-solid fa-database text-omni-primary mr-2"></i>Gerenciamento da Base do Funil</h2>
+                    <p class="text-sm text-omni-muted">O sistema utiliza um motor de inteligência que analisa a sua planilha extraída da empresa e cruza os dados com a base local. Nenhuma anotação é perdida.</p>
+                    
+                    <div class="bg-omni-base border-2 border-dashed border-omni-border rounded-xl p-8 text-center flex flex-col items-center justify-center">
+                        <i class="fa-solid fa-file-excel text-4xl text-omni-green mb-4"></i>
+                        <h3 class="text-white font-bold mb-2">Importar / Atualizar Base</h3>
+                        <p class="text-xs text-omni-muted mb-4 max-w-md">Selecione 1 ou múltiplos arquivos (.xlsx, .csv). O sistema irá unificar as estruturas automaticamente reconhecendo CódigoRevendedor, Ciclo, Nível, etc.</p>
+                        
+                        <input type="file" id="file-upload" accept=".xlsx, .xls, .csv" multiple class="hidden" onchange="App.processarArquivos(event)">
+                        
+                        <button onclick="document.getElementById('file-upload').click()" class="bg-omni-primary text-omni-base font-bold py-3 px-8 rounded-xl hover:bg-white transition shadow-lg">
+                            Procurar Arquivos
+                        </button>
+                    </div>
+
+                    <div class="border-t border-omni-border pt-6 mt-2 flex justify-between items-center">
+                        <p class="text-xs text-omni-muted">Aviso: A limpeza da base apaga permanentemente todo o histórico e anotações armazenadas no seu navegador.</p>
+                        <button onclick="App.limparBaseCompleta()" class="border border-omni-red text-omni-red hover:bg-omni-red hover:text-white font-bold py-2 px-6 rounded-lg transition flex items-center gap-2 text-sm">
+                            <i class="fa-solid fa-trash-can"></i> Limpar Base Toda
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ========================================== -->
+    <!-- MODAIS GLOBAIS (Z-INDEX ALTO)              -->
+    <!-- ========================================== -->
+
+    <!-- Modal 1: DOSSIÊ E HISTÓRICO (Timeline) -->
+    <div id="modal-dossie" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] hidden items-center justify-center p-4">
+        <div class="glass rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl border border-omni-border/50">
+            <div class="p-5 border-b border-omni-border bg-omni-base flex justify-between items-start">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-full bg-omni-panel border border-omni-border flex items-center justify-center text-xl font-bold text-omni-muted shadow-inner" id="md-avatar">M</div>
+                    <div>
+                        <!-- CLIQUE PARA COPIAR NOME -->
+                        <h2 class="text-xl font-bold text-white flex items-center gap-2 cursor-pointer hover:text-omni-primary transition-colors" id="md-nome" title="Copiar Nome" onclick="App.copiarTexto(this.innerText, event)">Nome da Pessoa</h2>
+                        <div class="flex items-center gap-3 text-sm mt-1">
+                            <!-- CLIQUE PARA COPIAR CÓDIGO (Remove a palavra "Cód: " antes de copiar) -->
+                            <span class="text-omni-muted font-mono cursor-pointer hover:text-omni-primary transition-colors inline-block" id="md-codigo" title="Copiar Código" onclick="App.copiarTexto(this.innerText.replace('Cód: ', ''), event)">Cód: 000</span>
+                            <!-- CLIQUE PARA COPIAR TELEFONE (Remove a palavra "Fone: " antes de copiar) -->
+                            <span class="text-omni-muted font-mono cursor-pointer hover:text-omni-primary transition-colors inline-block" id="md-telefone" title="Copiar Telefone" onclick="App.copiarTexto(this.innerText.replace('Fone: ', ''), event)">Fone: (00) 00000-0000</span>
+                            
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider" id="md-badge-nivel">Nível</span>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="App.fecharModal('modal-dossie')" class="text-omni-muted hover:text-white transition w-8 h-8 rounded-full bg-omni-panel flex items-center justify-center border border-omni-border"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="flex-1 flex overflow-hidden">
+                <!-- Esquerda: Timeline / Histórico -->
+                <div class="flex-1 flex flex-col border-r border-omni-border bg-[#0B1120]">
+                    <div class="p-3 bg-omni-panel border-b border-omni-border"><h3 class="text-xs font-bold text-omni-muted uppercase tracking-widest"><i class="fa-solid fa-clock-rotate-left mr-2"></i>Histórico de Interações</h3></div>
+                    <div class="flex-1 overflow-y-auto p-6 flex flex-col gap-6" id="md-timeline"></div>
+                </div>
+                
+                <!-- Direita: Ações Manuais e Info -->
+                <div class="w-80 bg-omni-base flex flex-col">
+                    <div class="p-4 border-b border-omni-border flex flex-col gap-2">
+                        <span class="text-xs font-bold text-omni-muted uppercase tracking-widest">Informações Pessoais</span>
+                        <!-- CLIQUE PARA COPIAR E-MAIL -->
+                        <p class="text-sm text-omni-text flex items-center gap-2"><i class="fa-solid fa-envelope w-4 text-omni-muted"></i> <span id="md-email" class="cursor-pointer hover:text-omni-primary transition-colors truncate" title="Copiar E-mail" onclick="App.copiarTexto(this.innerText, event)">email@exemplo.com</span></p>
+                        <p class="text-sm text-omni-text flex items-center gap-2"><i class="fa-solid fa-cake-candles w-4 text-omni-muted"></i> <span id="md-aniversario">--/--</span></p>
+                        <p class="text-sm text-omni-text flex items-center gap-2"><i class="fa-solid fa-location-dot w-4 text-omni-muted"></i> <span id="md-distancia">Indefinido</span></p>
+                    </div>
+                    <div class="p-4 flex-1 flex flex-col gap-3">
+                        <span class="text-xs font-bold text-omni-muted uppercase tracking-widest">Registro Rápido</span>
+                        <textarea id="md-nota-manual" class="w-full flex-1 bg-omni-panel border border-omni-border rounded-xl p-3 text-sm text-white resize-none outline-none focus:border-omni-primary" placeholder="Anote algo que ocorreu fora do sistema..."></textarea>
+                        <button onclick="App.salvarNotaManual()" class="w-full bg-omni-panel border border-omni-border hover:bg-omni-border text-white text-sm font-bold py-3 rounded-xl transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-pen-to-square"></i> Registrar
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- Modal 2: TABULAÇÃO DE LIGAÇÃO (CRM 1-A-1) -->
+    <div id="modal-ligacao" class="fixed inset-0 bg-black/90 backdrop-blur-md z-[110] hidden items-center justify-center p-4">
+        <div class="glass rounded-3xl w-full max-w-5xl h-[600px] flex overflow-hidden shadow-[0_0_50px_rgba(56,189,248,0.1)] border border-omni-primary/30">
+            <div class="w-1/2 bg-omni-base border-r border-omni-border flex flex-col items-center justify-center p-10 relative">
+                <button onclick="App.fecharModal('modal-ligacao')" class="absolute top-6 left-6 text-omni-muted hover:text-white"><i class="fa-solid fa-arrow-left text-xl"></i></button>
+                <div class="w-24 h-24 rounded-full bg-omni-panel border border-omni-primary/30 flex items-center justify-center mb-6 relative">
+                    <div class="absolute inset-0 rounded-full border-2 border-omni-primary border-dashed animate-[spin_4s_linear_infinite]"></div>
+                    <i class="fa-solid fa-phone-volume text-4xl text-omni-primary animate-pulse"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-white mb-2" id="call-nome">Nome da Pessoa</h2>
+                <p class="text-xl font-mono text-omni-muted mb-8" id="call-telefone">(00) 00000-0000</p>
+                <div class="text-6xl font-black tabular-nums tracking-tighter text-white mb-4" id="call-timer">00:00</div>
+                <p class="text-xs font-bold text-omni-primary uppercase tracking-widest animate-pulse">Ligação em Andamento via Android</p>
+            </div>
+            
+            <div class="w-1/2 bg-omni-panel p-8 flex flex-col">
+                <h3 class="text-sm font-bold text-omni-muted uppercase tracking-widest mb-6">Resultado do Atendimento</h3>
+                <div class="grid grid-cols-2 gap-3 mb-6">
+                    <!-- ADICIONADO SMS AUTO PARA VENDA AQUI TAMBÉM -->
+                    <button onclick="App.encerrarLigacao('Atendeu (Sucesso)')" class="bg-omni-base border border-omni-border hover:border-omni-green hover:bg-omni-green/10 text-white font-semibold py-3 px-4 rounded-xl text-sm transition text-left flex flex-col gap-1">
+                        <span class="text-omni-green"><i class="fa-solid fa-check-circle"></i> Atendeu / Venda</span><span class="text-[10px] text-omni-muted">Registra e envia SMS Auto</span>
+                    </button>
+                    <button onclick="App.encerrarLigacao('Caixa de Mensagem')" class="bg-omni-base border border-omni-border hover:border-omni-orange hover:bg-omni-orange/10 text-white font-semibold py-3 px-4 rounded-xl text-sm transition text-left flex flex-col gap-1">
+                        <span class="text-omni-orange"><i class="fa-solid fa-voicemail"></i> Caixa Postal</span><span class="text-[10px] text-omni-muted">Deixou Recado / Não Atendeu</span>
+                    </button>
+                    <button onclick="App.encerrarLigacao('Número Bloqueado')" class="bg-omni-base border border-omni-border hover:border-omni-red hover:bg-omni-red/10 text-white font-semibold py-3 px-4 rounded-xl text-sm transition text-left flex flex-col gap-1">
+                        <span class="text-omni-red"><i class="fa-solid fa-ban"></i> Bloqueado</span><span class="text-[10px] text-omni-muted">Não recebe chamadas</span>
+                    </button>
+                    <button onclick="App.encerrarLigacao('Desconhece Titular')" class="bg-omni-base border border-omni-border hover:border-omni-primary hover:bg-omni-primary/10 text-white font-semibold py-3 px-4 rounded-xl text-sm transition text-left flex flex-col gap-1">
+                        <span class="text-omni-primary"><i class="fa-solid fa-user-slash"></i> Desconhece</span><span class="text-[10px] text-omni-muted">Pessoa errada no número</span>
+                    </button>
+                </div>
+                <div class="flex-1 flex flex-col gap-2">
+                    <label class="text-xs font-bold text-omni-muted uppercase tracking-widest">Observações (Opcional)</label>
+                    <textarea id="call-nota" class="flex-1 bg-omni-base border border-omni-border rounded-xl p-4 text-sm text-white resize-none outline-none focus:border-omni-primary"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 3: AÇÃO WHATSAPP INDIVIDUAL -->
+    <div id="modal-wa-individual" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[110] hidden items-center justify-center p-4">
+        <div class="glass rounded-2xl w-full max-w-lg shadow-2xl border border-omni-green/30 overflow-hidden">
+            <div class="p-5 bg-[#0B141A] border-b border-omni-border flex justify-between items-center">
+                <h2 class="text-lg font-bold text-white flex items-center gap-2"><i class="fa-brands fa-whatsapp text-omni-green"></i> Envio Rápido WA</h2>
+                <button onclick="App.fecharModal('modal-wa-individual')" class="text-omni-muted hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="p-6 bg-omni-base flex flex-col gap-4">
+                <p class="text-xs text-omni-muted mb-2">A mensagem será enviada nativamente pelo celular conectado via ADB.</p>
+                <textarea id="wa-ind-texto" class="w-full h-32 bg-omni-panel border border-omni-border rounded-xl p-4 text-sm text-white resize-none outline-none focus:border-omni-green" placeholder="Escreva sua mensagem..."></textarea>
+                <button onclick="App.enviarWAIndividual()" class="w-full bg-omni-green hover:bg-green-500 text-white font-bold py-3 rounded-xl transition flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(34,197,94,0.3)]">
+                    <i class="fa-solid fa-paper-plane"></i> Enviar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 4: AÇÃO SMS INDIVIDUAL (1 a 1 CRM) -->
+    <div id="modal-sms-individual" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[110] hidden items-center justify-center p-4">
+        <div class="glass rounded-2xl w-full max-w-lg shadow-2xl border border-omni-orange/30 overflow-hidden">
+            <div class="p-5 bg-omni-base border-b border-omni-border flex justify-between items-center">
+                <h2 class="text-lg font-bold text-white flex items-center gap-2"><i class="fa-solid fa-comment-sms text-omni-orange"></i> SMS via Android</h2>
+                <button onclick="App.fecharModal('modal-sms-individual')" class="text-omni-muted hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="p-6 bg-omni-panel flex flex-col gap-4">
+                <p class="text-xs text-omni-muted mb-2">Digite o texto do SMS para ser despachado nativamente usando o chip do aparelho conectado.</p>
+                <textarea id="sms-ind-texto" class="w-full h-32 bg-omni-base border border-omni-border rounded-xl p-4 text-sm text-white resize-none outline-none focus:border-omni-orange" placeholder="Sua mensagem SMS curta aqui..."></textarea>
+                <button onclick="App.enviarSMSIndividual()" class="w-full bg-omni-orange hover:bg-orange-500 text-white font-bold py-3 rounded-xl transition flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(249,115,22,0.3)]">
+                    <i class="fa-solid fa-paper-plane"></i> Disparar SMS
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 5: CALENDÁRIO DISCADOR (Dark Mode) -->
+    <div id="modal-calendario" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[120] hidden items-center justify-center p-4">
+        <div class="bg-omni-base w-full max-w-sm flex flex-col rounded-xl shadow-2xl border border-omni-border">
+            <div class="p-4 border-b border-omni-border flex justify-between items-center bg-omni-panel rounded-t-xl">
+                <h3 class="font-bold text-white text-sm"><i class="fa-solid fa-calendar-day text-omni-primary mr-2"></i> Agendar Retorno</h3>
+                <button onclick="App.discador.fecharModalCalendario()" class="text-omni-muted hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="p-5 flex flex-col gap-5">
+                <div>
+                    <label class="block text-xs font-bold text-omni-muted uppercase tracking-wide mb-1.5">Data (Dia Útil)</label>
+                    <input type="date" id="cal-data" class="w-full bg-omni-panel border border-omni-border text-white rounded-md p-2 text-sm outline-none focus:border-omni-primary" onchange="App.discador.validarDataCalendario(this)">
+                    <p id="cal-erro" class="text-[10px] text-omni-red font-medium mt-1 hidden"></p>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-omni-muted uppercase tracking-wide mb-1.5">Horário Exato (09:00 às 18:00)</label>
+                    <input type="time" id="cal-hora" class="w-full bg-omni-panel border border-omni-border text-white rounded-md p-2 text-sm outline-none focus:border-omni-primary" value="09:00" required>
+                </div>
+            </div>
+            <div class="p-4 border-t border-omni-border bg-omni-panel rounded-b-xl flex gap-3">
+                <button onclick="App.discador.fecharModalCalendario()" class="flex-1 bg-omni-base border border-omni-border text-omni-muted hover:text-white py-2.5 rounded-lg text-xs font-bold transition-colors">Cancelar</button>
+                <button onclick="App.discador.confirmarAgendamento()" class="flex-1 bg-omni-primary text-omni-base hover:bg-white py-2.5 rounded-lg text-xs font-bold transition-colors">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modais ADB Antigos Ocultos Simplificados (Apenas para não quebrar compatibilidade do Disparador WA) -->
+    <div id="modal-preview-adb" class="fixed inset-0 bg-black/80 z-[120] hidden items-center justify-center p-4"></div>
+    <div id="modal-msg-adb" class="fixed inset-0 bg-black/80 z-[120] hidden items-center justify-center p-4"></div>
+
+    <div id="toast-container" class="fixed bottom-6 right-6 z-[200] flex flex-col gap-3 pointer-events-none"></div>
+
+    <!-- CORE JAVASCRIPT GLOBAL -->
     <script>
-        const codigoDoRobo = function() {
-            const PANEL_ID = 'sistema-disparai-pro'; 
-            if (document.getElementById(PANEL_ID)) document.getElementById(PANEL_ID).remove();
-            if (document.getElementById(PANEL_ID + '-fab')) document.getElementById(PANEL_ID + '-fab').remove();
+        // ==========================================
+        // ESTADO ADB GLOBAL UNIFICADO
+        // ==========================================
+        let usbDeviceAdb = null;
+        let epInAdb = null, epOutAdb = null;
+        let isAdbReadyAdb = false;
+        let localIdCounterAdb = 1;
 
-            const host = document.createElement('div');
-            host.id = PANEL_ID;
-            document.body.appendChild(host);
-            const shadow = host.attachShadow({mode: 'open'});
+        async function getAdbKeyPair() { return await crypto.subtle.generateKey({ name: "RSASSA-PKCS1-v1_5", modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" }, true, ["sign", "verify"]); }
+        async function signAdbToken(keyPair, token) { return new Uint8Array(await crypto.subtle.sign("RSASSA-PKCS1-v1_5", keyPair.privateKey, token)); }
+        async function getAdbPublicKeyPayload(keyPair) {
+            const exported = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
+            const binaryStr = atob(exported.n.replace(/-/g, '+').replace(/_/g, '/')), modBytes = new Uint8Array(binaryStr.length);
+            for (let i = 0; i < binaryStr.length; i++) modBytes[i] = binaryStr.charCodeAt(i);
+            let n = 0n; for (let i = 0; i < modBytes.length; i++) n = (n << 8n) | BigInt(modBytes[i]);
+            const r32 = 1n << 32n, n0 = n % r32; let inv = 1n; for (let i = 0; i < 32; i++) inv = (inv * (2n - n0 * inv)) % r32;
+            const buffer = new ArrayBuffer(524), view = new DataView(buffer), bytes = new Uint8Array(buffer);
+            view.setUint32(0, 64, true); view.setUint32(4, Number((r32 - inv) % r32), true);
+            let tempN = n; for (let i = 0; i < 256; i++) { bytes[8 + i] = Number(tempN & 0xffn); tempN >>= 8n; }
+            let tempRR = ((1n << 2048n) * (1n << 2048n)) % n; for (let i = 0; i < 256; i++) { bytes[264 + i] = Number(tempRR & 0xffn); tempRR >>= 8n; }
+            view.setUint32(520, 65537, true); const nameBytes = new TextEncoder().encode("OmniVD_ADB\0");
+            const fullPayload = new Uint8Array(buffer.byteLength + nameBytes.length); fullPayload.set(bytes, 0); fullPayload.set(nameBytes, buffer.byteLength); return fullPayload;
+        }
+        async function sendPacket(cmd, arg0, arg1, data = new Uint8Array(0)) {
+            if (!usbDeviceAdb || !epOutAdb) return;
+            const header = new ArrayBuffer(24), view = new DataView(header); let checksum = 0; for (let i = 0; i < data.length; i++) checksum = (checksum + data[i]) & 0xffffffff;
+            view.setUint32(0, cmd, true); view.setUint32(4, arg0, true); view.setUint32(8, arg1, true); view.setUint32(12, data.length, true); view.setUint32(16, checksum, true); view.setUint32(20, (cmd ^ 0xffffffff) >>> 0, true);
+            const buffer = new Uint8Array(24 + data.length); buffer.set(new Uint8Array(header), 0); buffer.set(data, 24); await usbDeviceAdb.transferOut(epOutAdb, buffer);
+        }
+        async function readPacket() {
+            if (!usbDeviceAdb || !epInAdb) return null;
+            try {
+                const headerRes = await usbDeviceAdb.transferIn(epInAdb, 24); if (!headerRes.data || headerRes.data.byteLength < 24) return null;
+                const view = new DataView(headerRes.data.buffer), cmd = view.getUint32(0, true), arg0 = view.getUint32(4, true), arg1 = view.getUint32(8, true), len = view.getUint32(12, true);
+                let payload = new Uint8Array(0); if (len > 0) { const dataRes = await usbDeviceAdb.transferIn(epInAdb, len); if (dataRes.data) payload = new Uint8Array(dataRes.data.buffer); }
+                return { cmd, arg0, arg1, data: payload };
+            } catch (e) { return { error: true, msg: e.message }; }
+        }
 
-            const style = document.createElement('style');
-            style.textContent = `
-                :host {
-                    all: initial;
-                    --c-bg-base: #131314; --c-bg-panel: #1e1f20; --c-bg-hover: #282a2c;
-                    --c-text-main: #e3e3e3; --c-text-muted: #c4c7c5; --c-border: #444746;
-                    --c-primary: #8ab4f8; --c-primary-hover: #aecbfa; --c-primary-bg: rgba(138, 180, 248, 0.12);
-                    --c-success: #81c995; --c-success-bg: rgba(129, 201, 149, 0.12);
-                    --c-danger: #f28b82; --c-danger-bg: rgba(242, 139, 130, 0.12);
-                    --c-warning: #fde293; --c-warning-bg: rgba(253, 226, 147, 0.12);
-                    --c-extreme: #c58af9; --c-extreme-bg: rgba(197, 138, 249, 0.12);
-                    --shadow-soft: 0 4px 20px rgba(0,0,0,0.3); --shadow-hard: 5px 0 30px rgba(0,0,0,0.6);
-                    --radius-md: 12px; --radius-lg: 24px;
-                    font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        async function conectarUSB() {
+            try {
+                usbDeviceAdb = await navigator.usb.requestDevice({ filters: [{ classCode: 255, subclassCode: 66, protocolCode: 1 }] }); await usbDeviceAdb.open();
+                if (usbDeviceAdb.configuration === null) await usbDeviceAdb.selectConfiguration(1);
+                let intfNum = -1;
+                for (const conf of usbDeviceAdb.configurations) { for (const intf of conf.interfaces) { for (const alt of intf.alternates) { if (alt.interfaceClass === 255 && alt.interfaceSubclass === 66 && alt.interfaceProtocol === 1) { intfNum = intf.interfaceNumber; epInAdb = alt.endpoints.find(e => e.direction === 'in').endpointNumber; epOutAdb = alt.endpoints.find(e => e.direction === 'out').endpointNumber; break; } } } }
+                await usbDeviceAdb.claimInterface(intfNum);
+                await sendPacket(0x4E584E43, 0x01000000, 4096, new TextEncoder().encode("host::OmniVD\0"));
+                let keyPair = await getAdbKeyPair(), resp = await readPacket();
+                if (resp && resp.cmd === 0x4E584E43) isAdbReadyAdb = true; 
+                else if (resp && resp.cmd === 0x48545541 && resp.arg0 === 1) { 
+                    await sendPacket(0x48545541, 2, 0, await signAdbToken(keyPair, resp.data)); let resp2 = await readPacket();
+                    if (resp2 && resp2.cmd === 0x4E584E43) isAdbReadyAdb = true;
+                    else { await sendPacket(0x48545541, 3, 0, await getAdbPublicKeyPayload(keyPair)); App.showToast("🚨 Permita a conexão no seu celular (Tela dele)!", "warning"); while(!isAdbReadyAdb) { let waitResp = await readPacket(); if(waitResp && waitResp.error) return; if(waitResp && waitResp.cmd === 0x4E584E43) isAdbReadyAdb = true; } }
                 }
-                .ui-container { position: fixed; top: 0; left: 0; height: 100vh; background: var(--c-bg-panel); z-index: 2147483647; color: var(--c-text-main); display: flex; transition: all 0.5s cubic-bezier(0.2, 0, 0, 1); overflow: hidden; box-sizing: border-box; }
-                .state-fullscreen { width: 100vw; background: rgba(19, 19, 20, 0.95); backdrop-filter: blur(10px); align-items: center; justify-content: center; }
-                .state-sidebar { width: clamp(340px, 400px, 100vw); box-shadow: var(--shadow-hard); border-right: 1px solid var(--c-border); }
-                .state-hidden { transform: translateX(-100%); width: 400px; }
-                .app-layout { display: flex; width: 100%; height: 100%; opacity: 1; transition: opacity 0.3s ease; }
-                .state-fullscreen .app-layout { display: none; }
-                .sidebar { width: 72px; background: var(--c-bg-base); border-right: 1px solid var(--c-border); display: flex; flex-direction: column; align-items: center; padding: 20px 0; gap: 16px; flex-shrink: 0; }
-                .tab { width: 48px; height: 48px; border: none; background: transparent; color: var(--c-text-muted); border-radius: var(--radius-md); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; position: relative; }
-                .tab:hover { background: var(--c-bg-hover); color: var(--c-text-main); }
-                .tab.active { background: var(--c-primary-bg); color: var(--c-primary); }
-                .content-area { flex: 1; display: flex; flex-direction: column; height: 100%; background: var(--c-bg-panel); position: relative; }
-                .header { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; border-bottom: 1px solid var(--c-border); flex-shrink: 0; }
-                .brand { display: flex; align-items: center; gap: 12px; }
-                .header h2 { margin: 0; font-size: 18px; font-weight: 600; background: linear-gradient(90deg, #8ab4f8, #c58af9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-                .header-actions { display: flex; gap: 8px; }
-                .btn-action-header { background: none; border: none; color: var(--c-text-muted); cursor: pointer; padding: 6px; border-radius: 8px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
-                .btn-action-header:hover { background: var(--c-bg-hover); color: var(--c-text-main); }
-                .btn-close:hover { color: var(--c-danger); background: var(--c-danger-bg); }
-                .speed-pill-header { font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; border: 1px solid transparent; }
-                .speed-pill-header.turbo { background: var(--c-danger-bg); color: var(--c-danger); border-color: rgba(242,139,130,0.3); }
-                .speed-pill-header.rapido { background: var(--c-warning-bg); color: var(--c-warning); border-color: rgba(253,226,147,0.3); }
-                .speed-pill-header.normal { background: var(--c-success-bg); color: var(--c-success); border-color: rgba(129,201,149,0.3); }
-                .speed-pill-header.seguro { background: var(--c-extreme-bg); color: var(--c-extreme); border-color: rgba(197,138,249,0.3); }
-                .fullscreen-overlay { display: none; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; text-align: center; }
-                .state-fullscreen .fullscreen-overlay { display: flex; animation: fadeIn 0.4s ease-out; }
-                .fs-title { font-size: 42px; font-weight: 700; background: linear-gradient(90deg, #8ab4f8, #c58af9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; }
-                .fs-subtitle { font-size: 16px; color: var(--c-text-muted); margin-bottom: 40px; }
-                .speed-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; max-width: 600px; width: 90%; }
-                .speed-card { background: var(--c-bg-panel); border: 1px solid var(--c-border); border-radius: var(--radius-lg); padding: 24px; cursor: pointer; transition: all 0.2s; text-align: left; position: relative; overflow: hidden; }
-                .speed-card:hover { border-color: var(--c-primary); transform: translateY(-4px); box-shadow: var(--shadow-soft); background: var(--c-bg-hover); }
-                .card-title { font-size: 18px; font-weight: 700; color: var(--c-text-main); margin-bottom: 8px; }
-                .card-desc { font-size: 13px; color: var(--c-text-muted); line-height: 1.4; }
-                .speed-card[data-speed="turbo"] .card-title { color: var(--c-danger); }
-                .speed-card[data-speed="rapido"] .card-title { color: var(--c-warning); }
-                .speed-card[data-speed="normal"] .card-title { color: var(--c-success); }
-                .speed-card[data-speed="seguro"] .card-title { color: var(--c-extreme); }
-                .fs-footer { position: absolute; bottom: 24px; font-size: 14px; max-width: 80%; text-align: center; line-height: 1.5; background: linear-gradient(90deg, #8ab4f8, #c58af9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 500; }
-                .tab-content { padding: 24px; display: none; flex-direction: column; flex: 1; gap: 20px; overflow-y: auto; }
-                .tab-content.active { display: flex; animation: fadeIn 0.3s forwards; }
-                @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-                .input-group { display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
-                .input-label { font-size: 12px; font-weight: 600; color: var(--c-text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-                textarea { background: var(--c-bg-base); border: 1px solid var(--c-border); border-radius: var(--radius-md); padding: 16px; color: var(--c-text-main); font-size: 14px; line-height: 1.5; width: 100%; outline: none; resize: none; min-height: 100px; box-sizing: border-box; transition: all 0.2s; }
-                textarea:focus { border-color: var(--c-primary); box-shadow: 0 0 0 1px var(--c-primary); }
-                .msg-variant { position: relative; display: flex; flex-direction: column; animation: fadeIn 0.3s ease-out; }
-                .btn-remove-msg { position: absolute; top: 8px; right: 8px; background: var(--c-bg-base); border: 1px solid var(--c-border); color: var(--c-danger); border-radius: 6px; padding: 6px; cursor: pointer; opacity: 0.5; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
-                .btn-remove-msg:hover { opacity: 1; background: var(--c-danger-bg); border-color: var(--c-danger); transform: scale(1.05); }
-                .btn-add-msg { background: transparent; border: 1px dashed var(--c-primary); color: var(--c-primary); padding: 8px; border-radius: 8px; cursor: pointer; font-size: 11px; font-weight: 700; text-transform: uppercase; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
-                .btn-add-msg:hover { background: var(--c-primary-bg); }
-                .media-area { background: var(--c-bg-base); border: 1px dashed var(--c-border); border-radius: var(--radius-md); padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; transition: all 0.2s; }
-                .media-area:hover { border-color: var(--c-primary); }
-                .media-area.disabled { opacity: 0.5; pointer-events: none; border-color: var(--c-danger); background: var(--c-danger-bg); }
-                .file-info { font-size: 13px; color: var(--c-text-muted); display: flex; flex-direction: column; gap: 8px; align-items: center; width: 100%; }
-                .file-info b { color: var(--c-text-main); word-break: break-all; }
-                .btn-file { background: var(--c-bg-hover); color: var(--c-text-main); border: 1px solid var(--c-border); padding: 10px 20px; border-radius: 8px; font-size: 13px; cursor: pointer; font-weight: 600; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; }
-                .btn-file:hover { background: var(--c-primary-bg); border-color: var(--c-primary); color: var(--c-primary); }
-                .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; flex-shrink: 0; }
-                .stat-card { background: var(--c-bg-base); padding: 16px; border-radius: var(--radius-md); display: flex; flex-direction: column; gap: 4px; border: 1px solid var(--c-border); }
-                .stat-val { font-size: 24px; font-weight: 600; color: var(--c-text-main); }
-                .stat-lab { font-size: 10px; color: var(--c-text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;}
-                #st-sent { color: var(--c-success); } #st-err { color: var(--c-danger); }
-                .timer-box { background: var(--c-bg-base); border: 1px solid var(--c-border); padding: 16px; border-radius: var(--radius-md); display: flex; flex-direction: column; align-items: center; gap: 4px; flex-shrink: 0; }
-                .timer-label { font-size: 11px; color: var(--c-text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
-                .timer-clock { font-size: 28px; font-weight: 600; color: var(--c-text-main); font-variant-numeric: tabular-nums; }
-                @keyframes pulse-anti-idle { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
-                .anti-idle-active-badge { display: none; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: var(--c-success); margin-top: 8px; background: var(--c-success-bg); padding: 4px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px;}
-                .anti-idle-active-badge svg { animation: pulse-anti-idle 2s infinite ease-in-out; }
-                .btn-run { background: var(--c-primary); border: none; padding: 16px; border-radius: var(--radius-md); color: var(--c-bg-base); font-weight: 600; cursor: pointer; text-transform: uppercase; font-size: 14px; letter-spacing: 1px; transition: all 0.2s ease; width: 100%; display: flex; justify-content: center; align-items: center; gap: 10px; flex-shrink: 0;}
-                .btn-run:hover { background: var(--c-primary-hover); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(138, 180, 248, 0.2); }
-                .btn-outline { background: transparent; border: 1px solid var(--c-border); color: var(--c-text-main); }
-                .btn-outline:hover { border-color: var(--c-text-main); background: var(--c-bg-hover); transform: translateY(-2px); box-shadow: none; }
-                .btn-danger-outline { background: transparent; border: 1px solid var(--c-danger); color: var(--c-danger); }
-                .btn-danger-outline:hover { background: var(--c-danger-bg); transform: translateY(-2px); }
-                .logs-container { display: flex; flex-direction: column; gap: 8px; flex: 1; min-height: 120px; }
-                .logs { flex: 1; background: #000; border: 1px solid var(--c-border); border-radius: var(--radius-md); padding: 16px; font-family: "Consolas", monospace; font-size: 12px; color: #A0AAB2; overflow-y: auto; }
-                .log-entry { margin-bottom: 8px; line-height: 1.5; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px; }
-                ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: rgba(255,255,255, 0.1); border-radius: 10px; }
-            `;
-            shadow.appendChild(style);
+                if (isAdbReadyAdb) {
+                    document.getElementById('btn-conectar').style.display = 'none'; document.getElementById('usb-status').classList.remove('hidden'); document.getElementById('usb-status').classList.add('flex');
+                    if (contatosBaseAdb.length > 0) document.getElementById('btn-start-adb').disabled = false;
+                    await runAdbShell("settings put global stay_on_while_plugged_in 7"); await runAdbShell("settings put system screen_off_timeout 2147483647"); await runAdbShell("svc power stayon usb"); await runAdbShell("input keyevent 224"); 
+                    App.showToast("Sucesso! Aparelho pareado via ADB.", "success");
+                }
+            } catch (e) { App.showToast("Erro de conexão USB: " + e.message, "error"); }
+        }
 
-            const fab = document.createElement('div');
-            fab.id = PANEL_ID + '-fab';
-            fab.title = "Restaurar DisparAI";
-            Object.assign(fab.style, { position: 'fixed', bottom: '20px', left: '20px', width: '56px', height: '56px', backgroundColor: '#1e1f20', border: '1px solid #444746', borderRadius: '50%', display: 'none', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: '2147483648', boxShadow: '0 4px 20px rgba(0,0,0,0.5)', color: '#8ab4f8', transition: 'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)' });
-            fab.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"></path><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>`;
-            document.body.appendChild(fab);
+        async function runAdbShell(command) {
+            if (!isAdbReadyAdb) return false;
+            try {
+                const myId = localIdCounterAdb++; await sendPacket(0x4E45504F, myId, 0, new TextEncoder().encode("shell:" + command + "\0"));
+                let ok = false;
+                for(let i = 0; i < 4; i++) { let r = await readPacket(); if(r && r.error) continue; if(r && r.cmd === 0x59414B4F && r.arg1 === myId) ok = true; if(r && r.cmd === 0x45534C43) { await sendPacket(0x45534C43, myId, r.arg0); break; } }
+                return true;
+            } catch(e) { return false; }
+        }
 
-            const ui = document.createElement('div');
-            ui.id = 'main-wrapper';
-            ui.className = 'ui-container state-fullscreen';
-            ui.innerHTML = `
-                <div class="fullscreen-overlay">
-                    <h1 class="fs-title">DisparAI Pro</h1>
-                    <h3 class="fs-subtitle">Selecione a arquitetura de envio para iniciar</h3>
-                    <div class="speed-grid">
-                        <div class="speed-card" data-speed="turbo">
-                            <div class="card-title">Turbo</div><div class="card-desc">Máxima velocidade otimizada. Sem pausas orgânicas. Risco de Block.</div>
-                        </div>
-                        <div class="speed-card" data-speed="rapido">
-                            <div class="card-title">Rápido</div><div class="card-desc">Alta performance. Ideal para listas maturadas e aquecidas.</div>
-                        </div>
-                        <div class="speed-card" data-speed="normal">
-                            <div class="card-title">Normal</div><div class="card-desc">Padrão orgânico. Simulação humana constante e segura.</div>
-                        </div>
-                        <div class="speed-card" data-speed="seguro">
-                            <div class="card-title">Seguro</div><div class="card-desc">Comportamento extremo. Pausas longas imitando digitação.</div>
-                        </div>
-                    </div>
-                    <div class="fs-footer">Desenvolvido por Maikon Nattan</div>
-                </div>
+        const sleep = ms => new Promise(r => setTimeout(r, ms));
+        const rnd = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
-                <div class="app-layout">
-                    <div class="sidebar" id="sidebar-nav">
-                        <button class="tab active" data-tab="disparo" data-tooltip="Dashboard de Envio">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"></path><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                        </button>
-                        <button class="tab" data-tab="lista" data-tooltip="Lista de Contatos">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                        </button>
-                        <button class="tab" data-tab="dados" data-tooltip="Configurações e Logs">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-                        </button>
-                    </div>
+        // ==========================================
+        // APLICAÇÃO CRM (APP)
+        // ==========================================
+        const App = {
+            state: {
+                modoBloqueadas: false,
+                contatoAtualId: null,
+                chamadaInterval: null,
+                chamadaSegundos: 0,
+                bancoDados: [],
+                colunasDef: [
+                    { id: 'I6', title: 'I6', desc: 'Risco Crítico', color: 'text-omni-red', border: 'border-omni-red/30' },
+                    { id: 'I5', title: 'I5', desc: 'Risco Alto', color: 'text-omni-orange', border: 'border-omni-orange/30' },
+                    { id: 'I4', title: 'I4', desc: 'Risco Médio', color: 'text-yellow-400', border: 'border-yellow-400/30' },
+                    { id: 'I3', title: 'I3', desc: 'Inativa Leve', color: 'text-omni-primary', border: 'border-omni-primary/30' },
+                    { id: 'I2', title: 'I2', desc: 'Atenção', color: 'text-blue-400', border: 'border-blue-400/30' },
+                    { id: 'I1', title: 'I1', desc: 'Recente', color: 'text-indigo-400', border: 'border-indigo-400/30' },
+                    { id: 'A0', title: 'A0 (Ativa)', desc: 'Pote de Ouro', color: 'text-omni-green', border: 'border-omni-green/50', bg: 'bg-omni-green/5' }
+                ]
+            },
 
-                    <div class="content-area">
-                        <div class="header">
-                            <div class="brand">
-                                <button id="back-to-speed" class="btn-action-header" title="Trocar Velocidade"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg></button>
-                                <div><h2>DisparAI Pro</h2><span id="speed-indicator-pill" class="speed-pill-header normal">NORMAL</span></div>
-                            </div>
-                            <div class="header-actions">
-                                <button id="minimize-btn" class="btn-action-header"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
-                                <button id="close-dr" class="btn-action-header btn-close"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
-                            </div>
-                        </div>
-
-                        <div id="tab-disparo" class="tab-content active">
-                            <div class="input-group">
-                                <label class="input-label">Textos para Envio (Sorteio)</label>
-                                <div id="msg-list" style="display:flex; flex-direction:column; gap:12px;">
-                                    <div class="msg-variant">
-                                        <textarea class="dr-msg-input" placeholder="Digite sua mensagem aqui... Use :re: para puxar o NOME."></textarea>
-                                        <button class="btn-remove-msg"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
-                                    </div>
-                                </div>
-                                <button id="btn-add-msg" class="btn-add-msg">+ Adicionar Variação</button>
-                            </div>
-                            <div class="media-area" id="dr-media-container">
-                                <div class="file-info">
-                                    <span>Anexos: <b id="file-name">Nenhum</b></span>
-                                    <button id="btn-clear-img" style="background:none; border:none; color:var(--c-danger); font-size:11px; cursor:pointer; display:none;">REMOVER</button>
-                                </div>
-                                <label class="btn-file">
-                                    Adicionar Mídia <input type="file" id="dr-img-input" accept="image/*,video/*,application/pdf" style="display:none;" multiple>
-                                </label>
-                            </div>
-                            <div class="stats-grid">
-                                <div class="stat-card"><span class="stat-lab">Fila Restante</span><span class="stat-val" id="st-pend">0</span></div>
-                                <div class="stat-card"><span class="stat-lab">Enviados</span><span class="stat-val" id="st-sent">0</span></div>
-                                <div class="stat-card"><span class="stat-lab">Falhas</span><span class="stat-val" id="st-err">0</span></div>
-                                <div class="stat-card"><span class="stat-lab">Total Lidos</span><span class="stat-val" id="st-total">0</span></div>
-                            </div>
-                            <button id="dr-start" class="btn-run">INICIAR DISPAROS</button>
-                        </div>
-
-                        <div id="tab-lista" class="tab-content">
-                            <div class="input-group" style="flex:1;">
-                                <label class="input-label">Importar Base (Organização Automática)</label>
-                                <textarea id="dr-import" style="flex:1;" placeholder="Ex: 5511999999999 João"></textarea>
-                            </div>
-                            <button id="dr-save" class="btn-run">Processar e Validar Base</button>
-                        </div>
-
-                        <div id="tab-dados" class="tab-content">
-                            <div class="input-group" style="flex:1;">
-                                <label class="input-label">Terminal de Registros</label>
-                                <div class="logs-container">
-                                    <div class="logs" id="dr-logs"><div class="log-entry"><span style="color:var(--c-primary);">> DisparAI Inicializado.</span></div></div>
-                                </div>
-                            </div>
-                            <div style="display:flex; flex-direction:column; gap:12px;">
-                                <button id="dr-exp" class="btn-run btn-outline">Exportar Relatório</button>
-                                <button id="dr-reset" class="btn-run btn-danger-outline">Limpar Memória</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            shadow.appendChild(ui);
-
-            const wrapper = shadow.getElementById('main-wrapper');
-            const tabs = shadow.querySelectorAll('.tab');
-            const speedCards = shadow.querySelectorAll('.speed-card');
-            const speedPill = shadow.getElementById('speed-indicator-pill');
-            const msgList = shadow.getElementById('msg-list');
-            const btnAddMsg = shadow.getElementById('btn-add-msg');
-
-            let app = { active: false, contacts: [], selectedMedias: [], currentSpeedMode: 'normal', runSendsCount: 0 };
-
-            function bindRemoveMsg(btn) {
-                btn.onclick = () => {
-                    btn.parentElement.remove();
-                    if (shadow.querySelectorAll('.msg-variant').length === 0) addMsgVariant();
-                };
-            }
-
-            function addMsgVariant(value = '') {
-                const div = document.createElement('div');
-                div.className = 'msg-variant';
-                div.innerHTML = '<textarea class="dr-msg-input" placeholder="Digite sua mensagem aqui... Use :re: para puxar o NOME.">' + value + '</textarea><button class="btn-remove-msg"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>';
-                bindRemoveMsg(div.querySelector('.btn-remove-msg'));
-                msgList.appendChild(div);
-            }
-            btnAddMsg.onclick = () => addMsgVariant();
-            shadow.querySelectorAll('.btn-remove-msg').forEach(bindRemoveMsg);
-
-            tabs.forEach(btn => {
-                btn.onclick = () => {
-                    tabs.forEach(b => b.classList.remove('active'));
-                    shadow.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                    btn.classList.add('active');
-                    shadow.getElementById('tab-' + btn.dataset.tab).classList.add('active');
-                };
-            });
-
-            shadow.getElementById('minimize-btn').onclick = () => {
-                wrapper.className = 'ui-container state-hidden';
-                setTimeout(() => { fab.style.display = 'flex'; }, 400);
-            };
-
-            fab.onclick = () => {
-                fab.style.display = 'none';
-                wrapper.className = 'ui-container state-sidebar';
-            };
-
-            speedCards.forEach(card => {
-                card.onclick = () => {
-                    app.currentSpeedMode = card.dataset.speed;
-                    speedPill.className = 'speed-pill-header ' + app.currentSpeedMode;
-                    speedPill.innerText = app.currentSpeedMode.toUpperCase();
-                    writeLog("Arquitetura selecionada.", "info");
-                    wrapper.className = 'ui-container state-sidebar';
-                };
-            });
-
-            shadow.getElementById('back-to-speed').onclick = () => { wrapper.className = 'ui-container state-fullscreen'; };
-            shadow.getElementById('close-dr').onclick = () => { host.remove(); fab.remove(); };
-
-            const wait = (ms) => new Promise(r => setTimeout(r, ms));
-            const randomWait = (min, max) => wait(Math.floor(Math.random() * (max - min + 1) + min));
-
-            const DELAY_CONFIG = {
-                turbo: { search_wait: 300, paste_wait: 300, type_min: 2, type_max: 10, loop_wait: 1000 },
-                rapido: { search_wait: 600, paste_wait: 800, type_min: 10, type_max: 25, loop_wait: 3000 },
-                normal: { search_wait: 1500, paste_wait: 2000, type_min: 20, type_max: 60, loop_wait: 6000 },
-                seguro: { search_wait: 3000, paste_wait: 4000, type_min: 80, type_max: 200, loop_wait: 15000 }
-            };
-            const getDelay = (k) => DELAY_CONFIG[app.currentSpeedMode][k];
-
-            function writeLog(msg, type = 'info') {
-                const box = shadow.getElementById('dr-logs');
-                const el = document.createElement('div');
-                el.className = 'log-entry';
-                el.style.color = type === 'error' ? 'var(--c-danger)' : type === 'success' ? 'var(--c-success)' : 'var(--c-text-muted)';
-                el.innerHTML = "<span>> " + msg + "</span>";
-                box.prepend(el);
-            }
-
-            function syncStats() {
-                shadow.getElementById('st-sent').innerText = app.contacts.filter(c => c.status === 'ENVIADO').length;
-                shadow.getElementById('st-err').innerText = app.contacts.filter(c => c.status === 'ERRO').length;
-                shadow.getElementById('st-pend').innerText = app.contacts.filter(c => c.status === 'PENDENTE').length;
-                shadow.getElementById('st-total').innerText = app.contacts.length;
-            }
-
-            function dispatchKey(element, key) {
-                const keyCode = key === 'Enter' ? 13 : (key === 'Escape' ? 27 : key.charCodeAt(0));
-                const evt = { key, keyCode, bubbles: true };
-                (element || document).dispatchEvent(new KeyboardEvent('keydown', evt));
-                (element || document).dispatchEvent(new KeyboardEvent('keyup', evt));
-            }
-
-            async function typeLikeHuman(targetElement, text, mode) {
-                if (!targetElement) return;
-                targetElement.focus();
+            init: function() {
+                this.carregarDados();
+                this.renderKanbanColumns();
+                this.renderKanbanCards();
                 
-                // Força o clique biomecânico para ativar o cursor real do WhatsApp (Trava Biológica)
-                targetElement.dispatchEvent(new MouseEvent('mousedown', {bubbles:true}));
-                targetElement.dispatchEvent(new MouseEvent('mouseup', {bubbles:true}));
-                targetElement.dispatchEvent(new MouseEvent('click', {bubbles:true}));
+                window.addEventListener('keydown', function(e) {
+                    if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1 && e.target.nodeName !== 'INPUT' && e.target.nodeName !== 'TEXTAREA') e.preventDefault();
+                }, false);
 
-                try { document.execCommand('selectAll', false, null); document.execCommand('delete', false, null); } catch (e) { targetElement.textContent = ''; }
-                await wait(300);
+                this.discador.init();
+            },
 
-                const cnf = DELAY_CONFIG[mode];
-                const chars = Array.from(text.replace(/\\r\\n/g, '\\n').replace(/\\r/g, '\\n'));
+            carregarDados: function() {
+                const dadosSalvos = localStorage.getItem('omni_crm_bd');
+                if (dadosSalvos) {
+                    try { this.state.bancoDados = JSON.parse(dadosSalvos); } catch (e) { console.error("Erro", e); }
+                }
+            },
+
+            salvarDados: function() {
+                localStorage.setItem('omni_crm_bd', JSON.stringify(this.state.bancoDados));
+                this.renderizarRetornos();
+            },
+
+            limparBaseCompleta: function() {
+                if (confirm("ATENÇÃO: Excluir TODA a base?")) {
+                    this.state.bancoDados = []; this.salvarDados(); this.renderKanbanCards(); this.showToast("Base apagada.", "success");
+                }
+            },
+
+            processarArquivos: async function(event) {
+                const files = event.target.files;
+                if (!files || files.length === 0) return;
+                this.showToast("Vasculhando matriz de dados... Aguarde.", "info");
+
+                let novas = 0, atualizadas = 0, inalteradas = 0;
+
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    const data = await file.arrayBuffer();
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    
+                    const rawData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
+                    let headerIndex = -1; let headers = [];
+
+                    for (let r = 0; r < rawData.length; r++) {
+                        const linha = rawData[r]; if (!linha || linha.length === 0) continue;
+                        const linhaTexto = linha.join('').toLowerCase();
+                        if (linhaTexto.includes('codigorev') || linhaTexto.includes('nome') || linhaTexto.includes('papel') || linhaTexto.includes('ciclos')) {
+                            headerIndex = r; headers = linha; break;
+                        }
+                    }
+
+                    if (headerIndex === -1) { this.showToast(`Cabeçalhos não encontrados no arquivo ${file.name}.`, "error"); continue; }
+
+                    for (let r = headerIndex + 1; r < rawData.length; r++) {
+                        const rowArray = rawData[r]; if (!rowArray || rowArray.join('').trim() === '') continue; 
+
+                        let row = {}; headers.forEach((h, index) => { if (h) row[String(h).trim()] = rowArray[index]; });
+
+                        let codigoBruto = row['CodigoRevendedor'] || row['CodigoRev'] || row['codigo'] || row['Codigo'];
+                        if (!codigoBruto) continue; 
+                        let codigo = String(codigoBruto).replace(/\./g, '').trim(); 
+
+                        let nome = row['Nome'] || 'Sem Nome';
+                        let telefone = row['TelCelular'] || row['telefone'] || '';
+                        let email = row['EMail'] || row['email'] || '';
+                        let papel = row['Papel'] || 'Indefinido';
+                        let bloqueadoStr = String(row['Bloqueado'] || '').trim().toLowerCase();
+                        let isBloqueada = (bloqueadoStr === 'sim' || bloqueadoStr === 's' || bloqueadoStr === 'true' || bloqueadoStr === '1');
+                        let motivoBloqueio = row['MotivoBloqueio'] || '';
+                        let aniversario = row['DtAniversario'] || '--/--';
+                        
+                        let ciclos = row['CiclosInatividade'];
+                        let colunaCalculada = 'A0';
+                        if (ciclos !== "" && ciclos !== undefined && ciclos !== null) {
+                            let cNum = parseInt(ciclos);
+                            if (cNum === 0) colunaCalculada = 'A0';
+                            else if (cNum >= 1 && cNum <= 6) colunaCalculada = 'I' + cNum;
+                            else if (cNum > 6) colunaCalculada = 'I6';
+                        }
+
+                        let existente = this.state.bancoDados.find(c => c.codigo == codigo);
+                        if (existente) {
+                            let mudou = false;
+                            if (existente.coluna !== colunaCalculada) { existente.coluna = colunaCalculada; mudou = true; }
+                            if (existente.nivel !== papel) { existente.nivel = papel; mudou = true; }
+                            if (existente.isBloqueada !== isBloqueada) { existente.isBloqueada = isBloqueada; mudou = true; }
+                            if (existente.motivoBloqueio !== motivoBloqueio) { existente.motivoBloqueio = motivoBloqueio; mudou = true; }
+                            if (mudou) atualizadas++; else inalteradas++;
+                        } else {
+                            this.state.bancoDados.push({
+                                id: Date.now() + Math.floor(Math.random() * 100000), 
+                                codigo: codigo, nome: nome, telefone: String(telefone), email: email, nivel: papel,
+                                temperatura: 'Fria', coluna: colunaCalculada, isBloqueada: isBloqueada,
+                                motivoBloqueio: motivoBloqueio, aniversario: aniversario, lastActionTime: Date.now(), historico: []
+                            });
+                            novas++;
+                        }
+                    }
+                }
+                this.salvarDados();
+                setTimeout(() => {
+                    this.renderKanbanCards();
+                    this.showToast(`Concluído: ${novas} Novas, ${atualizadas} Atualizadas, ${inalteradas} Intactas.`, "success");
+                    event.target.value = ''; 
+                }, 500);
+            },
+
+            mudarAba: function(btnElement) {
+                document.querySelectorAll('.tab-btn').forEach(b => {
+                    b.classList.remove('border-omni-primary', 'text-omni-primary'); b.classList.add('border-transparent', 'text-omni-muted');
+                });
+                btnElement.classList.remove('border-transparent', 'text-omni-muted'); btnElement.classList.add('border-omni-primary', 'text-omni-primary');
+                document.querySelectorAll('.tab-content').forEach(c => {
+                    c.classList.remove('opacity-100', 'z-10'); c.classList.add('hidden', 'opacity-0', '-z-10');
+                });
+                const target = document.getElementById(btnElement.getAttribute('data-target'));
+                target.classList.remove('hidden', 'opacity-0', '-z-10'); target.classList.add('opacity-100', 'z-10');
+                if (btnElement.getAttribute('data-target') === 'tab-retornos') this.renderizarRetornos();
+            },
+            
+            mudarAbaPorId: function(targetId) { const btn = document.querySelector(`[data-target="${targetId}"]`); if(btn) this.mudarAba(btn); },
+
+            setModoBloqueadas: function(isBloqueada) {
+                this.state.modoBloqueadas = isBloqueada;
+                const btnAtiva = document.getElementById('btn-base-ativa'); const btnBloq = document.getElementById('btn-base-bloqueadas');
+                if(isBloqueada) {
+                    btnAtiva.className = "px-4 py-1.5 rounded-md text-omni-muted hover:text-white text-xs font-bold transition-all";
+                    btnBloq.className = "px-4 py-1.5 rounded-md bg-omni-red text-white text-xs font-bold transition-all shadow-sm";
+                } else {
+                    btnAtiva.className = "px-4 py-1.5 rounded-md bg-omni-primary text-omni-base text-xs font-bold transition-all shadow-sm";
+                    btnBloq.className = "px-4 py-1.5 rounded-md text-omni-muted hover:text-white text-xs font-bold transition-all";
+                }
+                this.renderKanbanCards();
+            },
+
+            filtrar: function() {
+                const btnClear = document.getElementById('btn-clear-search'); const termo = document.getElementById('global-search').value.toLowerCase();
+                if (termo.length > 0) btnClear.classList.remove('hidden'); else btnClear.classList.add('hidden');
+                this.renderKanbanCards();
+            },
+            limparBusca: function() { document.getElementById('global-search').value = ''; document.getElementById('btn-clear-search').classList.add('hidden'); this.renderKanbanCards(); },
+
+            renderKanbanColumns: function() {
+                const container = document.getElementById('kanban-container'); container.innerHTML = '';
+                this.state.colunasDef.forEach(col => {
+                    const el = document.createElement('div'); el.className = `kanban-column ${col.bg || ''}`;
+                    el.innerHTML = `
+                        <div class="p-4 border-b ${col.border} flex justify-between items-center bg-omni-panel rounded-t-2xl">
+                            <div><h2 class="font-bold ${col.color} text-lg">${col.title}</h2><p class="text-[10px] text-omni-muted uppercase tracking-wider font-semibold">${col.desc}</p></div>
+                            <span class="bg-omni-base text-omni-muted text-xs font-bold px-3 py-1 rounded-full border border-omni-border" id="count-${col.id}">0</span>
+                        </div>
+                        <div class="kanban-cards drag-container" id="col-${col.id}" ondrop="App.drop(event, '${col.id}')" ondragover="App.allowDrop(event)" ondragleave="App.dragLeave(event)"></div>
+                    `;
+                    container.appendChild(el);
+                });
+            },
+
+            renderKanbanCards: function() {
+                this.state.colunasDef.forEach(col => { const el = document.getElementById(`col-${col.id}`); if(el) el.innerHTML = ''; const countEl = document.getElementById(`count-${col.id}`); if(countEl) countEl.innerText = '0'; });
+                const termoBusca = document.getElementById('global-search').value.toLowerCase();
+                let filtrados = this.state.bancoDados.filter(c => c.isBloqueada === this.state.modoBloqueadas);
                 
-                for (const char of chars) {
-                    if (!app.active) break;
-                    if (char === '\\n') {
-                        const dt = new DataTransfer(); dt.setData('text/plain', '\\n');
-                        const pasteEvt = new ClipboardEvent('paste', { bubbles: true });
-                        Object.defineProperty(pasteEvt, 'clipboardData', { value: dt });
-                        targetElement.dispatchEvent(pasteEvt);
-                        await wait(400);
+                if (termoBusca) filtrados = filtrados.filter(c => c.nome.toLowerCase().includes(termoBusca) || c.codigo.includes(termoBusca) || c.telefone.includes(termoBusca) || c.email.toLowerCase().includes(termoBusca));
+                filtrados.sort((a, b) => a.lastActionTime - b.lastActionTime);
+                const countMap = {}; const fragmentos = {};
+                this.state.colunasDef.forEach(c => fragmentos[c.id] = document.createDocumentFragment());
+
+                filtrados.forEach(contato => {
+                    if (!fragmentos[contato.coluna]) return;
+                    countMap[contato.coluna] = (countMap[contato.coluna] || 0) + 1;
+                    let nivelClasse = String(contato.nivel || 'indefinido').toLowerCase().replace(/\s+/g, '');
+                    let badgeClass = `bg-${nivelClasse}`; let tempClass = `t-${contato.temperatura.toLowerCase()}`; let tempIcon = contato.temperatura === 'Quente' ? 'fa-fire' : (contato.temperatura === 'Morna' ? 'fa-temperature-half' : 'fa-snowflake');
+                    let bloqueioUI = contato.isBloqueada ? `<div class="mt-2 p-1.5 rounded bg-omni-red/20 border border-omni-red/30 text-[10px] font-bold text-omni-red uppercase flex items-center gap-1"><i class="fa-solid fa-lock"></i> Bloqueada: ${contato.motivoBloqueio}</div>` : '';
+                    let cardBorder = contato.isBloqueada ? 'border-omni-red/50 hover:border-omni-red' : 'border-omni-border hover:border-omni-primary';
+
+                    const card = document.createElement('div'); card.className = `p-4 rounded-xl bg-omni-panel border ${cardBorder} cursor-grab transition-all shadow-md group relative flex-shrink-0`; card.draggable = true; card.id = `card-${contato.id}`;
+                    card.ondragstart = (e) => App.drag(e, contato.id); card.onclick = () => App.abrirDossie(contato.id);
+
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <h3 class="font-bold text-white text-sm group-hover:text-omni-primary transition-colors">${contato.nome}</h3>
+                                <p class="text-[10px] text-omni-muted font-mono mt-0.5 cursor-pointer hover:text-omni-primary transition-colors inline-block" title="Copiar Código" onclick="App.copiarTexto('${contato.codigo}', event)">Cód: ${contato.codigo}</p>
+                            </div>
+                            <span class="text-[9px] px-2 py-0.5 rounded uppercase font-bold tracking-wider shadow-sm ${badgeClass}">${contato.nivel}</span>
+                        </div>
+                        ${bloqueioUI}
+                        <div class="flex justify-between items-end mt-4 pt-3 border-t border-omni-border/50">
+                            <div class="text-[10px] flex flex-col gap-1 font-semibold">
+                                <span class="${tempClass} flex items-center gap-1"><i class="fa-solid ${tempIcon}"></i> ${contato.temperatura}</span>
+                                <span class="text-omni-muted"><i class="fa-regular fa-calendar mr-1"></i> ${contato.aniversario}</span>
+                            </div>
+                            <div class="flex gap-1" onclick="event.stopPropagation()">
+                                <button onclick="App.abrirWAIndividual(${contato.id})" class="w-8 h-8 rounded-lg bg-omni-base border border-omni-border hover:bg-omni-green hover:border-omni-green text-omni-muted hover:text-white transition flex items-center justify-center" title="WhatsApp nativo via Android"><i class="fa-brands fa-whatsapp"></i></button>
+                                <button onclick="App.abrirSMSIndividual(${contato.id})" class="w-8 h-8 rounded-lg bg-omni-base border border-omni-border hover:bg-omni-orange hover:border-omni-orange text-omni-muted hover:text-white transition flex items-center justify-center" title="SMS nativo via Android"><i class="fa-solid fa-comment-sms"></i></button>
+                                <button onclick="App.abrirLigacao(${contato.id})" class="w-8 h-8 rounded-lg bg-omni-primary text-omni-base hover:bg-white transition flex items-center justify-center shadow-[0_0_10px_rgba(56,189,248,0.3)]" title="Ligar via Android"><i class="fa-solid fa-phone"></i></button>
+                            </div>
+                        </div>
+                    `;
+                    fragmentos[contato.coluna].appendChild(card);
+                });
+                this.state.colunasDef.forEach(c => {
+                    const el = document.getElementById(`col-${c.id}`); if(el) el.appendChild(fragmentos[c.id]);
+                    const countEl = document.getElementById(`count-${c.id}`); if(countEl) countEl.innerText = countMap[c.id] || 0;
+                });
+            },
+
+            moverParaFimDaFila: function(contatoId) {
+                const contato = this.state.bancoDados.find(c => c.id === contatoId);
+                if (contato) { contato.lastActionTime = Date.now(); this.salvarDados(); this.renderKanbanCards(); }
+            },
+
+            abrirDossie: function(id) {
+                this.state.contatoAtualId = id; const c = this.state.bancoDados.find(x => x.id === id); if(!c) return;
+                document.getElementById('md-avatar').innerText = c.nome.charAt(0).toUpperCase();
+                document.getElementById('md-nome').innerText = c.nome;
+                document.getElementById('md-codigo').innerText = `Cód: ${c.codigo}`;
+                document.getElementById('md-telefone').innerText = `Fone: ${c.telefone}`;
+                
+                let nivelClasse = String(c.nivel || 'indefinido').toLowerCase().replace(/\s+/g, '');
+                const badge = document.getElementById('md-badge-nivel'); badge.innerText = c.nivel; badge.className = `px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-${nivelClasse}`;
+                document.getElementById('md-email').innerText = c.email || 'Não informado';
+                document.getElementById('md-aniversario').innerText = c.aniversario;
+                document.getElementById('md-distancia').innerText = c.temperatura;
+                
+                document.getElementById('md-nota-manual').value = ''; this.renderizarTimeline(c);
+                document.getElementById('modal-dossie').classList.remove('hidden'); document.getElementById('modal-dossie').classList.add('flex');
+            },
+
+            renderizarTimeline: function(contato) {
+                const box = document.getElementById('md-timeline'); box.innerHTML = '';
+                if (contato.historico.length === 0) { box.innerHTML = `<div class="text-center text-omni-muted text-sm my-10 italic">Nenhum registro de interação encontrado.</div>`; return; }
+                const historicoRev = [...contato.historico].reverse();
+                historicoRev.forEach((item, index) => {
+                    let icon, color, bg;
+                    if(item.tipo === 'Ligação') { icon = 'fa-phone'; color = 'text-omni-primary'; bg = 'bg-omni-primary/10'; }
+                    else if(item.tipo === 'WhatsApp') { icon = 'fa-whatsapp'; color = 'text-omni-green'; bg = 'bg-omni-green/10'; }
+                    else if(item.tipo === 'SMS') { icon = 'fa-comment-sms'; color = 'text-omni-orange'; bg = 'bg-omni-orange/10'; }
+                    else { icon = 'fa-pen'; color = 'text-omni-muted'; bg = 'bg-omni-border'; }
+
+                    const agendamentoUI = `<div class="mt-3 pt-3 border-t border-omni-border/50 flex flex-col gap-2"><div class="flex items-center gap-2"><input type="datetime-local" id="dt-agenda-${index}" class="bg-omni-base border border-omni-border rounded text-xs text-white px-2 py-1 outline-none focus:border-omni-primary"><button onclick="App.agendarFollowUpContextual(${contato.id}, ${index}, 'dt-agenda-${index}')" class="bg-omni-panel border border-omni-border hover:bg-omni-primary/20 hover:text-omni-primary text-omni-muted text-xs font-bold px-3 py-1 rounded transition flex items-center gap-1"><i class="fa-solid fa-calendar-plus"></i> Agendar Retorno</button></div></div>`;
+                    const html = `<div class="relative pl-6 border-l-2 border-omni-border pb-6 last:border-0 last:pb-0"><div class="absolute -left-[17px] top-0 w-8 h-8 rounded-full ${bg} border border-omni-border/30 flex items-center justify-center ${color}"><i class="fa-solid ${icon} text-sm"></i></div><div class="bg-omni-base border border-omni-border rounded-xl p-4 ml-4"><div class="flex justify-between items-start mb-2"><span class="font-bold text-white text-sm">${item.tipo}</span><span class="text-[10px] text-omni-muted font-mono">${item.data}</span></div><p class="text-sm text-omni-muted leading-relaxed">${item.detalhes}</p>${agendamentoUI}</div></div>`;
+                    box.insertAdjacentHTML('beforeend', html);
+                });
+            },
+
+            salvarNotaManual: function() {
+                const txt = document.getElementById('md-nota-manual').value.trim(); if(!txt) return this.showToast("Digite algo para registrar.", "warning");
+                this.adicionarHistorico(this.state.contatoAtualId, 'Nota Manual', txt); this.moverParaFimDaFila(this.state.contatoAtualId); this.abrirDossie(this.state.contatoAtualId); this.showToast("Nota salva e revendedora jogada pro fim da fila.", "success");
+            },
+
+            adicionarHistorico: function(id, tipo, detalhes) {
+                const c = this.state.bancoDados.find(x => x.id === id);
+                if(c) { const agora = new Date(); c.historico.push({ tipo: tipo, detalhes: detalhes, data: `${agora.toLocaleDateString()} ${agora.toLocaleTimeString()}`, timestamp: Date.now() }); }
+            },
+
+            agendarFollowUpContextual: function(contatoId, historicoIndex, inputId) {
+                const dataVal = document.getElementById(inputId).value; if(!dataVal) return this.showToast("Selecione data e hora.", "warning");
+                const dataFormatada = new Date(dataVal).toLocaleString();
+                this.adicionarHistorico(contatoId, 'Sistema', `📅 Lembrete agendado para: ${dataFormatada}`); this.salvarDados(); this.showToast("Retorno agendado com sucesso.", "success");
+                const badge = document.getElementById('badge-notificacoes'); badge.classList.remove('hidden'); badge.innerText = parseInt(badge.innerText) + 1;
+                this.abrirDossie(contatoId);
+            },
+
+            renderizarRetornos: function() {
+                const box = document.getElementById('lista-retornos'); if(!box) return;
+                let count = 0; box.innerHTML = '';
+                this.state.bancoDados.forEach(c => {
+                    c.historico.forEach(h => {
+                        if(h.detalhes.includes('📅 Lembrete agendado')) {
+                            box.innerHTML += `<div class="bg-omni-panel border border-omni-border p-4 rounded-xl flex justify-between items-center cursor-pointer hover:border-omni-primary" onclick="App.abrirDossie(${c.id})"><div><h4 class="font-bold text-white text-sm">${c.nome} <span class="text-xs text-omni-muted ml-2">Cód: ${c.codigo}</span></h4><p class="text-sm text-omni-primary mt-1">${h.detalhes}</p></div><i class="fa-solid fa-arrow-right text-omni-muted"></i></div>`; count++;
+                        }
+                    });
+                });
+                if(count === 0) box.innerHTML = '<p class="text-omni-muted text-sm italic">Nenhum retorno agendado na base.</p>';
+                const badge = document.getElementById('badge-notificacoes'); if(count > 0) { badge.classList.remove('hidden'); badge.innerText = count; } else { badge.classList.add('hidden'); }
+            },
+
+            abrirLigacao: function(id) {
+                this.state.contatoAtualId = id; const c = this.state.bancoDados.find(x => x.id === id); if(!c) return;
+                document.getElementById('call-nome').innerText = c.nome; document.getElementById('call-telefone').innerText = c.telefone; document.getElementById('call-nota').value = '';
+                this.state.chamadaSegundos = 0; document.getElementById('call-timer').innerText = "00:00";
+                document.getElementById('modal-ligacao').classList.remove('hidden'); document.getElementById('modal-ligacao').classList.add('flex');
+                clearInterval(this.state.chamadaInterval);
+                this.state.chamadaInterval = setInterval(() => {
+                    this.state.chamadaSegundos++; const m = Math.floor(this.state.chamadaSegundos / 60).toString().padStart(2, '0'); const s = (this.state.chamadaSegundos % 60).toString().padStart(2, '0');
+                    document.getElementById('call-timer').innerText = `${m}:${s}`;
+                }, 1000);
+            },
+
+            encerrarLigacao: async function(motivo) {
+                clearInterval(this.state.chamadaInterval);
+                const c = this.state.bancoDados.find(x => x.id === this.state.contatoAtualId);
+                const nota = document.getElementById('call-nota').value.trim(); const tempo = document.getElementById('call-timer').innerText;
+                const detalhes = `Duração: ${tempo} | Status: ${motivo} ${nota ? ' | Obs: ' + nota : ''}`;
+                this.adicionarHistorico(c.id, 'Ligação', detalhes);
+                this.moverParaFimDaFila(c.id);
+                this.fecharModal('modal-ligacao');
+                this.showToast(`Chamada tabulada: ${motivo}`, 'success');
+
+                // Envio Auto SMS (Se venda ou agendamento no CRM 1 a 1)
+                if(motivo === 'Atendeu (Sucesso)') {
+                    let primeiroNome = c.nome.trim().split(' ')[0];
+                    if (primeiroNome === "Contato") primeiroNome = "Cliente";
+                    let msg = `${primeiroNome}, parabéns! Seu pedido foi efetuado por ligação com sucesso. Para acompanhar mais sobre o seu pedido, acesse o app Revendedor Grupo Boticário.`;
+                    this.showToast(`Despachando SMS Auto para Venda...`, 'info');
+                    await App.dispararSMS_ADB(c.telefone, msg);
+                    this.adicionarHistorico(c.id, 'Sistema', `SMS de Venda Automático enviado via ADB.`);
+                }
+            },
+
+            abrirWAIndividual: function(id) {
+                this.state.contatoAtualId = id; 
+                document.getElementById('wa-ind-texto').value = ''; 
+                document.getElementById('modal-wa-individual').classList.remove('hidden'); 
+                document.getElementById('modal-wa-individual').classList.add('flex');
+            },
+
+            enviarWAIndividual: async function() {
+                const c = this.state.bancoDados.find(x => x.id === this.state.contatoAtualId); 
+                const txt = document.getElementById('wa-ind-texto').value.trim();
+                
+                if(!txt) return this.showToast("Digite a mensagem.", "warning");
+                if(typeof isAdbReadyAdb !== 'undefined' && !isAdbReadyAdb) return this.showToast("Conecte o Cabo USB no cabeçalho primeiro.", "error");
+
+                this.showToast(`Preparando disparo WA ADB para ${c.nome}...`, "info");
+                this.fecharModal('modal-wa-individual');
+
+                try {
+                    let encodedMsg = encodeURIComponent(txt).replace(/'/g, "%27").replace(/"/g, "%22");
+                    let phone = c.telefone.replace(/\D/g, '');
+                    if (phone.length === 10) phone = phone.substring(0, 2) + '9' + phone.substring(2);
+                    if (!phone.startsWith('55')) phone = '55' + phone;
+
+                    const intentUrl = `whatsapp://send?phone=${phone}&text=${encodedMsg}`;
+                    const appPackageEl = document.getElementById('cfg-app');
+                    const clickModeEl = document.getElementById('cfg-click');
+                    const appPackage = appPackageEl ? appPackageEl.value : 'com.whatsapp.w4b';
+                    const clickMode = clickModeEl ? clickModeEl.value : 'auto';
+
+                    // Desperta o celular
+                    await runAdbShell("input keyevent 224"); 
+                    await runAdbShell("input swipe 500 1500 500 200"); 
+                    await runAdbShell("input keyevent 3"); 
+                    await sleep(500);
+
+                    // Abre o WhatsApp na conversa da pessoa
+                    await runAdbShell(`am start -a android.intent.action.VIEW -d '${intentUrl}' -p ${appPackage}`);
+                    await sleep(4000);
+
+                    // Clica em enviar (Enter Automático ou Clique na Tela)
+                    if (clickMode === 'auto') {
+                        await runAdbShell("input keyevent 66"); 
+                        await sleep(300); 
+                        await runAdbShell("input keyevent 66");
                     } else {
-                        document.execCommand('insertText', false, char);
+                        const tapXEl = document.getElementById('cfg-tap-x');
+                        const tapYEl = document.getElementById('cfg-tap-y');
+                        const tapX = tapXEl ? tapXEl.value : 950;
+                        const tapY = tapYEl ? tapYEl.value : 1350;
+                        await runAdbShell(`input tap ${tapX} ${tapY}`);
                     }
-                    targetElement.dispatchEvent(new Event('input', { bubbles: true }));
-                    if (char !== '\\n') await randomWait(cnf.type_min, cnf.type_max);
-                    if (mode !== 'turbo' && Math.random() < 0.03) await randomWait(cnf.type_max * 2, cnf.type_max * 4);
+
+                    await sleep(1500); 
+                    await runAdbShell("input keyevent 3"); // Volta para tela inicial
+
+                    this.adicionarHistorico(c.id, 'WhatsApp', `Mensagem ADB: "${txt}"`); 
+                    this.moverParaFimDaFila(c.id);
+                    this.showToast(`WhatsApp enviado para ${c.nome} via ADB!`, 'success');
+                } catch (e) {
+                    console.error(e);
+                    this.showToast(`Erro ao disparar WhatsApp para ${c.nome}`, "error");
                 }
+            },
+
+            abrirSMSIndividual: function(id) {
+                this.state.contatoAtualId = id;
+                document.getElementById('sms-ind-texto').value = ''; 
+                document.getElementById('modal-sms-individual').classList.remove('hidden'); document.getElementById('modal-sms-individual').classList.add('flex');
+            },
+
+            enviarSMSIndividual: async function() {
+                const c = this.state.bancoDados.find(x => x.id === this.state.contatoAtualId);
+                const txt = document.getElementById('sms-ind-texto').value.trim();
+                if(!txt) return this.showToast("Digite o texto do SMS.", "error");
                 
-                document.execCommand('insertText', false, ' ');
-                targetElement.dispatchEvent(new Event('input', { bubbles: true }));
-            }
-
-            async function simulateMediaPaste(targetElement, file) {
-                if (!targetElement) return;
-                targetElement.focus();
-                await wait(500);
-                const dt = new DataTransfer(); dt.items.add(file);
-                const pe = new ClipboardEvent('paste', { bubbles: true });
-                Object.defineProperty(pe, 'clipboardData', { value: dt });
-                targetElement.dispatchEvent(pe);
-                await wait(1000);
-            }
-
-            // SELETORES RESILIENTES BLINDADOS
-            function findChatInput() { return document.querySelector('footer div[contenteditable="true"]') || document.querySelector('div[contenteditable="true"][data-tab="10"]') || document.querySelector('#main footer div[contenteditable="true"]'); }
-            
-            function findSendButton() { 
-                // Se estiver dentro da janela de mídia, força pegar o botão da mídia
-                let modal = document.querySelector('div[role="dialog"]') || document.querySelector('div[data-testid="drawer-left"]') || document.querySelector('div[data-testid="media-preview"]');
-                if (modal) {
-                    let btn = modal.querySelector('span[data-icon="send"]') || modal.querySelector('button[aria-label="Enviar"]') || modal.querySelector('[data-testid="send"]');
-                    if (btn) return btn;
+                this.fecharModal('modal-sms-individual');
+                this.showToast(`Preparando disparo SMS ADB para ${c.nome}...`, "info");
+                
+                let success = await App.dispararSMS_ADB(c.telefone, txt);
+                if(success) {
+                    this.adicionarHistorico(c.id, 'SMS', `Mensagem ADB: "${txt}"`);
+                    this.moverParaFimDaFila(c.id);
+                    this.showToast("SMS disparado via ADB com sucesso!", "success");
                 }
-                // Botão de envio padrão do chat
-                return document.querySelector('span[data-icon="send"]') || document.querySelector('button[aria-label="Enviar"]') || document.querySelector('button[aria-label="Send"]') || document.querySelector('[data-testid="send"]'); 
-            }
-            
-            function isMediaPreviewOpen() {
-                return !!document.querySelector('div[role="dialog"]') || !!document.querySelector('div[data-testid="drawer-left"]') || !!document.querySelector('div[data-testid="media-preview"]') || !!document.querySelector('[class*="media-preview"]');
-            }
+            },
 
-            // CAÇADOR DE LEGENDAS MODO DEUS (Para vídeos e fotos)
-            function findCaptionField() {
-                let el = document.querySelector('div[aria-placeholder*="legenda" i]') || 
-                         document.querySelector('div[aria-placeholder*="caption" i]') || 
-                         document.querySelector('div[aria-label*="legenda" i]') || 
-                         document.querySelector('div[aria-label*="caption" i]');
-                if (el) return el;
-                
-                let modals = document.querySelectorAll('div[role="dialog"], div[data-testid="drawer-left"], div[data-testid="media-preview"], [class*="media-preview"]');
-                for (let modal of modals) {
-                    let editables = modal.querySelectorAll('div[contenteditable="true"]');
-                    for (let editable of editables) {
-                        if (editable.offsetWidth > 0 && editable.offsetHeight > 0) return editable;
+            dispararSMS_ADB: async function(phone, text) {
+                if(typeof isAdbReadyAdb !== 'undefined' && !isAdbReadyAdb) { this.showToast("Você precisa Conectar o Cabo USB primeiro!", "error"); return false; }
+                try {
+                    let cleanText = text.replace(/\r?\n|\r/g, ' ').replace(/"/g, '\\"').replace(/'/g, "");
+                    let smsPhone = phone.replace(/\D/g, '');
+                    if (!smsPhone.startsWith('55') && !smsPhone.startsWith('+55')) smsPhone = '+55' + smsPhone;
+
+                    await runAdbShell(`am start -a android.intent.action.SENDTO -d smsto:${smsPhone} --es sms_body "${cleanText}"`);
+                    await sleep(3000); 
+                    await runAdbShell("input keyevent 111"); // Fecha teclado
+                    await sleep(800);
+                    await runAdbShell("input keyevent 61"); // TAB
+                    await sleep(300);
+                    await runAdbShell("input keyevent 61"); // TAB
+                    await sleep(300);
+                    await runAdbShell("input keyevent 66"); // ENTER
+                    await sleep(500);
+                    await runAdbShell("input keyevent 66"); 
+                    await sleep(1500); 
+                    await runAdbShell("input keyevent 3"); // HOME
+                    return true;
+                } catch(e) { this.showToast("Erro ao disparar SMS pelo ADB", "error"); return false; }
+            },
+
+            fecharModal: function(modalId) { document.getElementById(modalId).classList.add('hidden'); document.getElementById(modalId).classList.remove('flex'); },
+            showToast: function(msg, type = 'info') {
+                const color = type === 'error' ? 'bg-omni-red' : (type === 'success' ? 'bg-omni-green' : (type === 'warning' ? 'bg-omni-orange' : 'bg-omni-primary'));
+                const icon = type === 'error' ? 'fa-ban' : (type === 'success' ? 'fa-check' : 'fa-info');
+                const t = document.createElement('div'); t.className = `fixed bottom-4 right-4 ${color} text-white px-6 py-3 rounded-xl shadow-2xl font-bold text-sm flex items-center gap-3 transform transition-all duration-300 translate-y-10 opacity-0 z-[9999]`;
+                t.innerHTML = `<i class="fa-solid ${icon}"></i> ${msg}`; document.body.appendChild(t);
+                requestAnimationFrame(() => t.classList.remove('translate-y-10', 'opacity-0'));
+                setTimeout(() => { t.classList.add('translate-y-10', 'opacity-0'); setTimeout(() => t.remove(), 300); }, 4000);
+            },
+            copiarTexto: function(texto, event) {
+                if (event) event.stopPropagation(); 
+                if (texto === 'Não informado' || !texto || texto === 'undefined') return;
+                const el = document.createElement('textarea'); el.value = texto; el.setAttribute('readonly', ''); el.style.position = 'absolute'; el.style.left = '-9999px';
+                document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); this.showToast(`Copiado: ${texto}`, 'info');
+            },
+            allowDrop: function(ev) { ev.preventDefault(); },
+            drag: function(ev, id) { ev.dataTransfer.setData("text", id); },
+            dragLeave: function(ev) { },
+            drop: function(ev, novaColuna) {
+                ev.preventDefault(); const id = parseInt(ev.dataTransfer.getData("text")); const contato = this.state.bancoDados.find(c => c.id === id);
+                if(contato && contato.coluna !== novaColuna) { contato.coluna = novaColuna; this.adicionarHistorico(id, 'Sistema', `Movido manualmente para a coluna ${novaColuna}`); this.salvarDados(); this.renderKanbanCards(); }
+            }
+        };
+
+        // ==========================================
+        // APP DISCADOR PREDITIVO (NATIVO NA ABA 4)
+        // ==========================================
+        App.discador = {
+            state: {
+                contatosBase: [], historico: [], currentIndex: 0,
+                estadoOperacao: 'PARADO', callState: 'IDLE',
+                timeLeft: 0, timerInterval: null
+            },
+            
+            init: function() {
+                this.atualizarInterfaceBase();
+            },
+
+            switchTab: function(tabId) {
+                document.querySelectorAll('.d-tab-content').forEach(el => { el.classList.add('hidden'); el.classList.remove('flex'); });
+                document.querySelectorAll('.d-tab-btn').forEach(btn => {
+                    btn.classList.remove('bg-omni-primary', 'text-omni-base', 'border-omni-primary');
+                    btn.classList.add('bg-omni-base', 'text-omni-text', 'border-omni-border');
+                });
+                document.getElementById(`d-tab-${tabId}`).classList.remove('hidden'); document.getElementById(`d-tab-${tabId}`).classList.add('flex');
+                const activeBtn = document.getElementById(`dTabBtn-${tabId}`);
+                activeBtn.classList.remove('bg-omni-base', 'text-omni-text', 'border-omni-border');
+                activeBtn.classList.add('bg-omni-primary', 'text-omni-base', 'border-omni-primary');
+            },
+
+            processarEntradas: function() {
+                const rawText = document.getElementById('d-paste-area').value;
+                if(!rawText.trim()) return App.showToast("Cole dados antes de processar.", "warning");
+                this.analisarEPrevisualizar(rawText);
+            },
+
+            handleFileImport: function(e) {
+                const file = e.target.files[0]; if(!file) return; const reader = new FileReader();
+                reader.onload = (evt) => {
+                    try {
+                        const data = new Uint8Array(evt.target.result); const workbook = XLSX.read(data, {type: 'array'});
+                        const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {header: 1});
+                        const rawLines = json.map(row => row.join(' ')).join('\n');
+                        this.analisarEPrevisualizar(rawLines);
+                    } catch(e) { App.showToast("Erro ao ler arquivo.", "error"); }
+                };
+                reader.readAsArrayBuffer(file); e.target.value = '';
+            },
+
+            analisarEPrevisualizar: function(rawText) {
+                let validos = 0; const linhas = rawText.split('\n');
+                for (let linha of linhas) {
+                    let cleanText = linha.trim().replace(/(?:\b|\+)(?:55|0055)\s?/g, ''); if (!cleanText) continue;
+                    let tokens = cleanText.split(/\s+/); if (tokens.length === 0) continue;
+                    let phone = ""; let tokensToRemove = 0; let tempDigits = "";
+                    for (let i = tokens.length - 1; i >= 0; i--) {
+                        let tokenDigits = tokens[i].replace(/\D/g, ''); tempDigits = tokenDigits + tempDigits; 
+                        if (tempDigits.length >= 10 && tempDigits.length <= 11) { phone = tempDigits; tokensToRemove = tokens.length - i; break; }
+                        if (tempDigits.length > 11) break; 
                     }
+                    if (!phone && tokens.length > 0) {
+                        let lastTokenDigits = tokens[tokens.length - 1].replace(/\D/g, '');
+                        if(lastTokenDigits.length >= 10 && lastTokenDigits.length <= 11) { phone = lastTokenDigits; tokensToRemove = 1; }
+                    }
+                    if (!phone) continue; 
+                    let remainingTokens = tokens.slice(0, tokens.length - tokensToRemove);
+                    let code = "S/C"; let name = "";
+                    if (remainingTokens.length > 0) {
+                        let firstTokenHasNumbers = /\d/.test(remainingTokens[0]);
+                        if (firstTokenHasNumbers) { code = remainingTokens[0].replace(/\D/g, ''); remainingTokens.shift(); }
+                        if (remainingTokens.length > 0) name = remainingTokens.join(' ').replace(/[^\w\sÀ-ÿ]/g, '').trim();
+                    }
+                    if(!name) name = "Contato Não Identificado";
+                    if (phone.length === 10) phone = phone.substring(0, 2) + '9' + phone.substring(2);
+                    if (phone.length === 11) { this.state.contatosBase.push({ name, code, phone }); validos++; }
                 }
-                
-                let active = document.activeElement;
-                if (active && active.getAttribute('contenteditable') === 'true' && !active.closest('#main footer')) {
-                    return active;
-                }
-                
-                return null;
-            }
+                if(validos === 0) return App.showToast("Nenhum telefone válido encontrado.", "error");
+                this.atualizarInterfaceBase(); document.getElementById('d-paste-area').value = ''; this.switchTab('dashboard');
+                App.showToast(`${validos} contatos prontos para discagem!`, 'success');
+            },
 
-            async function engine() {
-                if (!app.active) return;
-                const next = app.contacts.find(c => c.status === 'PENDENTE');
+            getInitials: function(name) {
+                let parts = name.trim().split(' ').filter(n => n.length > 0);
+                if (parts.length === 0) return "--"; if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+                return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+            },
+
+            atualizarInterfaceBase: function() {
+                const pendentes = this.state.contatosBase.length - this.state.currentIndex;
+                document.getElementById('d-stat-total').innerText = this.state.contatosBase.length;
+                document.getElementById('badgeContacts-disc').innerText = this.state.contatosBase.length;
+                document.getElementById('d-stat-pending').innerText = Math.max(0, pendentes);
+                document.getElementById('d-stat-sales').innerText = this.state.historico.filter(h => h.resultado === 'Venda Realizada').length;
+                document.getElementById('d-stat-returns').innerText = this.state.historico.filter(h => h.resultado.includes('Retorno')).length;
+
+                const filaDiv = document.getElementById('d-queue-list');
+                if(pendentes <= 0) {
+                    filaDiv.innerHTML = `<div class="text-center text-omni-muted py-10 text-xs">Sua fila está vazia.</div>`;
+                } else {
+                    const proximos = this.state.contatosBase.slice(this.state.currentIndex, this.state.currentIndex + 50);
+                    filaDiv.innerHTML = proximos.map((c, idx) => {
+                        let initials = this.getInitials(c.name); let isCurrent = (idx === 0 && this.state.estadoOperacao !== 'PARADO');
+                        let borderClass = isCurrent ? 'border-omni-primary bg-omni-primary/10' : 'border-omni-border bg-omni-base';
+                        return `<div class="p-3 rounded-lg border ${borderClass} flex items-center gap-3 transition-colors shadow-sm"><div class="w-9 h-9 rounded-full bg-omni-panel text-omni-muted font-bold text-xs flex items-center justify-center flex-shrink-0 border border-omni-border">${initials}</div><div class="flex-1 min-w-0"><p class="text-xs font-semibold text-white truncate leading-tight mb-1">${c.name}</p><span class="inline-block px-1.5 py-0.5 rounded text-[9px] font-mono text-omni-primary border border-omni-primary/30 bg-omni-primary/10">${c.code}</span></div>${isCurrent ? '<i class="fa-solid fa-phone-volume text-omni-primary animate-pulse text-sm"></i>' : ''}</div>`;
+                    }).join('');
+                }
                 
-                if (!next) {
-                    writeLog("PROCESSO CONCLUÍDO!", "success");
-                    app.active = false;
-                    shadow.getElementById('dr-start').innerText = "INICIAR DISPAROS";
+                const histDiv = document.getElementById('d-history-list');
+                if (this.state.historico.length > 0) {
+                    histDiv.innerHTML = [...this.state.historico].reverse().slice(0, 100).map(h => {
+                        let txt = h.resultado === 'Venda Realizada' ? 'text-omni-green' : (h.resultado.includes('Retorno') ? 'text-omni-primary' : 'text-omni-muted');
+                        let pts = h.data.split(' ');
+                        return `<tr><td class="py-3 px-4 font-mono text-omni-muted">${h.codigo}</td><td class="py-3 px-4 font-semibold text-white">${h.nome}</td><td class="py-3 px-4 font-mono">${h.telefone}</td><td class="py-3 px-4 font-bold ${txt}">${h.resultado}</td><td class="py-3 px-4 text-omni-muted">${pts[0]}<br>${pts[1]}</td></tr>`;
+                    }).join('');
+                }
+            },
+
+            iniciarCampanha: function() {
+                if (!isAdbReadyAdb) return App.showToast("Conecte o USB no Header primeiro.", "error");
+                if (this.state.currentIndex >= this.state.contatosBase.length) return App.showToast("A fila acabou. Importe mais contatos.", "warning");
+
+                this.state.estadoOperacao = 'RODANDO';
+                const btnInic = document.getElementById('d-btn-iniciar');
+                btnInic.classList.remove('bg-omni-primary', 'hover:bg-white', 'text-omni-base');
+                btnInic.classList.add('bg-omni-orange', 'hover:bg-orange-500', 'text-white');
+                btnInic.innerHTML = `<i class="fa-solid fa-pause"></i> Pausar Atendimento`;
+                btnInic.onclick = () => this.pausarCampanha();
+                
+                document.getElementById('d-active-controls').classList.remove('hidden'); document.getElementById('d-active-controls').classList.add('grid');
+                this.processarChamada();
+            },
+
+            pausarCampanha: function(forcaStatus = false) {
+                this.state.estadoOperacao = 'PAUSADO';
+                const btnInic = document.getElementById('d-btn-iniciar');
+                btnInic.classList.remove('bg-omni-orange', 'hover:bg-orange-500', 'text-white');
+                btnInic.classList.add('bg-omni-primary', 'hover:bg-white', 'text-omni-base');
+                btnInic.innerHTML = `<i class="fa-solid fa-play"></i> Retomar Atendimento`;
+                btnInic.onclick = () => this.retomarCampanha();
+                
+                document.getElementById('d-active-controls').classList.add('hidden'); document.getElementById('d-active-controls').classList.remove('grid');
+                if(!forcaStatus) App.showToast("Operação em Pausa.", "info");
+            },
+
+            retomarCampanha: function() {
+                if (!isAdbReadyAdb) return App.showToast("Cabo desconectado. Conecte primeiro.", "warning");
+                this.iniciarCampanha(); if (this.state.callState === 'IDLE') this.processarChamada();
+            },
+
+            refazerLigacao: async function() {
+                if (this.state.callState !== 'IDLE') await this.desligarLigacaoFisica();
+                this.processarChamada(); 
+            },
+
+            processarChamada: async function() {
+                if (this.state.estadoOperacao !== 'RODANDO' || this.state.currentIndex >= this.state.contatosBase.length) {
+                    if(this.state.currentIndex >= this.state.contatosBase.length) this.finalizaMesaBaseVazia();
                     return;
                 }
 
-                try {
-                    writeLog("Contatando: " + next.phone);
-                    
-                    // SPA: Navegação por clique fantasma para evitar refresh e perda de estado
-                    let a = document.getElementById('wa-magic-link');
-                    if(!a) { a = document.createElement('a'); a.id = 'wa-magic-link'; document.body.appendChild(a); }
-                    a.href = "https://web.whatsapp.com/send?phone=55" + next.phone;
-                    a.click();
-                    
-                    await wait(getDelay('search_wait') + 1500);
+                let contato = this.state.contatosBase[this.state.currentIndex];
+                this.state.callState = 'CALLING'; this.atualizarInterfaceBase();
 
-                    // Verifica número inválido bloqueado pelo WA
-                    let errorModal = document.querySelector('[data-animate-modal-popup="true"]');
-                    if(errorModal && errorModal.innerText.toLowerCase().includes('inválid')) {
-                        let okBtn = errorModal.querySelector('button');
-                        if(okBtn) okBtn.click();
-                        throw new Error("Número Inválido");
+                document.getElementById('d-stage-name').innerText = contato.name;
+                document.getElementById('d-stage-code').innerText = `CÓD: ${contato.code}`;
+                document.getElementById('d-stage-phone').innerText = contato.phone.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+                
+                document.getElementById('d-timer-container').classList.remove('hidden'); document.getElementById('d-timer-container').classList.add('flex');
+                document.getElementById('d-btn-atendeu').classList.remove('hidden'); document.getElementById('d-btn-atendeu').classList.add('flex');
+                document.getElementById('d-tela-tabulacao').classList.add('hidden');
+                
+                await runAdbShell("input keyevent 224"); 
+                const res = await runAdbShell(`am start -a android.intent.action.CALL -d tel:${contato.phone}`);
+                if (!res) { App.showToast("Erro ADB. Celular não respondeu.", "error"); return; }
+
+                const maxTime = parseInt(document.getElementById('d-cfg-time').value) || 25;
+                this.state.timeLeft = maxTime;
+                const timerEl = document.getElementById('d-stage-timer'); const barEl = document.getElementById('d-timer-bar');
+                timerEl.innerText = this.state.timeLeft; barEl.style.width = '100%';
+
+                clearInterval(this.state.timerInterval);
+                this.state.timerInterval = setInterval(async () => {
+                    if (this.state.callState !== 'CALLING') return;
+                    this.state.timeLeft--; timerEl.innerText = this.state.timeLeft; barEl.style.width = `${(this.state.timeLeft / maxTime) * 100}%`;
+                    if (this.state.timeLeft <= 0) {
+                        clearInterval(this.state.timerInterval); await this.desligarLigacaoFisica();
+                        await this.registrarEAvancar('Não Atendeu (Timeout)', false, false, false); 
                     }
+                }, 1000);
+            },
 
-                    const chatInput = findChatInput();
-                    if (!chatInput) throw new Error("Chat não acessível.");
+            marcarAtendido: function() {
+                if (this.state.callState !== 'CALLING') return;
+                clearInterval(this.state.timerInterval); this.state.callState = 'TALKING';
+                document.getElementById('d-timer-container').classList.add('hidden'); document.getElementById('d-timer-container').classList.remove('flex');
+                document.getElementById('d-btn-atendeu').classList.add('hidden'); document.getElementById('d-btn-atendeu').classList.remove('flex');
+                document.getElementById('d-tela-tabulacao').classList.remove('hidden');
+            },
 
-                    const textareas = Array.from(shadow.querySelectorAll('.dr-msg-input')).map(t => t.value).filter(v => v.trim() !== '');
-                    let msgFinal = textareas.length > 0 ? textareas[Math.floor(Math.random() * textareas.length)] : '';
-                    
-                    // Variável Perfeita: aceita :re ou :re: e puxa o nome limpo do contato
-                    msgFinal = msgFinal.replace(/:re:?/gi, next.name);
+            desligarLigacaoFisica: async function() { await runAdbShell("input keyevent 6"); await sleep(600); },
+            desligarEPular: async function() {
+                if (this.state.callState === 'IDLE') return;
+                clearInterval(this.state.timerInterval); await this.desligarLigacaoFisica();
+                await this.registrarEAvancar('Pulo Manual', true, false, false);
+            },
 
-                    let captionPasted = false;
+            tabulaChamada: async function(resultado) {
+                let manterLigacao = (resultado === 'Venda Realizada' || resultado.startsWith('Retorno Agendado'));
+                if (!manterLigacao) await this.desligarLigacaoFisica(); 
+                if (resultado === 'Queda de Ligação') await this.registrarEAvancar(resultado, false, true, false);
+                else await this.registrarEAvancar(resultado, false, false, manterLigacao);
+            },
 
-                    if (app.selectedMedias.length > 0 && app.currentSpeedMode !== 'turbo') {
-                        for (let i = 0; i < app.selectedMedias.length; i++) {
-                            let file = app.selectedMedias[i];
-                            let isLast = (i === app.selectedMedias.length - 1);
-                            
-                            await simulateMediaPaste(chatInput, file);
-                            
-                            // Aguarda modal de mídia abrir garantido
-                            let modalAberto = false;
-                            for (let cycle = 0; cycle < 50; cycle++) {
-                                if (!app.active) break;
-                                if (isMediaPreviewOpen() || findCaptionField()) {
-                                    modalAberto = true;
-                                    break;
-                                }
-                                await wait(200);
-                            }
-
-                            if (modalAberto) {
-                                await wait(1500); // Tempo paciência para renderizar foto/vídeo na tela
-
-                                // Só escreve legenda na última mídia do carrossel
-                                if (isLast && msgFinal.trim().length > 0) {
-                                    let caption = null;
-                                    for(let c=0; c<20; c++){ 
-                                        caption = findCaptionField(); 
-                                        if(caption && caption.offsetWidth > 0) break; 
-                                        await wait(300); 
-                                    }
-
-                                    if(caption) {
-                                        writeLog("Inserindo legenda...");
-                                        caption.focus();
-                                        caption.click(); // Trava o cursor na tela
-                                        await wait(500);
-
-                                        try {
-                                            await typeLikeHuman(caption, msgFinal, app.currentSpeedMode);
-                                        } catch (err) {
-                                            const dtText = new DataTransfer();
-                                            dtText.setData('text/plain', msgFinal);
-                                            const pasteText = new ClipboardEvent('paste', { bubbles: true, cancelable: true });
-                                            Object.defineProperty(pasteText, 'clipboardData', { value: dtText });
-                                            caption.dispatchEvent(pasteText);
-                                        }
-
-                                        captionPasted = true;
-                                        await wait(1000);
-                                    } else {
-                                        writeLog("Campo de legenda bloqueado (ex: PDF)", "warning");
-                                    }
-                                }
-
-                                let sendBtn = findSendButton();
-                                if(sendBtn) sendBtn.click();
-                                else dispatchKey(document.activeElement, 'Enter');
-                                
-                                // Espera o modal fechar para não atropelar a próxima mídia
-                                for (let cycle = 0; cycle < 50; cycle++) {
-                                    if (!isMediaPreviewOpen()) break;
-                                    await wait(200);
-                                }
-                                await wait(1500);
-                            }
-                        }
-                    }
-
-                    // FALLBACK: Se falhou a legenda porque era documento ou falhou (atira embaixo)
-                    if (msgFinal.trim().length > 0 && !captionPasted) {
-                        writeLog("Injetando texto...");
-                        await wait(1500); 
-                        let freshChatInput = findChatInput();
-                        if (freshChatInput) {
-                            freshChatInput.focus();
-                            await typeLikeHuman(freshChatInput, msgFinal, app.currentSpeedMode);
-                            await wait(500);
-                            let sBtn = findSendButton();
-                            if(sBtn) sBtn.click();
-                            else dispatchKey(freshChatInput, 'Enter');
-                        }
-                    }
-
-                    next.status = 'ENVIADO'; syncStats(); writeLog("Sucesso: " + next.phone, "success");
-                    
-                    if (app.active) {
-                        let wt = getDelay('loop_wait');
-                        if (app.currentSpeedMode === 'normal' || app.currentSpeedMode === 'seguro') {
-                            wt += Math.floor(Math.random() * 5000); 
-                        }
-                        await wait(wt);
-                        setTimeout(engine, 100);
-                    }
-
-                } catch (e) {
-                    writeLog("Erro " + next.phone + ": " + e.message, "error");
-                    next.status = 'ERRO'; syncStats();
-                    dispatchKey(document, 'Escape'); await wait(200); dispatchKey(document, 'Escape');
-                    await wait(3000);
-                    if (app.active) setTimeout(engine, 100);
-                }
-            }
-
-            shadow.getElementById('dr-save').onclick = () => {
-                const text = shadow.getElementById('dr-import').value;
-                app.contacts = text.split('\\n').filter(l => l.trim()).map(line => {
-                    // REGRA DE SEPARAÇÃO BLINDADA (Isola o nome perfeitamente)
-                    const parts = line.split(/[\\s\\t]+/);
-                    let phone = ''; let nameParts = [];
-                    parts.forEach(p => { 
-                        const cl = p.replace(/\\D/g, ''); 
-                        if(cl.length >= 10 && !phone) phone = cl; 
-                        else nameParts.push(p); 
-                    });
-                    return { phone, name: nameParts.join(' ').trim() || 'Cliente', status: 'PENDENTE' };
-                }).filter(c => c.phone);
-                writeLog(app.contacts.length + " contatos carregados."); syncStats();
-                shadow.querySelector('[data-tab="disparo"]').click();
-            };
-
-            shadow.getElementById('dr-img-input').onchange = (e) => {
-                app.selectedMedias = Array.from(e.target.files);
-                shadow.getElementById('file-name').innerText = app.selectedMedias.length > 0 ? app.selectedMedias.length + " arquivo(s)" : "Nenhum";
-                if(app.selectedMedias.length > 0) shadow.getElementById('btn-clear-img').style.display = 'inline';
-            };
+            abrirModalCalendario: function() {
+                document.getElementById('cal-erro').classList.add('hidden'); let amanha = new Date(); amanha.setDate(amanha.getDate() + 1);
+                document.getElementById('cal-data').min = amanha.toISOString().split('T')[0];
+                document.getElementById('modal-calendario').classList.remove('hidden'); document.getElementById('modal-calendario').classList.add('flex');
+            },
+            fecharModalCalendario: function() { App.fecharModal('modal-calendario'); },
             
-            shadow.getElementById('btn-clear-img').onclick = () => {
-                app.selectedMedias = [];
-                shadow.getElementById('dr-img-input').value = "";
-                shadow.getElementById('file-name').innerText = "Nenhum";
-                shadow.getElementById('btn-clear-img').style.display = 'none';
-            }
+            validarDataCalendario: function(input) {
+                let dataSelec = new Date(input.value + "T12:00:00"); let erroEl = document.getElementById('cal-erro'); erroEl.classList.add('hidden');
+                if (isNaN(dataSelec.getTime())) return; let diaSemana = dataSelec.getDay();
+                if (diaSemana === 0 || diaSemana === 6) { erroEl.innerText = "Fins de semana bloqueados."; erroEl.classList.remove('hidden'); input.value = ""; return; }
+                const feriadosNacionais = ['01-01', '21-04', '01-05', '07-09', '12-10', '02-11', '15-11', '25-12'];
+                let diaMes = ("0" + dataSelec.getDate()).slice(-2) + "-" + ("0" + (dataSelec.getMonth() + 1)).slice(-2);
+                if (feriadosNacionais.includes(diaMes)) { erroEl.innerText = "Feriado Nacional. Escolha outro dia."; erroEl.classList.remove('hidden'); input.value = ""; return; }
+            },
+            
+            confirmarAgendamento: async function() {
+                let dataStr = document.getElementById('cal-data').value; let horaStr = document.getElementById('cal-hora').value; let erroEl = document.getElementById('cal-erro');
+                if (!dataStr || !horaStr) { erroEl.innerText = "Escolha data e horário válidos."; erroEl.classList.remove('hidden'); return; }
+                let [h, m] = horaStr.split(':').map(Number);
+                if (h < 9 || h > 18 || (h === 18 && m > 0)) { erroEl.innerText = "Horário deve ser entre 09:00 e 18:00."; erroEl.classList.remove('hidden'); return; }
+                let dataFormatada = dataStr.split('-').reverse().join('/') + " às " + horaStr;
+                this.fecharModalCalendario(); await this.tabulaChamada(`Retorno Agendado: ${dataFormatada}`);
+            },
 
-            shadow.getElementById('dr-start').onclick = () => {
-                if (app.contacts.length === 0) return alert("Adicione contatos na aba 'Lista'!");
-                app.active = !app.active;
-                const btn = shadow.getElementById('dr-start');
-                if (app.active) {
-                    btn.innerText = "PAUSAR MOTOR"; btn.style.background = "var(--c-danger)";
-                    engine();
+            registrarEAvancar: async function(resultado, foiPulo = false, repeteAgora = false, manterLigacao = false) {
+                if (!manterLigacao) this.state.callState = 'IDLE';
+                let contato = this.state.contatosBase[this.state.currentIndex];
+                this.state.historico.push({ codigo: contato.code, nome: contato.name, telefone: contato.phone, resultado: resultado, data: new Date().toLocaleString('pt-BR') });
+
+                let textToSend = ""; let primeiroNome = contato.name.trim().split(' ')[0]; if (primeiroNome === "Contato") primeiroNome = "Cliente";
+
+                // Venda ou Retorno -> SMS Automático
+                if (resultado === 'Venda Realizada') {
+                    textToSend = `${primeiroNome}, parabéns! Seu pedido foi efetuado por ligação com sucesso. Para acompanhar mais sobre o seu pedido, acesse o app Revendedor Grupo Boticário.`;
+                } else if (resultado.startsWith('Retorno Agendado:')) {
+                    let partes = resultado.replace('Retorno Agendado: ', '').split(' às ');
+                    if (partes.length === 2) textToSend = `${primeiroNome}, passando aqui para te deixar esse lembrete: iremos retornar nossa conversa dia ${partes[0]} às ${partes[1]}. Não se esqueça viu, qualquer coisa me chame no WhatsApp ou pelo chat dentro do aplicativo Revendedor Grupo Boticário.`;
+                }
+
+                if (textToSend && !repeteAgora) {
+                    App.showToast(`Despachando SMS oculto para ${primeiroNome}...`, 'info');
+                    await App.dispararSMS_ADB(contato.phone, textToSend);
+                }
+
+                if (manterLigacao) {
+                    document.getElementById('d-grid-tabulacao').classList.add('hidden');
+                    document.getElementById('d-aguardo-desligamento').classList.remove('hidden'); document.getElementById('d-aguardo-desligamento').classList.add('flex');
                 } else {
-                    btn.innerText = "INICIAR DISPAROS"; btn.style.background = "var(--c-primary)";
+                    this.concluirAvancoFila(repeteAgora);
                 }
-            };
-            
-            shadow.getElementById('dr-reset').onclick = () => {
-                app.contacts = []; app.selectedMedias = [];
-                shadow.getElementById('dr-import').value = ""; shadow.getElementById('dr-img-input').value = "";
-                shadow.getElementById('file-name').innerText = "Nenhum";
-                shadow.getElementById('btn-clear-img').style.display = 'none';
-                syncStats(); writeLog("Memória Limpa.");
-            };
+            },
+
+            finalizarLigacaoPosTabulacao: async function() { await this.desligarLigacaoFisica(); this.concluirAvancoFila(false); },
+
+            concluirAvancoFila: function(repeteAgora) {
+                this.state.callState = 'IDLE'; if (!repeteAgora) this.state.currentIndex++; 
+                this.atualizarInterfaceBase(); this.resetarInterfaceCall();
+                if (this.state.estadoOperacao === 'RODANDO') setTimeout(() => this.processarChamada(), 1500); 
+            },
+
+            resetarInterfaceCall: function() {
+                document.getElementById('d-timer-container').classList.add('hidden'); document.getElementById('d-timer-container').classList.remove('flex');
+                document.getElementById('d-btn-atendeu').classList.add('hidden'); document.getElementById('d-btn-atendeu').classList.remove('flex');
+                document.getElementById('d-tela-tabulacao').classList.add('hidden');
+                document.getElementById('d-grid-tabulacao').classList.remove('hidden');
+                document.getElementById('d-aguardo-desligamento').classList.add('hidden'); document.getElementById('d-aguardo-desligamento').classList.remove('flex');
+            },
+
+            finalizaMesaBaseVazia: function() {
+                this.state.estadoOperacao = 'PARADO';
+                document.getElementById('d-stage-name').innerText = "Fila Concluída!";
+                document.getElementById('d-stage-code').innerText = "--"; document.getElementById('d-stage-phone').innerText = "--";
+                const btnInic = document.getElementById('d-btn-iniciar');
+                btnInic.classList.remove('bg-omni-orange', 'hover:bg-orange-500', 'text-white'); btnInic.classList.add('bg-omni-primary', 'hover:bg-white', 'text-omni-base');
+                btnInic.innerHTML = `<i class="fa-solid fa-play"></i> Iniciar Atendimento`; btnInic.onclick = () => this.iniciarCampanha();
+                document.getElementById('d-active-controls').classList.add('hidden'); document.getElementById('d-active-controls').classList.remove('grid');
+                this.resetarInterfaceCall();
+            },
+
+            exportarRelatorioCSV: function() {
+                if(this.state.historico.length === 0) return App.showToast("Histórico vazio. Nenhuma chamada realizada.", "warning");
+                let csvContent = "\uFEFFCÓDIGO;NOME;TELEFONE;OCORRIDO;DATA;HORÁRIO\n";
+                this.state.historico.forEach(h => {
+                    let cod = h.codigo || "S/C"; let partes = h.data.replace(',', '').split(' ');
+                    csvContent += `"${cod}";"${h.nome}";"${h.telefone}";"${h.resultado}";"${partes[0] || ""}";"${partes[1] || ""}"\n`;
+                });
+                let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' }); let link = document.createElement("a");
+                link.href = URL.createObjectURL(blob); link.download = "Relatorio_Discador.csv"; link.style.display = 'none';
+                document.body.appendChild(link); link.click(); document.body.removeChild(link); App.showToast("Relatório CSV baixado com sucesso!", "success");
+            }
         };
 
-        const scriptString = codigoDoRobo.toString();
-        const linkMagico = document.getElementById('btn-magico');
-        linkMagico.href = 'javascript:(' + encodeURIComponent(scriptString) + ')();';
+        // ==========================================
+        // WA DISPARADOR MASSA (INTEGRAÇÃO ANTIGA)
+        // ==========================================
+        let contatosBaseAdb = []; let currentIndexAdb = 0; let processadosAdb = 0; let isCampaignActiveAdb = false; let isProcessingCoreAdb = false; let variaveisMensagemAdb = [""]; 
+        function salvarConfiguracoesAdb() { const config = { variaveis: variaveisMensagemAdb, app: document.getElementById('cfg-app').value, clickMode: document.getElementById('cfg-click').value, tapX: document.getElementById('cfg-tap-x').value, tapY: document.getElementById('cfg-tap-y').value, delayMin: document.getElementById('cfg-delay-min').value, delayMax: document.getElementById('cfg-delay-max').value }; localStorage.setItem('disparaAiConfigAdb', JSON.stringify(config)); }
+        function renderVariacoesUIAdb() { const container = document.getElementById('variacoes-container'); if(!container) return; container.innerHTML = ''; variaveisMensagemAdb.forEach((texto, index) => { const div = document.createElement('div'); div.className = "relative group"; div.innerHTML = `<div class="absolute top-2 right-2 flex gap-2"><span class="bg-omni-base text-omni-muted text-[9px] px-2 py-0.5 rounded font-bold border border-omni-border pointer-events-none">VAR ${index + 1}</span>${variaveisMensagemAdb.length > 1 ? `<button onclick="removerVariacaoAdb(${index})" class="bg-omni-base border border-omni-border text-omni-muted hover:text-omni-red rounded w-6 h-6 flex items-center justify-center transition-colors shadow-sm"><i class="fa-solid fa-trash text-[10px]"></i></button>` : ''}</div><textarea rows="3" class="w-full bg-omni-base input-clean rounded-lg p-3 pt-8 text-sm text-white font-medium placeholder-omni-muted/50 resize-none" oninput="updateVariacaoAdb(${index}, this.value)">${texto.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;")}</textarea>`; container.appendChild(div); }); }
+        function addVariacaoAdb() { variaveisMensagemAdb.push(""); renderVariacoesUIAdb(); salvarConfiguracoesAdb(); }
+        function removerVariacaoAdb(index) { variaveisMensagemAdb.splice(index, 1); renderVariacoesUIAdb(); salvarConfiguracoesAdb(); }
+        function updateVariacaoAdb(index, val) { variaveisMensagemAdb[index] = val; salvarConfiguracoesAdb(); }
+        function toggleCoordenadas() { document.getElementById('painel-coord').style.display = document.getElementById('cfg-click').value === 'manual' ? 'block' : 'none'; }
+        function limparBaseAdb() { if(isCampaignActiveAdb) return App.showToast("Pare o motor primeiro.", "error"); contatosBaseAdb = []; processadosAdb = 0; currentIndexAdb = 0; atualizarMetricasAdb(); App.showToast("Fila WA esvaziada.", "success"); }
+        function processarEntradasAdb() { const rawText = document.getElementById('paste-area-adb').value; if(!rawText.trim()) return; let total = 0; rawText.split('\n').forEach(linha => { let s = linha.trim().replace(/(?:\b|\+)(?:55|0055)\s?/g, ''); if (!s) return; let phone = "", nameParts = []; let words = s.split(/\s+/); for (let word of words) { let cleanNumbers = word.replace(/\D/g, ''); if (cleanNumbers.length >= 10 && cleanNumbers.length <= 11 && !phone) phone = cleanNumbers; else if (!(/^[a-zA-Z0-9]+$/.test(word) && word.length <= 8 && /\d/.test(word)) && !(cleanNumbers.length > 0 && cleanNumbers.length <= 7)) nameParts.push(word); } if (!phone) return; if (phone.length === 10) phone = phone.substring(0, 2) + '9' + phone.substring(2); if (phone.length !== 11) return; let name = nameParts.join(' ').replace(/[^\w\sÀ-ÿ]/g, '').trim() || "Contato"; total++; contatosBaseAdb.push({ name, phone, statusEnvio: 'Pendente' }); }); atualizarMetricasAdb(); document.getElementById('paste-area-adb').value = ''; App.showToast(`${total} contatos WA injetados!`, 'success'); }
+        function parseMensagem(template, nomeContato) { let texto = template.replace(/:re:?/gi, nomeContato); const regex = /\{([^{}]+)\}/g; let match; while ((match = regex.exec(texto)) !== null) { const options = match[1].split('|'); const choice = options[Math.floor(Math.random() * options.length)]; texto = texto.replace(match[0], choice); regex.lastIndex = 0; } return texto; }
+        function testarMacroAdb() { const valid = variaveisMensagemAdb.filter(v => v.trim() !== ""); if(valid.length === 0) return App.showToast("Escreva uma mensagem.", "warning"); alert(parseMensagem(valid[Math.floor(Math.random() * valid.length)], "Camila Viana")); }
+        function atualizarMetricasAdb() { const pendentes = contatosBaseAdb.filter(c => c.statusEnvio === 'Pendente').length; document.getElementById('stat-pendentes-adb').innerText = pendentes; document.getElementById('stat-feitos-adb').innerText = processadosAdb; if(pendentes > 0 && isAdbReadyAdb && !isCampaignActiveAdb) document.getElementById('btn-start-adb').disabled = false; else document.getElementById('btn-start-adb').disabled = true; if (pendentes === 0) document.getElementById('stat-eta-adb').innerText = "00h 00m"; else { const min = parseInt(document.getElementById('cfg-delay-min').value) || 8; const max = parseInt(document.getElementById('cfg-delay-max').value) || 21; const totalSeconds = Math.ceil(pendentes * (((min + max) / 2) + 8)); const hours = Math.floor(totalSeconds / 3600), minutes = Math.floor((totalSeconds % 3600) / 60); document.getElementById('stat-eta-adb').innerText = (hours > 0 ? `${hours}h ` : "") + `${minutes}m`; } }
+        function setActionUIAdb(icon, text, isPulsing = false, iconColor = 'text-omni-primary', bgColor = 'bg-omni-base') { document.getElementById('action-feedback').classList.remove('hidden'); document.getElementById('action-feedback').classList.add('flex'); document.getElementById('action-icon-box').className = `w-16 h-16 rounded-full ${bgColor} border border-omni-border flex items-center justify-center mb-3 transition-all ${isPulsing ? 'shadow-[0_0_15px_rgba(56,189,248,0.5)]' : ''}`; document.getElementById('action-icon').className = `fa-solid ${icon} text-2xl ${iconColor}`; document.getElementById('action-text').innerText = text; }
+        async function testarToqueAdb() { if (!isAdbReadyAdb) return App.showToast("Conecte USB.", "warning"); const x = document.getElementById('cfg-tap-x').value, y = document.getElementById('cfg-tap-y').value; await runAdbShell("input keyevent 224"); await runAdbShell(`input tap ${x} ${y}`); }
+        async function iniciarCampanhaAdb() { if (!isAdbReadyAdb) return App.showToast("Conecte o USB.", "error"); if(variaveisMensagemAdb.filter(v => v.trim() !== "").length === 0) return App.showToast("Preencha Variação.", "error"); isCampaignActiveAdb = true; document.getElementById('btn-start-adb').style.display = 'none'; document.getElementById('btn-stop-adb').style.display = 'flex'; processarProximoAdb(); }
+        async function processarProximoAdb() { if (!isCampaignActiveAdb || isProcessingCoreAdb) return; isProcessingCoreAdb = true; while (currentIndexAdb < contatosBaseAdb.length && contatosBaseAdb[currentIndexAdb].statusEnvio !== 'Pendente') currentIndexAdb++; if (currentIndexAdb >= contatosBaseAdb.length) { isCampaignActiveAdb = false; isProcessingCoreAdb = false; document.getElementById('stage-status-adb').innerText = "CONCLUÍDO"; document.getElementById('stage-name-adb').innerText = "Fila Finalizada"; document.getElementById('stage-phone-adb').innerText = "---"; document.getElementById('btn-stop-adb').style.display = 'none'; document.getElementById('btn-start-adb').style.display = 'flex'; setActionUIAdb('fa-flag-checkered', 'Concluído!', false, 'text-omni-green', 'bg-omni-green/10'); App.showToast("Fim da Fila!", "success"); atualizarMetricasAdb(); return; } let contato = contatosBaseAdb[currentIndexAdb]; document.getElementById('stage-status-adb').innerText = `ENVIANDO • ID: ${currentIndexAdb + 1}/${contatosBaseAdb.length}`; document.getElementById('stage-name-adb').innerText = contato.name; document.getElementById('stage-phone-adb').innerText = contato.phone.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3"); try { const valid = variaveisMensagemAdb.filter(v => v.trim() !== ""); const msgSorteada = valid[Math.floor(Math.random() * valid.length)]; const msgFinal = parseMensagem(msgSorteada, contato.name); const encodedMsg = encodeURIComponent(msgFinal).replace(/'/g, "%27").replace(/"/g, "%22"); const intentUrl = `whatsapp://send?phone=55${contato.phone}&text=${encodedMsg}`; const appPackage = document.getElementById('cfg-app').value; const clickMode = document.getElementById('cfg-click').value; setActionUIAdb('fa-mobile-screen', 'Despertando...', true, 'text-omni-orange', 'bg-omni-orange/10'); await runAdbShell("input keyevent 224"); await runAdbShell("input swipe 500 1500 500 200"); await runAdbShell("input keyevent 3"); await sleep(500); setActionUIAdb('fa-whatsapp', 'Injetando Texto...', true, 'text-omni-primary', 'bg-omni-primary/10'); await runAdbShell(`am start -a android.intent.action.VIEW -d '${intentUrl}' -p ${appPackage}`); await sleep(4000); if (clickMode === 'auto') { setActionUIAdb('fa-paper-plane', 'Enviando (Enter)...', true, 'text-omni-base', 'bg-omni-primary'); await sleep(400); await runAdbShell("input keyevent 66"); await sleep(300); await runAdbShell("input keyevent 66"); } else { setActionUIAdb('fa-hand-pointer', 'Tap Manual...', true, 'text-omni-base', 'bg-omni-primary'); const tapX = document.getElementById('cfg-tap-x').value || 950, tapY = document.getElementById('cfg-tap-y').value || 1350; await runAdbShell(`input tap ${tapX} ${tapY}`); } await sleep(1500); await runAdbShell("input keyevent 3"); contato.statusEnvio = 'Enviado'; processadosAdb++; currentIndexAdb++; atualizarMetricasAdb(); if (!isCampaignActiveAdb) { isProcessingCoreAdb = false; return; } const delaySegundos = rnd(parseInt(document.getElementById('cfg-delay-min').value) || 5, parseInt(document.getElementById('cfg-delay-max').value) || 15); setActionUIAdb('fa-hourglass-half', `Pausa: ${delaySegundos}s`, false, 'text-omni-muted', 'bg-omni-base'); for(let i=0; i<delaySegundos; i++) { if(!isCampaignActiveAdb) break; if(i > 0 && i % 8 === 0) runAdbShell("input keyevent 224"); await sleep(1000); } isProcessingCoreAdb = false; if(isCampaignActiveAdb) processarProximoAdb(); } catch (e) { contato.statusEnvio = 'Erro'; currentIndexAdb++; atualizarMetricasAdb(); isProcessingCoreAdb = false; if(isCampaignActiveAdb) processarProximoAdb(); } }
+        function pararCampanhaAdb() { isCampaignActiveAdb = false; document.getElementById('btn-stop-adb').style.display = 'none'; document.getElementById('btn-start-adb').style.display = 'flex'; document.getElementById('stage-status-adb').innerText = "Interrompido"; setActionUIAdb('fa-hand', 'Pausado', false, 'text-omni-red', 'bg-omni-red/10'); }
+        function exportarRelatorioAdb() { if (contatosBaseAdb.length === 0) return App.showToast("Fila vazia.", "warning"); let csv = "Nome,Telefone,Status\n"; contatosBaseAdb.forEach(c => csv += `${c.name},${c.phone},${c.statusEnvio}\n`); const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "Relatorio_WA.csv"; link.click(); }
+
+        window.onload = () => App.init();
     </script>
 </body>
 </html>
