@@ -13,7 +13,7 @@
     <!-- SheetJS para ler Excel (.xlsx) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
-    <!-- Configuração do Tailwind (Paleta Omni VD) -->
+    <!-- Configuração do Tailwind (Paleta Omni VD e WA Clone) -->
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -22,16 +22,26 @@
                     fontFamily: { sans: ['Inter', 'sans-serif'] },
                     colors: {
                         omni: {
-                            base: '#0B1120',      // Fundo escuro profundo (Navy)
-                            panel: '#151E32',     // Cards e painéis
-                            border: '#23314B',    // Bordas sutis
-                            primary: '#38BDF8',   // Azul/Ciano claro
-                            purple: '#A855F7',    // Roxo (Logo)
-                            green: '#22C55E',     // Verde (Logo)
-                            orange: '#F97316',    // Laranja (Logo)
-                            red: '#EF4444',       // Alertas
-                            text: '#F1F5F9',      // Texto principal
-                            muted: '#94A3B8'      // Texto secundário
+                            base: '#0B1120',      
+                            panel: '#151E32',     
+                            border: '#23314B',    
+                            primary: '#38BDF8',   
+                            purple: '#A855F7',    
+                            green: '#22C55E',     
+                            orange: '#F97316',    
+                            red: '#EF4444',       
+                            text: '#F1F5F9',      
+                            muted: '#94A3B8'      
+                        },
+                        wa: {
+                            base: '#111B21',
+                            panel: '#202C33',
+                            chatBg: '#0B141A',
+                            border: '#222D34',
+                            text: '#E9EDEF',
+                            muted: '#8696A0',
+                            bubbleOut: '#005C4B',
+                            bubbleIn: '#202C33'
                         }
                     }
                 }
@@ -53,13 +63,13 @@
             border: 1px solid rgba(35, 49, 75, 0.8);
         }
 
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #475569; }
-        
         .hide-scroll::-webkit-scrollbar { display: none; }
 
+        /* Scroll Horizontal do Kanban */
         .kanban-board {
             display: flex;
             gap: 1.5rem;
@@ -99,6 +109,7 @@
         .bg-diamante { background: linear-gradient(135deg, #B9F2FF, #38BDF8); color: #1E293B; }
         .bg-indefinido { background: #475569; color: white; }
 
+        /* Animação do Logo */
         .logo-container { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; transition: all 0.3s ease; }
         .logo-icon { width: 36px; height: 36px; border-radius: 50%; background: conic-gradient(#22C55E 0deg 90deg, #F97316 90deg 180deg, #EF4444 180deg 270deg, #A855F7 270deg 360deg); padding: 4px; box-shadow: 0 0 15px rgba(34, 197, 94, 0.2); transition: all 0.4s ease; }
         .logo-inner { width: 100%; height: 100%; background: #0B1120; border-radius: 50%; }
@@ -108,16 +119,16 @@
 
         .input-clean { border: 1px solid #23314B; transition: all 0.2s ease; }
         .input-clean:focus { border-color: #38BDF8; box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2); outline: none; }
-        .discador-timer-bar { transition: width 1s linear; }
-
-        /* Cursor pointer para elementos copiáveis */
+        
         .copy-hover { cursor: pointer; transition: color 0.2s ease; }
         .copy-hover:hover { color: #38BDF8 !important; }
+        
+        .timer-bar { transition: width 1s linear; }
+        .wa-bg { background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-repeat: repeat; opacity: 0.8; }
     </style>
 </head>
 <body class="flex flex-col h-screen">
 
-    <!-- HEADER GLOBAL -->
     <header class="glass h-16 flex-shrink-0 flex items-center justify-between px-6 z-50 shadow-md border-b border-omni-border">
         <!-- Logo -->
         <div class="logo-container" id="main-logo" onclick="this.classList.toggle('logo-expanded')">
@@ -130,7 +141,7 @@
         <!-- Barra de Pesquisa Global -->
         <div class="flex-1 max-w-2xl mx-8 relative group">
             <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-omni-muted group-focus-within:text-omni-primary transition-colors text-lg"></i>
-            <input type="text" id="global-search" oninput="App.filtrar()" placeholder="Buscar por Nome, Código, CPF, Telefone ou E-mail..." 
+            <input type="text" id="global-search" oninput="App.filtrar()" placeholder="Buscar por Nome, Código, Telefone ou E-mail..." 
                    class="w-full bg-omni-base border border-omni-border rounded-full py-3 pl-12 pr-12 text-sm text-white font-medium outline-none focus:border-omni-primary focus:ring-1 focus:ring-omni-primary transition-all placeholder:text-omni-muted shadow-inner">
             <button id="btn-clear-search" onclick="App.limparBusca()" class="absolute right-4 top-1/2 -translate-y-1/2 text-omni-muted hover:text-white transition-colors hidden h-8 w-8 flex items-center justify-center rounded-full hover:bg-omni-border">
                 <i class="fa-solid fa-circle-xmark text-lg"></i>
@@ -139,7 +150,6 @@
 
         <!-- Controles Direita -->
         <div class="flex items-center gap-4">
-            
             <!-- Central de Notificações com Menu Suspenso -->
             <div class="relative">
                 <button class="relative p-2 text-omni-muted hover:text-white transition-colors" title="Notificações" onclick="App.toggleNotificacoes(event)">
@@ -147,7 +157,6 @@
                     <span id="badge-notificacoes" class="absolute top-1 right-1 w-4 h-4 bg-omni-red rounded-full text-[9px] font-bold flex items-center justify-center border-2 border-omni-panel hidden">0</span>
                 </button>
                 
-                <!-- Dropdown -->
                 <div id="dropdown-notificacoes" class="hidden absolute top-full right-0 mt-3 w-80 bg-omni-panel border border-omni-border rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.5)] z-[100] flex flex-col overflow-hidden" onclick="event.stopPropagation()">
                     <div class="p-4 border-b border-omni-border bg-omni-base flex justify-between items-center">
                         <h3 class="font-bold text-white text-sm"><i class="fa-solid fa-bell text-omni-primary mr-2"></i>Avisos e Tarefas</h3>
@@ -173,6 +182,9 @@
 
             <!-- Botão Conectar ADB Unificado -->
             <div class="flex items-center gap-2">
+                <div id="usb-disconnected-warning" class="hidden text-omni-red font-semibold text-xs flex items-center gap-2 mr-2">
+                    <i class="fa-solid fa-triangle-exclamation animate-pulse"></i> Cabo Solto!
+                </div>
                 <div id="usb-status" class="hidden items-center gap-2 px-3 py-1.5 rounded-lg bg-omni-green/10 border border-omni-green/30 text-omni-green transition-all">
                     <div class="w-2 h-2 rounded-full bg-omni-green animate-pulse shadow-[0_0_8px_#22C55E]"></div>
                     <span class="text-[10px] font-bold uppercase tracking-wider">Conectado</span>
@@ -184,10 +196,9 @@
         </div>
     </header>
 
-    <!-- NAVEGAÇÃO DAS ABAS (Inicia em Dados) -->
     <nav class="bg-omni-base border-b border-omni-border flex-shrink-0 px-6 flex gap-2">
         <button class="tab-btn px-4 py-3 text-sm font-semibold border-b-2 border-transparent text-omni-muted hover:text-white transition-colors flex items-center gap-2" data-target="tab-funil" onclick="App.mudarAba(this)">
-            <i class="fa-solid fa-filter"></i> Funil (CRM)
+            <i class="fa-solid fa-filter"></i> Funil
         </button>
         <button class="tab-btn px-4 py-3 text-sm font-semibold border-b-2 border-transparent text-omni-muted hover:text-white transition-colors flex items-center gap-2" data-target="tab-wa-chat" onclick="App.mudarAba(this)">
             <i class="fa-brands fa-whatsapp"></i> WhatsApp
@@ -201,46 +212,104 @@
         <button class="tab-btn px-4 py-3 text-sm font-semibold border-b-2 border-transparent text-omni-muted hover:text-white transition-colors flex items-center gap-2" data-target="tab-retornos" onclick="App.mudarAba(this)">
             <i class="fa-regular fa-calendar-check"></i> Retornos
         </button>
-        <!-- ABA DADOS (Aba Inicial Padrão) -->
+        <!-- ABA INICIAL -->
         <button class="tab-btn px-4 py-3 text-sm font-semibold border-b-2 border-omni-primary text-omni-primary transition-colors flex items-center gap-2" data-target="tab-dados" onclick="App.mudarAba(this)">
             <i class="fa-solid fa-database"></i> Dados
         </button>
     </nav>
 
-    <!-- ÁREA PRINCIPAL DAS ABAS -->
+    <!-- ÁREA PRINCIPAL -->
     <main class="flex-1 relative overflow-hidden bg-omni-base min-h-0">
         
-        <!-- ABA 1: FUNIL (CRM) -->
+        <!-- ABA 1: FUNIL -->
         <section id="tab-funil" class="tab-content absolute inset-0 p-6 flex flex-col hidden">
             <div class="kanban-board" id="kanban-container">
                 <!-- Colunas injetadas via JS -->
             </div>
         </section>
 
-        <!-- ABA 2: WHATSAPP (Painel Oficial) -->
-        <section id="tab-wa-chat" class="tab-content absolute inset-0 flex flex-col hidden">
-            <div class="flex-1 w-full h-full flex flex-col items-center justify-center p-8 bg-[url('https://i.pinimg.com/736x/8c/98/99/8c98994518b575bfd8c949e91d20548b.jpg')] bg-cover bg-center bg-blend-overlay bg-black/80">
-                <div class="glass p-10 rounded-3xl max-w-2xl text-center border border-omni-border shadow-2xl flex flex-col items-center">
-                    <div class="w-24 h-24 rounded-full bg-omni-green/10 border border-omni-green/30 flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(34,197,94,0.2)]">
-                        <i class="fa-brands fa-whatsapp text-6xl text-omni-green"></i>
+        <!-- ABA 2: WHATSAPP CLONE -->
+        <section id="tab-wa-chat" class="tab-content absolute inset-0 p-4 flex flex-col hidden">
+            <div class="flex flex-1 w-full bg-wa-base rounded-2xl overflow-hidden border border-omni-border shadow-2xl">
+                
+                <!-- PAINEL ESQUERDO: Lista de Contatos -->
+                <div class="w-1/3 flex flex-col border-r border-wa-border bg-wa-base min-w-[300px]">
+                    <!-- Header Sidebar -->
+                    <div class="h-16 bg-wa-panel flex items-center px-4 justify-between border-b border-wa-border">
+                        <div class="w-10 h-10 rounded-full bg-wa-border flex items-center justify-center">
+                            <i class="fa-solid fa-user text-wa-muted text-lg"></i>
+                        </div>
+                        <div class="flex gap-4 text-wa-muted">
+                            <i class="fa-solid fa-message cursor-pointer hover:text-wa-text transition-colors"></i>
+                            <i class="fa-solid fa-ellipsis-vertical cursor-pointer hover:text-wa-text transition-colors"></i>
+                        </div>
                     </div>
-                    <h2 class="text-3xl font-black text-white mb-4">Acesso Oficial do WhatsApp Web</h2>
-                    <div class="bg-omni-panel border border-omni-border p-5 rounded-xl mb-8 text-left">
-                        <p class="text-sm text-omni-muted leading-relaxed mb-3">
-                            <i class="fa-solid fa-shield-halved text-omni-primary mr-2"></i><b>Aviso de Segurança (Meta):</b> O sistema do Facebook possui uma trava militar (X-Frame-Options) que proíbe exibir o WhatsApp Web espelhado dentro de qualquer outro sistema do mundo para evitar roubo de dados.
-                        </p>
-                        <p class="text-sm text-omni-muted leading-relaxed">
-                            Para utilizar o WhatsApp Web de forma 100% segura, clique no botão abaixo. Ele abrirá uma guia oficial em paralelo para você operar com segurança enquanto usa o Omni VD.
-                        </p>
+                    <!-- Search Bar -->
+                    <div class="p-2 bg-wa-base border-b border-wa-border">
+                        <div class="bg-wa-panel rounded-lg flex items-center px-3 py-1.5 gap-3">
+                            <i class="fa-solid fa-magnifying-glass text-wa-muted text-sm"></i>
+                            <input type="text" id="wa-clone-search" oninput="App.filtrarWaClone()" placeholder="Pesquisar ou começar uma nova conversa" class="bg-transparent flex-1 text-sm text-wa-text outline-none placeholder:text-wa-muted/70">
+                        </div>
                     </div>
-                    <a href="https://web.whatsapp.com/" target="_blank" class="w-full bg-omni-green hover:bg-green-500 text-white font-black text-lg py-4 px-8 rounded-xl transition-all shadow-[0_0_20px_rgba(34,197,94,0.4)] flex items-center justify-center gap-3">
-                        <i class="fa-solid fa-up-right-from-square"></i> Abrir Sessão Segura do WhatsApp
-                    </a>
+                    <!-- Lista Dinâmica -->
+                    <div id="wa-clone-list" class="flex-1 overflow-y-auto hide-scroll bg-wa-base flex flex-col">
+                        <!-- Itens renderizados via JS -->
+                    </div>
+                </div>
+
+                <!-- PAINEL DIREITO: Chat Area -->
+                <div class="flex-1 flex flex-col bg-wa-chatBg relative">
+                    <!-- Estado Vazio (Antes de selecionar contato) -->
+                    <div id="wa-clone-empty" class="absolute inset-0 flex flex-col items-center justify-center bg-wa-border z-10">
+                        <div class="w-72 h-72 bg-wa-panel rounded-full flex items-center justify-center mb-8 shadow-inner">
+                            <i class="fa-brands fa-whatsapp text-8xl text-wa-muted/30"></i>
+                        </div>
+                        <h2 class="text-3xl font-light text-wa-text mb-4">WhatsApp Integrado</h2>
+                        <p class="text-wa-muted text-sm text-center max-w-md">Envie e receba mensagens usando a conexão nativa ADB do seu smartphone. Selecione um contato no funil ao lado.</p>
+                        <p class="text-wa-muted/50 text-xs mt-8 flex items-center gap-1"><i class="fa-solid fa-lock"></i> Criptografado ponta-a-ponta via USB</p>
+                    </div>
+
+                    <!-- Header do Chat -->
+                    <div id="wa-clone-header" class="h-16 bg-wa-panel flex items-center px-4 gap-4 hidden z-20 border-b border-wa-border">
+                        <div class="w-10 h-10 rounded-full bg-wa-border flex items-center justify-center text-wa-text font-bold" id="wa-clone-avatar"></div>
+                        <div class="flex-1">
+                            <h3 class="font-semibold text-wa-text leading-tight" id="wa-clone-name">Nome do Contato</h3>
+                            <p class="text-[11px] text-wa-muted" id="wa-clone-phone">+55 00 0000-0000</p>
+                        </div>
+                        <div class="flex items-center gap-4 text-wa-muted">
+                            <div id="wa-clone-adb-status" class="w-2.5 h-2.5 rounded-full bg-omni-red" title="Status ADB"></div>
+                            <i class="fa-solid fa-magnifying-glass cursor-pointer"></i>
+                            <i class="fa-solid fa-ellipsis-vertical cursor-pointer"></i>
+                        </div>
+                    </div>
+
+                    <!-- Corpo do Chat (Fundo) -->
+                    <div id="wa-clone-body" class="flex-1 overflow-y-auto p-6 wa-bg hidden flex-col gap-2 z-0 relative">
+                        <div class="absolute inset-0 bg-[#0B141A]/90 z-0"></div> <!-- Escurece o fundo -->
+                        <div class="text-center z-10 my-4">
+                            <span class="bg-wa-panel text-wa-muted text-xs px-3 py-1 rounded-lg uppercase tracking-wider font-semibold shadow">Início do Histórico</span>
+                        </div>
+                        <div id="wa-clone-messages" class="flex flex-col gap-2 z-10">
+                            <!-- Mensagens injetadas via JS -->
+                        </div>
+                    </div>
+
+                    <!-- Área de Input -->
+                    <div id="wa-clone-input-area" class="min-h-[60px] bg-wa-panel px-4 py-3 flex items-end gap-4 hidden z-20">
+                        <div class="flex items-center gap-4 text-wa-muted mb-2">
+                            <i class="fa-regular fa-face-smile text-xl cursor-pointer hover:text-wa-text transition-colors"></i>
+                            <i class="fa-solid fa-paperclip text-xl cursor-pointer hover:text-wa-text transition-colors"></i>
+                        </div>
+                        <textarea id="wa-clone-text" class="flex-1 bg-wa-border text-wa-text rounded-lg px-4 py-2.5 outline-none resize-none hide-scroll min-h-[40px] max-h-[120px]" rows="1" placeholder="Digite uma mensagem" onkeydown="App.checkWaEnter(event)"></textarea>
+                        <button onclick="App.enviarMensagemWaClone()" class="text-wa-muted hover:text-wa-text transition-colors mb-2 cursor-pointer flex items-center justify-center">
+                            <i class="fa-solid fa-paper-plane text-xl"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- ABA 3: WHATSAPP DISPARADOR -->
+        <!-- ABA 3: WA DISPARADOR -->
         <section id="tab-wa-disp" class="tab-content absolute inset-0 p-6 overflow-y-auto hide-scroll hidden">
             <div class="max-w-[1600px] mx-auto grid grid-cols-1 xl:grid-cols-12 gap-6 h-full pb-20">
                 <div class="xl:col-span-5 flex flex-col gap-6">
@@ -249,7 +318,7 @@
                     <div class="bg-omni-panel border border-omni-primary/40 rounded-xl p-5 shadow-[0_0_15px_rgba(56,189,248,0.1)] relative overflow-hidden">
                         <div class="absolute top-0 left-0 w-1 h-full bg-omni-primary"></div>
                         <h2 class="text-white font-bold text-xs uppercase tracking-widest mb-3 flex items-center gap-2">
-                            <i class="fa-solid fa-bolt text-omni-primary"></i> 1. Puxar Base do Funil (CRM)
+                            <i class="fa-solid fa-bolt text-omni-primary"></i> 1. Abastecer Fila de Disparo
                         </h2>
                         <p class="text-[10px] text-omni-muted mb-3 font-medium">Extraia revendedoras que já estão no seu sistema diretamente para a fila de disparo.</p>
                         <div class="flex gap-2">
@@ -264,7 +333,7 @@
                                 <option value="I6">Coluna: I6 (Risco Crítico)</option>
                             </select>
                             <button onclick="App.puxarDoCRMPara('wa')" class="bg-omni-primary hover:bg-white text-omni-base px-4 py-2 rounded-lg text-xs font-bold transition-all shadow-sm">
-                                <i class="fa-solid fa-download mr-1"></i> Importar
+                                <i class="fa-solid fa-download mr-1"></i> Puxar Contatos
                             </button>
                         </div>
                     </div>
@@ -398,28 +467,26 @@
         <section id="tab-discador" class="tab-content absolute inset-0 p-6 overflow-y-auto hidden">
             <div class="max-w-7xl mx-auto h-full flex flex-col gap-6">
                 
-                <!-- Navegação Interna Discador -->
                 <div class="flex items-center gap-3 border-b border-omni-border pb-4">
                     <button onclick="App.discador.switchTab('dashboard')" id="dTabBtn-dashboard" class="d-tab-btn bg-omni-primary text-omni-base border border-omni-primary px-5 py-2.5 rounded-lg text-sm font-semibold flex items-center gap-2 transition-colors shadow-sm">
                         <i class="fa-solid fa-desktop"></i> Mesa de Operação
                     </button>
                     <button onclick="App.discador.switchTab('contacts')" id="dTabBtn-contacts" class="d-tab-btn bg-omni-base text-omni-text hover:bg-omni-border border border-omni-border px-5 py-2.5 rounded-lg text-sm font-semibold flex items-center gap-2 transition-colors">
-                        <i class="fa-solid fa-file-import"></i> Dados da Fila <span id="badgeContacts-disc" class="bg-omni-panel text-omni-muted border border-omni-border text-[10px] px-2 py-0.5 rounded-full font-bold ml-1">0</span>
+                        <i class="fa-solid fa-file-import"></i> Abastecer Fila <span id="badgeContacts-disc" class="bg-omni-panel text-omni-muted border border-omni-border text-[10px] px-2 py-0.5 rounded-full font-bold ml-1">0</span>
                     </button>
                     <button onclick="App.discador.switchTab('history')" id="dTabBtn-history" class="d-tab-btn bg-omni-base text-omni-text hover:bg-omni-border border border-omni-border px-5 py-2.5 rounded-lg text-sm font-semibold flex items-center gap-2 transition-colors">
                         <i class="fa-solid fa-chart-pie"></i> Relatórios
                     </button>
                 </div>
 
-                <!-- D-TAB: MESA DE OPERAÇÃO -->
+                <!-- MESA DE OPERAÇÃO -->
                 <div id="d-tab-dashboard" class="d-tab-content flex flex-col gap-6">
-                    <!-- Indicadores -->
                     <div class="grid grid-cols-5 gap-4">
                         <div class="col-span-1 bg-omni-panel border border-omni-primary/30 p-4 rounded-xl flex flex-col justify-center">
-                            <span class="text-[10px] font-bold text-omni-muted uppercase tracking-wider mb-1">Pular se não atender em:</span>
+                            <span class="text-[10px] font-bold text-omni-muted uppercase tracking-wider mb-1">Pular se não atender:</span>
                             <div class="flex items-center gap-2">
                                 <input type="number" id="d-cfg-time" value="25" class="bg-omni-base border border-omni-border rounded-md w-16 px-2 py-1 text-center font-bold text-white outline-none focus:border-omni-primary">
-                                <span class="text-xs text-omni-muted font-medium">Segundos</span>
+                                <span class="text-xs text-omni-muted font-medium">Seg</span>
                             </div>
                         </div>
                         <div class="bg-omni-panel border border-omni-border p-4 rounded-xl flex flex-col justify-between">
@@ -441,7 +508,6 @@
                     </div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <!-- Mesa Central -->
                         <div class="lg:col-span-2 bg-omni-panel border border-omni-border rounded-xl p-8 flex flex-col relative">
                             <div class="flex-1 flex flex-col items-center justify-center text-center py-6 mb-4 bg-omni-base rounded-xl border border-omni-border relative">
                                 <span class="text-[11px] font-bold text-omni-muted uppercase tracking-widest block mb-2">Contato Atual</span>
@@ -452,7 +518,6 @@
                                     <p id="d-stage-phone" class="text-2xl font-mono text-omni-muted tracking-wider">--</p>
                                 </div>
 
-                                <!-- Cronômetro -->
                                 <div id="d-timer-container" class="w-full max-w-sm mx-auto hidden flex-col items-center">
                                     <p class="text-xs font-bold text-omni-muted mb-2 uppercase tracking-wide">Desligando e pulando em:</p>
                                     <div class="text-5xl font-light text-white mb-3 tabular-nums" id="d-stage-timer">00</div>
@@ -461,17 +526,14 @@
                                     </div>
                                 </div>
                                 
-                                <!-- Botão Cliente Atendeu -->
                                 <button id="d-btn-atendeu" onclick="App.discador.marcarAtendido()" class="hidden mt-6 bg-omni-green hover:bg-green-500 text-white font-bold text-lg uppercase tracking-wide px-10 py-4 rounded-xl shadow-[0_0_15px_rgba(34,197,94,0.3)] transition-all flex items-center justify-center gap-3 w-full max-w-sm">
                                     <i class="fa-solid fa-headset text-2xl"></i> Cliente Atendeu
                                 </button>
                                 
-                                <!-- Tabulação -->
                                 <div id="d-tela-tabulacao" class="hidden w-full max-w-lg mt-4 border-t border-omni-border pt-6">
                                     <h3 class="text-xs font-bold text-omni-muted uppercase tracking-wider mb-4 flex items-center justify-center gap-2">
                                         <span class="w-2 h-2 rounded-full bg-omni-green animate-pulse"></span> Em Atendimento: Registre o resultado
                                     </h3>
-                                    
                                     <div id="d-grid-tabulacao" class="grid grid-cols-2 gap-3">
                                         <button onclick="App.discador.tabulaChamada('Venda Realizada')" class="bg-omni-green/10 hover:bg-omni-green/20 border border-omni-green/30 text-omni-green p-4 flex flex-col items-center gap-2 rounded-xl transition-colors">
                                             <i class="fa-solid fa-bag-shopping text-xl"></i>
@@ -490,12 +552,10 @@
                                             <span class="text-[10px] font-bold uppercase text-center">Queda de Ligação<br>(Ligar Agora)</span>
                                         </button>
                                     </div>
-
                                     <div id="d-aguardo-desligamento" class="hidden flex-col items-center py-6 bg-omni-green/10 border border-omni-green/30 rounded-xl">
                                         <i class="fa-solid fa-circle-check text-3xl text-omni-green mb-2"></i>
                                         <p class="text-sm font-bold text-white mb-1">Registro Salvo! SMS despachado.</p>
-                                        <p class="text-xs text-omni-muted text-center mb-5 max-w-sm">Você ainda está na linha com o cliente. Fique à vontade para continuar a conversa.</p>
-                                        
+                                        <p class="text-xs text-omni-muted text-center mb-5 max-w-sm">Fique à vontade para continuar a conversa.</p>
                                         <button onclick="App.discador.finalizarLigacaoPosTabulacao()" class="bg-omni-red hover:bg-red-500 text-white font-bold py-3 px-8 rounded-lg shadow-sm text-sm transition-colors">
                                             <i class="fa-solid fa-phone-slash"></i> Encerrar Chamada e Avançar
                                         </button>
@@ -503,7 +563,6 @@
                                 </div>
                             </div>
 
-                            <!-- Controles Mestres -->
                             <div class="flex items-center gap-3 mt-4">
                                 <button id="d-btn-iniciar" onclick="App.discador.iniciarCampanha()" class="flex-1 bg-omni-primary hover:bg-white text-omni-base font-bold text-sm uppercase tracking-wider py-4 rounded-xl shadow-[0_0_15px_rgba(56,189,248,0.2)] transition-colors flex items-center justify-center gap-2 disabled:opacity-50">
                                     <i class="fa-solid fa-play"></i> Iniciar Atendimento
@@ -519,7 +578,6 @@
                             </div>
                         </div>
 
-                        <!-- Fila de Espera -->
                         <div class="bg-omni-panel border border-omni-border rounded-xl p-6 flex flex-col h-[650px]">
                             <h3 class="font-bold text-sm text-white border-b border-omni-border pb-4 mb-4 flex justify-between items-center">
                                 <span><i class="fa-solid fa-list-ol text-omni-muted mr-2"></i> Próximos na Fila</span>
@@ -531,7 +589,7 @@
                     </div>
                 </div>
 
-                <!-- D-TAB: DADOS DA FILA (CRM Pull) -->
+                <!-- ABASTECER FILA CRM -->
                 <div id="d-tab-contacts" class="d-tab-content hidden flex-col gap-6">
                     <div class="bg-omni-panel border border-omni-border rounded-xl p-8 max-w-2xl mx-auto w-full">
                         <h2 class="text-lg font-bold text-white mb-6 flex items-center gap-2"><i class="fa-solid fa-bolt text-omni-primary"></i> Abastecer Discador via CRM</h2>
@@ -562,7 +620,7 @@
                     </div>
                 </div>
 
-                <!-- D-TAB: RELATÓRIO -->
+                <!-- RELATÓRIO DISCADOR -->
                 <div id="d-tab-history" class="d-tab-content hidden flex-col gap-6">
                     <div class="bg-omni-panel border border-omni-border rounded-xl p-8 flex flex-col h-[700px]">
                         <div class="flex justify-between items-center border-b border-omni-border pb-5 mb-5">
@@ -589,7 +647,6 @@
                         </div>
                     </div>
                 </div>
-
             </div>
         </section>
 
@@ -598,12 +655,21 @@
             <div class="max-w-5xl mx-auto flex flex-col gap-6">
                 <div class="glass p-6 rounded-2xl">
                     <div class="flex justify-between items-center mb-6 border-b border-omni-border pb-4">
-                        <h2 class="text-xl font-bold text-white"><i class="fa-regular fa-calendar-check text-omni-primary mr-2"></i>Central de Retornos (Follow-ups)</h2>
+                        <h2 class="text-xl font-bold text-white"><i class="fa-regular fa-calendar-check text-omni-primary mr-2"></i>Monitor de Follow-ups</h2>
                         <div class="flex gap-2">
                             <span class="px-3 py-1 rounded bg-omni-red/10 border border-omni-red/30 text-omni-red text-xs font-bold" id="badge-atrasados">0 Atrasados</span>
                             <span class="px-3 py-1 rounded bg-omni-orange/10 border border-omni-orange/30 text-omni-orange text-xs font-bold" id="badge-pendentes">0 Pendentes</span>
                         </div>
                     </div>
+                    
+                    <div class="bg-omni-panel border border-omni-border p-4 rounded-xl mb-6 flex gap-4 items-start">
+                        <i class="fa-solid fa-robot text-omni-primary text-xl mt-1"></i>
+                        <div>
+                            <h3 class="text-sm font-bold text-white mb-1">Piloto Automático Ativado</h3>
+                            <p class="text-xs text-omni-muted leading-relaxed">Você não precisa mais "finalizar" os retornos manualmente. Ao interagir com a revendedora (WhatsApp, Ligação ou Nota) no horário marcado ou até 15 minutos depois, o sistema fecha a tarefa automaticamente e registra no histórico dela.</p>
+                        </div>
+                    </div>
+
                     <div id="lista-retornos" class="flex flex-col gap-4">
                         <p class="text-omni-muted text-sm italic">Nenhum retorno agendado na base.</p>
                     </div>
@@ -611,7 +677,7 @@
             </div>
         </section>
 
-        <!-- ABA 6: DADOS (Importação Principal) - ABA INICIAL -->
+        <!-- ABA 6: DADOS -->
         <section id="tab-dados" class="tab-content absolute inset-0 p-6 overflow-y-auto block z-10 opacity-100">
             <div class="max-w-3xl mx-auto flex flex-col gap-6">
                 <div class="glass p-8 rounded-2xl flex flex-col gap-6">
@@ -621,7 +687,7 @@
                     <div class="bg-omni-base border-2 border-dashed border-omni-border rounded-xl p-8 text-center flex flex-col items-center justify-center">
                         <i class="fa-solid fa-file-excel text-4xl text-omni-green mb-4"></i>
                         <h3 class="text-white font-bold mb-2">Importar / Atualizar Base</h3>
-                        <p class="text-xs text-omni-muted mb-4 max-w-md">Selecione 1 ou múltiplos arquivos (.xlsx, .csv). O sistema irá unificar as estruturas automaticamente reconhecendo CodigoRevendedor, Ciclo, Nível, etc.</p>
+                        <p class="text-xs text-omni-muted mb-4 max-w-md">Selecione 1 ou múltiplos arquivos (.xlsx, .csv). O sistema irá unificar as estruturas automaticamente reconhecendo CodigoRevendedor, Ciclo, Nível, Loja, etc.</p>
                         
                         <input type="file" id="file-upload" accept=".xlsx, .xls, .csv" multiple class="hidden" onchange="App.processarArquivos(event)">
                         
@@ -632,7 +698,7 @@
 
                     <div class="border-t border-omni-border pt-6 mt-2 flex justify-between items-center">
                         <p class="text-xs text-omni-muted">Aviso: A limpeza da base apaga permanentemente todo o histórico e anotações armazenadas no seu navegador.</p>
-                        <button onclick="App.limparBaseCompleta()" class="border border-omni-red text-omni-red hover:bg-omni-red hover:text-white font-bold py-2 px-6 rounded-lg transition flex items-center gap-2 text-sm">
+                        <button onclick="document.getElementById('modal-limpar-base').classList.remove('hidden'); document.getElementById('modal-limpar-base').classList.add('flex');" class="border border-omni-red text-omni-red hover:bg-omni-red hover:text-white font-bold py-2 px-6 rounded-lg transition flex items-center gap-2 text-sm">
                             <i class="fa-solid fa-trash-can"></i> Limpar Base Toda
                         </button>
                     </div>
@@ -642,9 +708,22 @@
 
     </main>
 
-    <!-- ========================================== -->
-    <!-- MODAIS GLOBAIS                             -->
-    <!-- ========================================== -->
+    <!-- Modal: LIMPAR BASE -->
+    <div id="modal-limpar-base" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[200] hidden items-center justify-center p-4">
+        <div class="bg-omni-base rounded-2xl w-full max-w-md shadow-2xl border border-omni-red/50 overflow-hidden">
+            <div class="p-6 text-center">
+                <div class="w-16 h-16 rounded-full bg-omni-red/10 border border-omni-red/30 mx-auto flex items-center justify-center mb-4">
+                    <i class="fa-solid fa-triangle-exclamation text-2xl text-omni-red"></i>
+                </div>
+                <h2 class="text-xl font-bold text-white mb-2">Excluir toda a base?</h2>
+                <p class="text-sm text-omni-muted mb-6">Você está prestes a excluir TODA a base de dados, histórico de atendimento e anotações deste navegador. <b>Esta ação não pode ser desfeita.</b></p>
+                <div class="flex gap-3">
+                    <button onclick="document.getElementById('modal-limpar-base').classList.add('hidden'); document.getElementById('modal-limpar-base').classList.remove('flex');" class="flex-1 bg-omni-panel border border-omni-border hover:bg-omni-border text-white py-3 rounded-xl font-bold transition-colors">Cancelar</button>
+                    <button onclick="App.limparBaseCompleta(); document.getElementById('modal-limpar-base').classList.add('hidden'); document.getElementById('modal-limpar-base').classList.remove('flex');" class="flex-1 bg-omni-red hover:bg-red-500 text-white py-3 rounded-xl font-bold transition-colors shadow-[0_0_15px_rgba(239,68,68,0.3)]">Sim, Excluir Tudo</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Modal 1: DOSSIÊ E HISTÓRICO -->
     <div id="modal-dossie" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] hidden items-center justify-center p-4">
@@ -657,7 +736,7 @@
                         <div class="flex items-center gap-3 text-sm mt-1">
                             <span class="text-omni-muted font-mono copy-hover" id="md-codigo" title="Copiar Código" onclick="App.copiarTexto(this.innerText.replace('Cód: ', ''), event)">Cód: 000</span>
                             <span class="text-omni-muted font-mono copy-hover" id="md-telefone" title="Copiar Telefone" onclick="App.copiarTexto(this.innerText.replace('Fone: ', ''), event)">Fone: (00) 00000-0000</span>
-                            <span class="text-omni-muted font-mono font-bold copy-hover" id="md-estrutura" title="Copiar Estrutura" onclick="App.copiarTexto(this.innerText.replace('Loja: ', ''), event)">Loja: --</span>
+                            <span class="text-omni-muted font-mono font-bold copy-hover" id="md-estrutura" title="Copiar Loja" onclick="App.copiarTexto(this.innerText.replace('Loja: ', ''), event)">Loja: --</span>
                             <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider copy-hover" id="md-badge-nivel" title="Copiar Nível" onclick="App.copiarTexto(this.innerText, event)">Nível</span>
                         </div>
                     </div>
@@ -739,14 +818,14 @@
             <div class="p-6 bg-omni-base flex flex-col gap-4">
                 <p class="text-xs text-omni-muted mb-2">A mensagem será enviada nativamente pelo celular conectado via ADB (Processo 1 a 1).</p>
                 <textarea id="wa-ind-texto" class="w-full h-32 bg-omni-panel border border-omni-border rounded-xl p-4 text-sm text-white resize-none outline-none focus:border-omni-green" placeholder="Escreva sua mensagem..."></textarea>
-                <button onclick="App.enviarWAIndividual()" class="w-full bg-omni-green hover:bg-green-500 text-white font-bold py-3 rounded-xl transition flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(34,197,94,0.3)]">
+                <button onclick="App.enviarWAIndividualADB()" class="w-full bg-omni-green hover:bg-green-500 text-white font-bold py-3 rounded-xl transition flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(34,197,94,0.3)]">
                     <i class="fa-solid fa-paper-plane"></i> Enviar
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Modal 4: AÇÃO SMS INDIVIDUAL (1 a 1 CRM) -->
+    <!-- Modal 4: AÇÃO SMS INDIVIDUAL -->
     <div id="modal-sms-individual" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[110] hidden items-center justify-center p-4">
         <div class="glass rounded-2xl w-full max-w-lg shadow-2xl border border-omni-orange/30 overflow-hidden">
             <div class="p-5 bg-omni-base border-b border-omni-border flex justify-between items-center">
@@ -790,15 +869,14 @@
 
     <div id="toast-container" class="fixed bottom-6 right-6 z-[200] flex flex-col gap-3 pointer-events-none"></div>
 
-    <!-- CORE JAVASCRIPT GLOBAL -->
     <script>
         // ==========================================
-        // ESTADO ADB GLOBAL UNIFICADO
+        // ESTADO ADB GLOBAL UNIFICADO (USB RSA)
         // ==========================================
-        let usbDeviceAdb = null;
-        let epInAdb = null, epOutAdb = null;
-        let isAdbReadyAdb = false;
-        let localIdCounterAdb = 1;
+        let usbDevice = null;
+        let epIn = null, epOut = null;
+        let isAdbReady = false;
+        let localIdCounter = 1;
 
         async function getAdbKeyPair() { return await crypto.subtle.generateKey({ name: "RSASSA-PKCS1-v1_5", modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" }, true, ["sign", "verify"]); }
         async function signAdbToken(keyPair, token) { return new Uint8Array(await crypto.subtle.sign("RSASSA-PKCS1-v1_5", keyPair.privateKey, token)); }
@@ -816,50 +894,81 @@
             const fullPayload = new Uint8Array(buffer.byteLength + nameBytes.length); fullPayload.set(bytes, 0); fullPayload.set(nameBytes, buffer.byteLength); return fullPayload;
         }
         async function sendPacket(cmd, arg0, arg1, data = new Uint8Array(0)) {
-            if (!usbDeviceAdb || !epOutAdb) return;
+            if (!usbDevice || !epOut) return;
             const header = new ArrayBuffer(24), view = new DataView(header); let checksum = 0; for (let i = 0; i < data.length; i++) checksum = (checksum + data[i]) & 0xffffffff;
             view.setUint32(0, cmd, true); view.setUint32(4, arg0, true); view.setUint32(8, arg1, true); view.setUint32(12, data.length, true); view.setUint32(16, checksum, true); view.setUint32(20, (cmd ^ 0xffffffff) >>> 0, true);
-            const buffer = new Uint8Array(24 + data.length); buffer.set(new Uint8Array(header), 0); buffer.set(data, 24); await usbDeviceAdb.transferOut(epOutAdb, buffer);
+            const buffer = new Uint8Array(24 + data.length); buffer.set(new Uint8Array(header), 0); buffer.set(data, 24); await usbDevice.transferOut(epOut, buffer);
         }
         async function readPacket() {
-            if (!usbDeviceAdb || !epInAdb) return null;
+            if (!usbDevice || !epIn) return null;
             try {
-                const headerRes = await usbDeviceAdb.transferIn(epInAdb, 24); if (!headerRes.data || headerRes.data.byteLength < 24) return null;
+                const headerRes = await usbDevice.transferIn(epIn, 24); if (!headerRes.data || headerRes.data.byteLength < 24) return null;
                 const view = new DataView(headerRes.data.buffer), cmd = view.getUint32(0, true), arg0 = view.getUint32(4, true), arg1 = view.getUint32(8, true), len = view.getUint32(12, true);
-                let payload = new Uint8Array(0); if (len > 0) { const dataRes = await usbDeviceAdb.transferIn(epInAdb, len); if (dataRes.data) payload = new Uint8Array(dataRes.data.buffer); }
+                let payload = new Uint8Array(0); if (len > 0) { const dataRes = await usbDevice.transferIn(epIn, len); if (dataRes.data) payload = new Uint8Array(dataRes.data.buffer); }
                 return { cmd, arg0, arg1, data: payload };
             } catch (e) { return { error: true, msg: e.message }; }
         }
 
         async function conectarUSB() {
             try {
-                usbDeviceAdb = await navigator.usb.requestDevice({ filters: [{ classCode: 255, subclassCode: 66, protocolCode: 1 }] }); await usbDeviceAdb.open();
-                if (usbDeviceAdb.configuration === null) await usbDeviceAdb.selectConfiguration(1);
+                usbDevice = await navigator.usb.requestDevice({ filters: [{ classCode: 255, subclassCode: 66, protocolCode: 1 }] }); await usbDevice.open();
+                if (usbDevice.configuration === null) await usbDevice.selectConfiguration(1);
                 let intfNum = -1;
-                for (const conf of usbDeviceAdb.configurations) { for (const intf of conf.interfaces) { for (const alt of intf.alternates) { if (alt.interfaceClass === 255 && alt.interfaceSubclass === 66 && alt.interfaceProtocol === 1) { intfNum = intf.interfaceNumber; epInAdb = alt.endpoints.find(e => e.direction === 'in').endpointNumber; epOutAdb = alt.endpoints.find(e => e.direction === 'out').endpointNumber; break; } } } }
-                await usbDeviceAdb.claimInterface(intfNum);
+                for (const conf of usbDevice.configurations) { for (const intf of conf.interfaces) { for (const alt of intf.alternates) { if (alt.interfaceClass === 255 && alt.interfaceSubclass === 66 && alt.interfaceProtocol === 1) { intfNum = intf.interfaceNumber; epIn = alt.endpoints.find(e => e.direction === 'in').endpointNumber; epOut = alt.endpoints.find(e => e.direction === 'out').endpointNumber; break; } } } }
+                await usbDevice.claimInterface(intfNum);
                 await sendPacket(0x4E584E43, 0x01000000, 4096, new TextEncoder().encode("host::OmniVD\0"));
                 let keyPair = await getAdbKeyPair(), resp = await readPacket();
-                if (resp && resp.cmd === 0x4E584E43) isAdbReadyAdb = true; 
+                if (resp && resp.cmd === 0x4E584E43) isAdbReady = true; 
                 else if (resp && resp.cmd === 0x48545541 && resp.arg0 === 1) { 
                     await sendPacket(0x48545541, 2, 0, await signAdbToken(keyPair, resp.data)); let resp2 = await readPacket();
-                    if (resp2 && resp2.cmd === 0x4E584E43) isAdbReadyAdb = true;
-                    else { await sendPacket(0x48545541, 3, 0, await getAdbPublicKeyPayload(keyPair)); App.showToast("🚨 Permita a conexão no seu celular (Tela dele)!", "warning"); while(!isAdbReadyAdb) { let waitResp = await readPacket(); if(waitResp && waitResp.error) return; if(waitResp && waitResp.cmd === 0x4E584E43) isAdbReadyAdb = true; } }
+                    if (resp2 && resp2.cmd === 0x4E584E43) isAdbReady = true;
+                    else { await sendPacket(0x48545541, 3, 0, await getAdbPublicKeyPayload(keyPair)); App.showToast("🚨 Permita a conexão no seu celular (Tela dele)!", "warning"); while(!isAdbReady) { let waitResp = await readPacket(); if(waitResp && waitResp.error) return; if(waitResp && waitResp.cmd === 0x4E584E43) isAdbReady = true; } }
                 }
-                if (isAdbReadyAdb) {
-                    document.getElementById('btn-conectar').style.display = 'none'; document.getElementById('usb-status').classList.remove('hidden'); document.getElementById('usb-status').classList.add('flex');
+                if (isAdbReady) {
+                    document.getElementById('btn-conectar').style.display = 'none'; 
+                    document.getElementById('usb-disconnected-warning').classList.add('hidden'); document.getElementById('usb-disconnected-warning').classList.remove('flex');
+                    document.getElementById('usb-status').classList.remove('hidden'); document.getElementById('usb-status').classList.add('flex');
+                    
                     if (contatosBaseAdb.length > 0) document.getElementById('btn-start-adb').disabled = false;
                     App.discador.desbloquearStart();
+                    
+                    // Indicador do WA Clone
+                    document.getElementById('wa-clone-adb-status').classList.remove('bg-omni-red');
+                    document.getElementById('wa-clone-adb-status').classList.add('bg-omni-green');
+
                     await runAdbShell("settings put global stay_on_while_plugged_in 7"); await runAdbShell("settings put system screen_off_timeout 2147483647"); await runAdbShell("svc power stayon usb"); await runAdbShell("input keyevent 224"); 
                     App.showToast("Sucesso! Aparelho pareado via ADB.", "success");
                 }
             } catch (e) { App.showToast("Erro de conexão USB: " + e.message, "error"); }
         }
 
+        if (navigator.usb) {
+            navigator.usb.addEventListener('disconnect', (event) => {
+                if (usbDevice && event.device === usbDevice) lidarComQuedaUSB();
+            });
+        }
+
+        function lidarComQuedaUSB() {
+            App.showToast("Cabo USB Desconectado! Operação Pausada.", "error");
+            isAdbReady = false; usbDevice = null;
+            document.getElementById('btn-conectar').style.display = 'flex';
+            document.getElementById('usb-status').classList.add('hidden'); document.getElementById('usb-status').classList.remove('flex');
+            document.getElementById('usb-disconnected-warning').classList.remove('hidden'); document.getElementById('usb-disconnected-warning').classList.add('flex');
+            
+            document.getElementById('btn-start-adb').disabled = true;
+            App.discador.bloquearStart();
+
+            document.getElementById('wa-clone-adb-status').classList.remove('bg-omni-green');
+            document.getElementById('wa-clone-adb-status').classList.add('bg-omni-red');
+
+            if(isCampaignActiveAdb) pararCampanhaAdb();
+            if(App.discador.state.estadoOperacao === 'RODANDO') App.discador.pausarCampanha(true); 
+        }
+
         async function runAdbShell(command) {
-            if (!isAdbReadyAdb) return false;
+            if (!isAdbReady) return false;
             try {
-                const myId = localIdCounterAdb++; await sendPacket(0x4E45504F, myId, 0, new TextEncoder().encode("shell:" + command + "\0"));
+                const myId = localIdCounter++; await sendPacket(0x4E45504F, myId, 0, new TextEncoder().encode("shell:" + command + "\0"));
                 let ok = false;
                 for(let i = 0; i < 4; i++) { let r = await readPacket(); if(r && r.error) continue; if(r && r.cmd === 0x59414B4F && r.arg1 === myId) ok = true; if(r && r.cmd === 0x45534C43) { await sendPacket(0x45534C43, myId, r.arg0); break; } }
                 return true;
@@ -880,6 +989,7 @@
                 chamadaSegundos: 0,
                 bancoDados: [],
                 notificacoesGlobais: [],
+                currentWaContactId: null,
                 colunasDef: [
                     { id: 'I6', title: 'I6', desc: 'Risco Crítico', color: 'text-omni-red', border: 'border-omni-red/30' },
                     { id: 'I5', title: 'I5', desc: 'Risco Alto', color: 'text-omni-orange', border: 'border-omni-orange/30' },
@@ -931,9 +1041,7 @@
             },
 
             limparBaseCompleta: function() {
-                if (confirm("ATENÇÃO: Excluir TODA a base?")) {
-                    this.state.bancoDados = []; this.salvarDados(); this.renderKanbanCards(); this.showToast("Base apagada.", "success");
-                }
+                this.state.bancoDados = []; this.salvarDados(); this.renderKanbanCards(); this.showToast("Base apagada com sucesso.", "success");
             },
 
             processarArquivos: async function(event) {
@@ -965,7 +1073,6 @@
 
                     for (let r = headerIndex + 1; r < rawData.length; r++) {
                         const rowArray = rawData[r]; if (!rowArray || rowArray.join('').trim() === '') continue; 
-
                         let row = {}; headers.forEach((h, index) => { if (h) row[String(h).trim()] = rowArray[index]; });
 
                         let codigoBruto = row['CodigoRevendedor'] || row['CodigoRev'] || row['codigo'] || row['Codigo'];
@@ -1027,7 +1134,6 @@
                 }, 500);
             },
 
-            // PUXAR DO CRM 
             puxarDoCRMPara: function(destino) {
                 let filtroId = destino === 'wa' ? 'pull-wa-filtro' : 'pull-disc-filtro';
                 let filtroVal = document.getElementById(filtroId).value;
@@ -1075,14 +1181,16 @@
                 });
                 btnElement.classList.remove('border-transparent', 'text-omni-muted'); btnElement.classList.add('border-omni-primary', 'text-omni-primary');
                 document.querySelectorAll('.tab-content').forEach(c => {
-                    c.classList.remove('opacity-100', 'z-10', 'block'); c.classList.add('hidden', 'opacity-0', '-z-10');
+                    c.classList.remove('opacity-100', 'z-10', 'block', 'flex'); c.classList.add('hidden', 'opacity-0', '-z-10');
                 });
-                const target = document.getElementById(btnElement.getAttribute('data-target'));
+                const targetId = btnElement.getAttribute('data-target');
+                const target = document.getElementById(targetId);
                 target.classList.remove('hidden', 'opacity-0', '-z-10'); 
-                if (target.id === 'tab-dados') target.classList.add('block', 'opacity-100', 'z-10');
+                if (targetId === 'tab-dados') target.classList.add('block', 'opacity-100', 'z-10');
                 else target.classList.add('flex', 'opacity-100', 'z-10');
 
-                if (btnElement.getAttribute('data-target') === 'tab-retornos') this.renderizarRetornos();
+                if (targetId === 'tab-retornos') this.renderizarRetornos();
+                if (targetId === 'tab-wa-chat') this.renderWaCloneList();
             },
             
             mudarAbaPorId: function(targetId) { const btn = document.querySelector(`[data-target="${targetId}"]`); if(btn) this.mudarAba(btn); },
@@ -1218,10 +1326,37 @@
 
             adicionarHistorico: function(id, tipo, detalhes) {
                 const c = this.state.bancoDados.find(x => x.id === id);
-                if(c) { const agora = new Date(); c.historico.push({ tipo: tipo, detalhes: detalhes, data: `${agora.toLocaleDateString()} ${agora.toLocaleTimeString()}`, timestamp: Date.now() }); }
+                if(c) { 
+                    const agora = new Date(); 
+                    c.historico.push({ tipo: tipo, detalhes: detalhes, data: `${agora.toLocaleDateString()} ${agora.toLocaleTimeString()}`, timestamp: Date.now() }); 
+                    this.verificarFechamentoRetornoAutomatico(c);
+                }
             },
 
             // ================== SISTEMA DE NOTIFICAÇÕES E RETORNOS ==================
+            verificarFechamentoRetornoAutomatico: function(contato) {
+                if (!contato.retornos || contato.retornos.length === 0) return;
+                
+                let agora = Date.now();
+                let quinzeMinutos = 15 * 60 * 1000;
+                
+                contato.retornos.forEach(r => {
+                    if (!r.finalizado) {
+                        if (agora >= r.timestamp && agora <= (r.timestamp + quinzeMinutos)) {
+                            r.finalizado = true;
+                            contato.historico.push({ tipo: 'Sistema', detalhes: `✅ Follow-up Concluído: Realizado no prazo.`, data: new Date().toLocaleString('pt-BR'), timestamp: Date.now() });
+                            this.showToast(`Retorno com ${contato.nome} fechado automaticamente!`, "success");
+                        }
+                        else if (agora < r.timestamp && (r.timestamp - agora) <= (24 * 60 * 60 * 1000)) { 
+                            r.finalizado = true;
+                            contato.historico.push({ tipo: 'Sistema', detalhes: `⚡ Follow-up Concluído: Antecipado com sucesso.`, data: new Date().toLocaleString('pt-BR'), timestamp: Date.now() });
+                            this.showToast(`Retorno antecipado fechado!`, "success");
+                        }
+                    }
+                });
+                this.salvarDados();
+            },
+
             adicionarNotificacaoGlobal: function(titulo, descricao, icon = 'fa-info-circle', color = 'text-omni-primary') {
                 this.state.notificacoesGlobais.unshift({
                     id: Date.now() + Math.random(),
@@ -1295,7 +1430,6 @@
                 let allItems = [];
                 let agora = Date.now();
                 
-                // Puxa Retornos Não Finalizados
                 this.state.bancoDados.forEach(c => {
                     if (c.retornos) {
                         c.retornos.forEach(r => {
@@ -1323,7 +1457,6 @@
                     }
                 });
 
-                // Puxa Notificações Globais
                 this.state.notificacoesGlobais.forEach(n => {
                     allItems.push({
                         type: 'global',
@@ -1391,27 +1524,21 @@
                 this.abrirDossie(contatoId);
             },
 
-            finalizarRetorno: function(contatoId, retornoId) {
-                const c = this.state.bancoDados.find(x => x.id === contatoId);
-                if(!c || !c.retornos) return;
-                
-                const ret = c.retornos.find(r => r.id === retornoId);
-                if(ret) {
-                    ret.finalizado = true;
-                    this.adicionarHistorico(c.id, 'Sistema', `✅ Retorno Concluído: Lembrete de ${ret.dataFormatada} foi marcado como finalizado.`);
-                    this.salvarDados();
-                    this.showToast("Retorno finalizado com sucesso!", "success");
-                }
-            },
-
             renderizarRetornos: function() {
                 const box = document.getElementById('lista-retornos');
                 if(!box) return;
                 
                 let allRetornos = [];
+                let agora = Date.now();
+
                 this.state.bancoDados.forEach(c => {
                     if (c.retornos) {
                         c.retornos.forEach(r => {
+                            if (!r.finalizado && r.timestamp < agora) {
+                                r.finalizado = true; 
+                                c.historico.push({ tipo: 'Sistema', detalhes: `❌ Follow-up Atrasado: O retorno de ${r.dataFormatada} não foi realizado.`, data: new Date().toLocaleString('pt-BR'), timestamp: Date.now() });
+                                this.salvarDados(); 
+                            }
                             allRetornos.push({ contato: c, retorno: r });
                         });
                     }
@@ -1425,11 +1552,9 @@
                 box.innerHTML = '';
                 
                 if(allRetornos.length === 0) {
-                    box.innerHTML = '<div class="bg-omni-panel border border-omni-border border-dashed p-8 rounded-xl text-center"><i class="fa-solid fa-mug-hot text-3xl text-omni-muted mb-3"></i><p class="text-omni-text font-bold text-sm">Nenhum retorno agendado na base.</p><p class="text-xs text-omni-muted mt-1">Quando você agendar um follow-up, ele aparecerá aqui.</p></div>';
+                    box.innerHTML = '<div class="bg-omni-panel border border-omni-border border-dashed p-8 rounded-xl text-center"><i class="fa-solid fa-mug-hot text-3xl text-omni-muted mb-3"></i><p class="text-omni-text font-bold text-sm">Nenhum histórico de retornos.</p><p class="text-xs text-omni-muted mt-1">Quando você agendar um follow-up, ele aparecerá aqui.</p></div>';
                     return;
                 }
-                
-                let agora = Date.now();
 
                 allRetornos.forEach(item => {
                     const c = item.contato;
@@ -1438,7 +1563,12 @@
                     let statusText, statusBadge, borderLeft;
                     
                     if (r.finalizado) {
-                        statusText = "Concluído"; statusBadge = "bg-omni-green/10 text-omni-green border-omni-green/30"; borderLeft = "border-omni-green/50";
+                        let isAtrasado = c.historico.some(h => h.detalhes.includes('❌ Follow-up Atrasado') && h.detalhes.includes(r.dataFormatada));
+                        if(isAtrasado) {
+                            statusText = "Não Realizado (Atraso)"; statusBadge = "bg-omni-red/10 text-omni-red border-omni-red/30"; borderLeft = "border-omni-red/50 opacity-60";
+                        } else {
+                            statusText = "Concluído"; statusBadge = "bg-omni-green/10 text-omni-green border-omni-green/30"; borderLeft = "border-omni-green/50 opacity-60";
+                        }
                     } else if (r.timestamp < agora) {
                         statusText = "Atrasado"; statusBadge = "bg-omni-red/10 text-omni-red border-omni-red/30 animate-pulse"; borderLeft = "border-omni-red";
                     } else {
@@ -1460,11 +1590,6 @@
                             </div>
                             
                             <div class="flex flex-col gap-2 w-full sm:w-auto">
-                                ${!r.finalizado ? `
-                                <button onclick="App.finalizarRetorno(${c.id}, ${r.id})" class="bg-omni-green hover:bg-green-500 text-white px-5 py-2.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-sm">
-                                    <i class="fa-solid fa-check"></i> Finalizar Retorno
-                                </button>
-                                ` : ''}
                                 <button onclick="App.abrirDossie(${c.id})" class="bg-omni-base border border-omni-border hover:border-omni-primary text-white px-5 py-2.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-sm">
                                     <i class="fa-solid fa-folder-open"></i> Abrir Histórico
                                 </button>
@@ -1472,6 +1597,178 @@
                         </div>
                     `;
                 });
+            },
+
+            // ================== WHATSAPP CLONE ==================
+            renderWaCloneList: function() {
+                const listEl = document.getElementById('wa-clone-list');
+                const termo = document.getElementById('wa-clone-search').value.toLowerCase();
+                listEl.innerHTML = '';
+
+                let contatosWa = this.state.bancoDados.filter(c => !c.isBloqueada);
+                if (termo) {
+                    contatosWa = contatosWa.filter(c => c.nome.toLowerCase().includes(termo) || c.telefone.includes(termo));
+                }
+                contatosWa.sort((a, b) => b.lastActionTime - a.lastActionTime);
+
+                if (contatosWa.length === 0) {
+                    listEl.innerHTML = '<div class="p-6 text-center text-wa-muted text-sm">Nenhum contato encontrado.</div>';
+                    return;
+                }
+
+                contatosWa.forEach(c => {
+                    const isSelected = this.state.currentWaContactId === c.id;
+                    const bgClass = isSelected ? 'bg-wa-panel' : 'hover:bg-wa-panel';
+                    
+                    // Pega a última mensagem de Whatsapp do histórico se tiver
+                    let lastMsg = "Clique para enviar mensagem";
+                    let lastTime = "";
+                    const historicoWa = c.historico.filter(h => h.tipo === 'WhatsApp');
+                    if (historicoWa.length > 0) {
+                        const h = historicoWa[historicoWa.length - 1];
+                        lastMsg = h.detalhes;
+                        lastTime = h.data.split(' ')[1].substring(0,5); // Pega só hh:mm
+                    }
+
+                    listEl.innerHTML += `
+                        <div class="flex items-center px-4 py-3 cursor-pointer border-b border-wa-border ${bgClass} transition-colors" onclick="App.selecionarContatoWa(${c.id})">
+                            <div class="w-12 h-12 rounded-full bg-wa-border flex items-center justify-center text-wa-text font-bold shrink-0">
+                                ${c.nome.charAt(0).toUpperCase()}
+                            </div>
+                            <div class="ml-4 flex-1 min-w-0">
+                                <div class="flex justify-between items-baseline mb-1">
+                                    <h4 class="text-wa-text font-semibold truncate text-[15px]">${c.nome}</h4>
+                                    <span class="text-[11px] text-wa-muted ml-2 shrink-0">${lastTime}</span>
+                                </div>
+                                <p class="text-wa-muted text-sm truncate">${lastMsg.replace('Mensagem ADB: ', '')}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+            },
+
+            filtrarWaClone: function() {
+                this.renderWaCloneList();
+            },
+
+            selecionarContatoWa: function(id) {
+                this.state.currentWaContactId = id;
+                this.renderWaCloneList(); // Re-render para marcar o ativo
+
+                const c = this.state.bancoDados.find(x => x.id === id);
+                if (!c) return;
+
+                // Esconde empty state
+                document.getElementById('wa-clone-empty').classList.add('hidden');
+                
+                // Mostra UI do chat
+                document.getElementById('wa-clone-header').classList.remove('hidden');
+                document.getElementById('wa-clone-body').classList.remove('hidden');
+                document.getElementById('wa-clone-input-area').classList.remove('hidden');
+                document.getElementById('wa-clone-header').classList.add('flex');
+                document.getElementById('wa-clone-body').classList.add('flex');
+                document.getElementById('wa-clone-input-area').classList.add('flex');
+
+                // Popula Header
+                document.getElementById('wa-clone-avatar').innerText = c.nome.charAt(0).toUpperCase();
+                document.getElementById('wa-clone-name').innerText = c.nome;
+                document.getElementById('wa-clone-phone').innerText = `+55 ${c.telefone}`;
+
+                this.renderWaMessages(c);
+            },
+
+            renderWaMessages: function(contato) {
+                const box = document.getElementById('wa-clone-messages');
+                box.innerHTML = '';
+                
+                // Filtra apenas mensagens de WA para simular o chat
+                const messages = contato.historico.filter(h => h.tipo === 'WhatsApp');
+                
+                if (messages.length === 0) {
+                    box.innerHTML = `<div class="text-center text-wa-muted text-xs my-4 bg-wa-panel mx-auto px-4 py-2 rounded-lg shadow">Você ainda não tem mensagens com este contato através do sistema.</div>`;
+                } else {
+                    messages.forEach(m => {
+                        let text = m.detalhes.replace('Mensagem ADB: ', '').replace(/^"|"$/g, '');
+                        let time = m.data.split(' ')[1].substring(0,5);
+                        
+                        box.innerHTML += `
+                            <div class="flex justify-end mb-1">
+                                <div class="bg-wa-bubbleOut text-wa-text px-3 py-1.5 rounded-lg max-w-[85%] relative shadow-sm">
+                                    <span class="text-sm leading-relaxed">${text}</span>
+                                    <div class="flex justify-end items-center gap-1 mt-1 -mb-1">
+                                        <span class="text-[10px] text-wa-text/70">${time}</span>
+                                        <i class="fa-solid fa-check-double text-[#53bdeb] text-[10px]"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                
+                // Rola para o fim
+                const body = document.getElementById('wa-clone-body');
+                body.scrollTop = body.scrollHeight;
+            },
+
+            checkWaEnter: function(event) {
+                if (event.key === 'Enter' && !event.shiftKey) {
+                    event.preventDefault();
+                    this.enviarMensagemWaClone();
+                }
+            },
+
+            enviarMensagemWaClone: async function() {
+                const c = this.state.bancoDados.find(x => x.id === this.state.currentWaContactId);
+                const inputEl = document.getElementById('wa-clone-text');
+                const txt = inputEl.value.trim();
+
+                if (!txt) return;
+                if (!isAdbReady) return this.showToast("Conecte o Smartphone via USB (ADB) para disparar a mensagem.", "error");
+
+                // Feedback visual otimista
+                inputEl.value = '';
+                this.adicionarHistorico(c.id, 'WhatsApp', `Mensagem ADB: "${txt}"`);
+                this.moverParaFimDaFila(c.id);
+                this.renderWaMessages(c);
+                this.renderWaCloneList();
+
+                this.showToast(`Enviando via Smartphone para ${c.nome}...`, "info");
+
+                try {
+                    let encodedMsg = encodeURIComponent(txt).replace(/'/g, "%27").replace(/"/g, "%22");
+                    let phone = c.telefone.replace(/\D/g, '');
+                    if (phone.length === 10) phone = phone.substring(0, 2) + '9' + phone.substring(2);
+                    if (!phone.startsWith('55')) phone = '55' + phone;
+
+                    const intentUrl = `whatsapp://send?phone=${phone}&text=${encodedMsg}`;
+                    const appPackageEl = document.getElementById('cfg-app');
+                    const clickModeEl = document.getElementById('cfg-click');
+                    const appPackage = appPackageEl ? appPackageEl.value : 'com.whatsapp.w4b';
+                    const clickMode = clickModeEl ? clickModeEl.value : 'auto';
+
+                    await runAdbShell("input keyevent 224"); 
+                    await runAdbShell("input swipe 500 1500 500 200"); 
+                    await runAdbShell("input keyevent 3"); 
+                    await sleep(500);
+
+                    await runAdbShell(`am start -a android.intent.action.VIEW -d '${intentUrl}' -p ${appPackage}`);
+                    await sleep(3500);
+
+                    if (clickMode === 'auto') {
+                        await runAdbShell("input keyevent 66"); await sleep(300); await runAdbShell("input keyevent 66");
+                    } else {
+                        const tapX = document.getElementById('cfg-tap-x') ? document.getElementById('cfg-tap-x').value : 950;
+                        const tapY = document.getElementById('cfg-tap-y') ? document.getElementById('cfg-tap-y').value : 1350;
+                        await runAdbShell(`input tap ${tapX} ${tapY}`);
+                    }
+
+                    await sleep(1500); await runAdbShell("input keyevent 3"); 
+
+                    this.showToast(`Mensagem entregue via ADB!`, 'success');
+                } catch (e) {
+                    console.error(e);
+                    this.showToast(`Erro ao disparar WhatsApp físico.`, "error");
+                }
             },
 
             // ================== MODAL LIGAÇÃO ==================
@@ -1497,7 +1794,6 @@
                 this.fecharModal('modal-ligacao');
                 this.showToast(`Chamada tabulada: ${motivo}`, 'success');
 
-                // Envio Auto SMS para Venda (Usando D-Pad ADB)
                 if(motivo === 'Atendeu (Sucesso)') {
                     let primeiroNome = c.nome.trim().split(' ')[0];
                     if (primeiroNome === "Contato") primeiroNome = "Cliente";
@@ -1508,6 +1804,7 @@
                 }
             },
 
+            // ================== MODAL WA (INDIVIDUAL DO KANBAN) ==================
             abrirWAIndividual: function(id) {
                 this.state.contatoAtualId = id; 
                 document.getElementById('wa-ind-texto').value = ''; 
@@ -1515,12 +1812,12 @@
                 document.getElementById('modal-wa-individual').classList.add('flex');
             },
 
-            enviarWAIndividual: async function() {
+            enviarWAIndividualADB: async function() {
                 const c = this.state.bancoDados.find(x => x.id === this.state.contatoAtualId); 
                 const txt = document.getElementById('wa-ind-texto').value.trim();
                 
                 if(!txt) return this.showToast("Digite a mensagem.", "warning");
-                if(typeof isAdbReadyAdb !== 'undefined' && !isAdbReadyAdb) return this.showToast("Conecte o Cabo USB no cabeçalho primeiro.", "error");
+                if(!isAdbReady) return this.showToast("Conecte o Cabo USB no cabeçalho primeiro.", "error");
 
                 this.showToast(`Preparando disparo WA ADB para ${c.nome}...`, "info");
                 this.fecharModal('modal-wa-individual');
@@ -1537,13 +1834,11 @@
                     const appPackage = appPackageEl ? appPackageEl.value : 'com.whatsapp.w4b';
                     const clickMode = clickModeEl ? clickModeEl.value : 'auto';
 
-                    // Acorda celular
                     await runAdbShell("input keyevent 224"); 
                     await runAdbShell("input swipe 500 1500 500 200"); 
                     await runAdbShell("input keyevent 3"); 
                     await sleep(500);
 
-                    // Lança a intent
                     await runAdbShell(`am start -a android.intent.action.VIEW -d '${intentUrl}' -p ${appPackage}`);
                     await sleep(4000);
 
@@ -1598,7 +1893,7 @@
             },
             copiarTexto: function(texto, event) {
                 if (event) event.stopPropagation(); 
-                if (texto === 'Não informado' || !texto || texto === 'undefined') return;
+                if (texto === 'Não informado' || !texto || texto === 'undefined' || texto === '--') return;
                 const el = document.createElement('textarea'); el.value = texto; el.setAttribute('readonly', ''); el.style.position = 'absolute'; el.style.left = '-9999px';
                 document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); this.showToast(`Copiado: ${texto}`, 'info');
             },
@@ -1612,7 +1907,7 @@
         };
 
         // ==========================================
-        // APP DISCADOR PREDITIVO (NATIVO NA ABA 4)
+        // APP DISCADOR PREDITIVO E SMS NATIVO
         // ==========================================
         App.discador = {
             state: {
@@ -1621,9 +1916,7 @@
                 timeLeft: 0, timerInterval: null
             },
             
-            init: function() {
-                this.atualizarInterfaceBase();
-            },
+            init: function() { this.atualizarInterfaceBase(); },
 
             switchTab: function(tabId) {
                 document.querySelectorAll('.d-tab-content').forEach(el => { el.classList.add('hidden'); el.classList.remove('flex'); });
@@ -1635,6 +1928,11 @@
                 const activeBtn = document.getElementById(`dTabBtn-${tabId}`);
                 activeBtn.classList.remove('bg-omni-base', 'text-omni-text', 'border-omni-border');
                 activeBtn.classList.add('bg-omni-primary', 'text-omni-base', 'border-omni-primary');
+            },
+
+            bloquearStart: function() {
+                const btn = document.getElementById('d-btn-iniciar');
+                if(btn) { btn.disabled = true; btn.classList.add('opacity-50'); }
             },
 
             desbloquearStart: function() {
@@ -1684,7 +1982,7 @@
             },
 
             iniciarCampanha: function() {
-                if (!isAdbReadyAdb) return App.showToast("Conecte o USB no Header primeiro.", "error");
+                if (!isAdbReady) return App.showToast("Conecte o USB no Header primeiro.", "error");
                 if (this.state.currentIndex >= this.state.contatosBase.length) return App.showToast("A fila acabou. Puxe mais do CRM.", "warning");
 
                 this.state.estadoOperacao = 'RODANDO';
@@ -1711,7 +2009,7 @@
             },
 
             retomarCampanha: function() {
-                if (!isAdbReadyAdb) return App.showToast("Cabo desconectado. Conecte primeiro.", "warning");
+                if (!isAdbReady) return App.showToast("Cabo desconectado. Conecte primeiro.", "warning");
                 this.iniciarCampanha(); if (this.state.callState === 'IDLE') this.processarChamada();
             },
 
@@ -1809,12 +2107,7 @@
                 
                 if (cVdi) {
                     if (!cVdi.retornos) cVdi.retornos = [];
-                    cVdi.retornos.push({
-                        id: Date.now(),
-                        timestamp: dataObj.getTime(),
-                        dataFormatada: dataFormatada,
-                        finalizado: false
-                    });
+                    cVdi.retornos.push({ id: Date.now(), timestamp: dataObj.getTime(), dataFormatada: dataFormatada, finalizado: false });
                     App.salvarDados();
                 }
 
@@ -1823,7 +2116,7 @@
             },
 
             dispararSMS_ADB: async function(phone, text) {
-                if(typeof isAdbReadyAdb !== 'undefined' && !isAdbReadyAdb) { App.showToast("Você precisa Conectar o Cabo USB primeiro!", "error"); return false; }
+                if(!isAdbReady) { App.showToast("Você precisa Conectar o Cabo USB primeiro!", "error"); return false; }
                 try {
                     let cleanText = text.replace(/\r?\n|\r/g, ' ').replace(/"/g, '\\"').replace(/'/g, "");
                     let smsPhone = phone.replace(/\D/g, '');
@@ -1863,6 +2156,12 @@
                 if (textToSend && !repeteAgora) {
                     App.showToast(`Despachando SMS oculto para ${primeiroNome}...`, 'info');
                     await this.dispararSMS_ADB(contato.phone, textToSend);
+                }
+
+                let cVdi = App.state.bancoDados.find(x => x.codigo === contato.code);
+                if(cVdi) {
+                    App.adicionarHistorico(cVdi.id, 'Ligação (Discador)', `Resultado: ${resultado}`);
+                    App.moverParaFimDaFila(cVdi.id);
                 }
 
                 if (manterLigacao) {
@@ -1927,11 +2226,11 @@
         
         function parseMensagem(template, nomeContato) { let texto = template.replace(/:re:?/gi, nomeContato); const regex = /\{([^{}]+)\}/g; let match; while ((match = regex.exec(texto)) !== null) { const options = match[1].split('|'); const choice = options[Math.floor(Math.random() * options.length)]; texto = texto.replace(match[0], choice); regex.lastIndex = 0; } return texto; }
         function testarMacroAdb() { const valid = variaveisMensagemAdb.filter(v => v.trim() !== ""); if(valid.length === 0) return App.showToast("Escreva uma mensagem.", "warning"); alert(parseMensagem(valid[Math.floor(Math.random() * valid.length)], "Camila Viana")); }
-        function atualizarMetricasAdb() { const pendentes = contatosBaseAdb.filter(c => c.statusEnvio === 'Pendente').length; document.getElementById('stat-pendentes-adb').innerText = pendentes; document.getElementById('stat-feitos-adb').innerText = processadosAdb; if(pendentes > 0 && isAdbReadyAdb && !isCampaignActiveAdb) document.getElementById('btn-start-adb').disabled = false; else document.getElementById('btn-start-adb').disabled = true; if (pendentes === 0) document.getElementById('stat-eta-adb').innerText = "00h 00m"; else { const min = parseInt(document.getElementById('cfg-delay-min').value) || 8; const max = parseInt(document.getElementById('cfg-delay-max').value) || 21; const totalSeconds = Math.ceil(pendentes * (((min + max) / 2) + 8)); const hours = Math.floor(totalSeconds / 3600), minutes = Math.floor((totalSeconds % 3600) / 60); document.getElementById('stat-eta-adb').innerText = (hours > 0 ? `${hours}h ` : "") + `${minutes}m`; } }
+        function atualizarMetricasAdb() { const pendentes = contatosBaseAdb.filter(c => c.statusEnvio === 'Pendente').length; document.getElementById('stat-pendentes-adb').innerText = pendentes; document.getElementById('stat-feitos-adb').innerText = processadosAdb; if(pendentes > 0 && isAdbReady && !isCampaignActiveAdb) document.getElementById('btn-start-adb').disabled = false; else document.getElementById('btn-start-adb').disabled = true; if (pendentes === 0) document.getElementById('stat-eta-adb').innerText = "00h 00m"; else { const min = parseInt(document.getElementById('cfg-delay-min').value) || 8; const max = parseInt(document.getElementById('cfg-delay-max').value) || 21; const totalSeconds = Math.ceil(pendentes * (((min + max) / 2) + 8)); const hours = Math.floor(totalSeconds / 3600), minutes = Math.floor((totalSeconds % 3600) / 60); document.getElementById('stat-eta-adb').innerText = (hours > 0 ? `${hours}h ` : "") + `${minutes}m`; } }
         function setActionUIAdb(icon, text, isPulsing = false, iconColor = 'text-omni-primary', bgColor = 'bg-omni-base') { document.getElementById('action-feedback').classList.remove('hidden'); document.getElementById('action-feedback').classList.add('flex'); document.getElementById('action-icon-box').className = `w-16 h-16 rounded-full ${bgColor} border border-omni-border flex items-center justify-center mb-3 transition-all ${isPulsing ? 'shadow-[0_0_15px_rgba(56,189,248,0.5)]' : ''}`; document.getElementById('action-icon').className = `fa-solid ${icon} text-2xl ${iconColor}`; document.getElementById('action-text').innerText = text; }
-        async function testarToqueAdb() { if (!isAdbReadyAdb) return App.showToast("Conecte USB.", "warning"); const x = document.getElementById('cfg-tap-x').value, y = document.getElementById('cfg-tap-y').value; await runAdbShell("input keyevent 224"); await runAdbShell(`input tap ${x} ${y}`); }
+        async function testarToqueAdb() { if (!isAdbReady) return App.showToast("Conecte USB.", "warning"); const x = document.getElementById('cfg-tap-x').value, y = document.getElementById('cfg-tap-y').value; await runAdbShell("input keyevent 224"); await runAdbShell(`input tap ${x} ${y}`); }
         
-        async function iniciarCampanhaAdb() { if (!isAdbReadyAdb) return App.showToast("Conecte o USB.", "error"); if(variaveisMensagemAdb.filter(v => v.trim() !== "").length === 0) return App.showToast("Preencha Variação.", "error"); isCampaignActiveAdb = true; document.getElementById('btn-start-adb').style.display = 'none'; document.getElementById('btn-stop-adb').style.display = 'flex'; processarProximoAdb(); }
+        async function iniciarCampanhaAdb() { if (!isAdbReady) return App.showToast("Conecte o USB.", "error"); if(variaveisMensagemAdb.filter(v => v.trim() !== "").length === 0) return App.showToast("Preencha Variação.", "error"); isCampaignActiveAdb = true; document.getElementById('btn-start-adb').style.display = 'none'; document.getElementById('btn-stop-adb').style.display = 'flex'; processarProximoAdb(); }
         async function processarProximoAdb() { if (!isCampaignActiveAdb || isProcessingCoreAdb) return; isProcessingCoreAdb = true; while (currentIndexAdb < contatosBaseAdb.length && contatosBaseAdb[currentIndexAdb].statusEnvio !== 'Pendente') currentIndexAdb++; if (currentIndexAdb >= contatosBaseAdb.length) { isCampaignActiveAdb = false; isProcessingCoreAdb = false; document.getElementById('stage-status-adb').innerText = "CONCLUÍDO"; document.getElementById('stage-name-adb').innerText = "Fila Finalizada"; document.getElementById('stage-phone-adb').innerText = "---"; document.getElementById('btn-stop-adb').style.display = 'none'; document.getElementById('btn-start-adb').style.display = 'flex'; setActionUIAdb('fa-flag-checkered', 'Concluído!', false, 'text-omni-green', 'bg-omni-green/10'); App.showToast("Fim da Fila!", "success"); atualizarMetricasAdb(); return; } let contato = contatosBaseAdb[currentIndexAdb]; document.getElementById('stage-status-adb').innerText = `ENVIANDO • ID: ${currentIndexAdb + 1}/${contatosBaseAdb.length}`; document.getElementById('stage-name-adb').innerText = contato.name; document.getElementById('stage-phone-adb').innerText = contato.phone.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3"); try { const valid = variaveisMensagemAdb.filter(v => v.trim() !== ""); const msgSorteada = valid[Math.floor(Math.random() * valid.length)]; const msgFinal = parseMensagem(msgSorteada, contato.name); const encodedMsg = encodeURIComponent(msgFinal).replace(/'/g, "%27").replace(/"/g, "%22"); const intentUrl = `whatsapp://send?phone=55${contato.phone}&text=${encodedMsg}`; const appPackage = document.getElementById('cfg-app').value; const clickMode = document.getElementById('cfg-click').value; setActionUIAdb('fa-mobile-screen', 'Despertando...', true, 'text-omni-orange', 'bg-omni-orange/10'); await runAdbShell("input keyevent 224"); await runAdbShell("input swipe 500 1500 500 200"); await runAdbShell("input keyevent 3"); await sleep(500); setActionUIAdb('fa-whatsapp', 'Injetando Texto...', true, 'text-omni-primary', 'bg-omni-primary/10'); await runAdbShell(`am start -a android.intent.action.VIEW -d '${intentUrl}' -p ${appPackage}`); await sleep(4000); if (clickMode === 'auto') { setActionUIAdb('fa-paper-plane', 'Enviando (Enter)...', true, 'text-omni-base', 'bg-omni-primary'); await sleep(400); await runAdbShell("input keyevent 66"); await sleep(300); await runAdbShell("input keyevent 66"); } else { setActionUIAdb('fa-hand-pointer', 'Tap Manual...', true, 'text-omni-base', 'bg-omni-primary'); const tapX = document.getElementById('cfg-tap-x').value || 950, tapY = document.getElementById('cfg-tap-y').value || 1350; await runAdbShell(`input tap ${tapX} ${tapY}`); } await sleep(1500); await runAdbShell("input keyevent 3"); contato.statusEnvio = 'Enviado'; processadosAdb++; currentIndexAdb++; atualizarMetricasAdb(); if (!isCampaignActiveAdb) { isProcessingCoreAdb = false; return; } const delaySegundos = rnd(parseInt(document.getElementById('cfg-delay-min').value) || 5, parseInt(document.getElementById('cfg-delay-max').value) || 15); setActionUIAdb('fa-hourglass-half', `Pausa: ${delaySegundos}s`, false, 'text-omni-muted', 'bg-omni-base'); for(let i=0; i<delaySegundos; i++) { if(!isCampaignActiveAdb) break; if(i > 0 && i % 8 === 0) runAdbShell("input keyevent 224"); await sleep(1000); } isProcessingCoreAdb = false; if(isCampaignActiveAdb) processarProximoAdb(); } catch (e) { contato.statusEnvio = 'Erro'; currentIndexAdb++; atualizarMetricasAdb(); isProcessingCoreAdb = false; if(isCampaignActiveAdb) processarProximoAdb(); } }
         function pararCampanhaAdb() { isCampaignActiveAdb = false; document.getElementById('btn-stop-adb').style.display = 'none'; document.getElementById('btn-start-adb').style.display = 'flex'; document.getElementById('stage-status-adb').innerText = "Interrompido"; setActionUIAdb('fa-hand', 'Pausado', false, 'text-omni-red', 'bg-omni-red/10'); }
         function exportarRelatorioAdb() { if (contatosBaseAdb.length === 0) return App.showToast("Fila vazia.", "warning"); let csv = "Nome,Telefone,Status\n"; contatosBaseAdb.forEach(c => csv += `${c.name},${c.phone},${c.statusEnvio}\n`); const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "Relatorio_WA.csv"; link.click(); }
